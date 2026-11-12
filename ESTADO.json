@@ -80,7 +80,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S03-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "12100e0",
+      "evidence": "Checkpoint S03: unit 485/485 (22 arquivos) com cobertura global 95.45% stmts/89.94% branches (S03: 96.57%/91.34%); E2E 40/40 local e 40/40 contra o container (IP publico, HTTP); tsc e build OK; docker healthy, version.txt=12100e0. ForecastPanel 20 testes (WAPE indefinido, padrao=menor erro, sem faixa, dados insuficientes, previsto x realizado retrospectivo, app: historico persiste e nao duplica, saldo projetado inalterado por modelo/horizonte); 5 mutacoes de UI detectadas (uma sobrevivente levou a teste novo). Revisao visual real em 390/768/1440: achados corrigidos (overflow do grid 510px, tabela cortada 437/280px, rotulos do grafico sobrepostos). Falha intermitente de teste da S02 sob CPU disputada da VPS mitigada (asyncUtilTimeout 15s). Nao verificado: acesso externo a 8084, outros navegadores, leitor de tela, contraste medido, zoom 200%. Dados 100% sinteticos: o erro medido nao prova precisao real.",
+      "verification": "declarada; confira logs e Git"
     },
     "S04-P01-T01": {
       "status": "pendente"
