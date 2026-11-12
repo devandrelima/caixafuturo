@@ -57,7 +57,7 @@ export function WeeklyView({ weekly, entriesById }: WeeklyViewProps) {
           )}
 
           <div className="cf-table-wrap">
-            <table className="cf-table cf-table--compact" aria-label="Fluxo de caixa por semana">
+            <table className="cf-table cf-table--compact cf-table--stack" role="table" aria-label="Fluxo de caixa por semana">
               <thead>
                 <tr>
                   <th scope="col">Semana</th>
@@ -69,15 +69,15 @@ export function WeeklyView({ weekly, entriesById }: WeeklyViewProps) {
               </thead>
               <tbody>
                 {weeks.map((w) => (
-                  <tr key={w.index} data-week={w.index}>
-                    <th scope="row" className="cf-wrap">
+                  <tr key={w.index} data-week={w.index} role="row">
+                    <th scope="row" role="rowheader" className="cf-wrap">
                       {w.index}ª · {range(w)}
                       {w.partial && <span className="cf-subtle"> (parcial: {w.days} dia{w.days === 1 ? '' : 's'})</span>}
                     </th>
-                    <td className="cf-num">{formatBRL(w.incomingCents)}</td>
-                    <td className="cf-num">{formatBRL(w.outgoingCents)}</td>
-                    <td className="cf-num">{formatBRL(w.closingCents)}</td>
-                    <td className="cf-wrap">
+                    <td className="cf-num" role="cell" data-label="Entradas">{formatBRL(w.incomingCents)}</td>
+                    <td className="cf-num" role="cell" data-label="Saídas">{formatBRL(w.outgoingCents)}</td>
+                    <td className="cf-num" role="cell" data-label="Saldo final">{formatBRL(w.closingCents)}</td>
+                    <td className="cf-wrap" role="cell" data-label="Situação">
                       <CfBadge tone={riskTone(w.risk)}>{riskText(w)}</CfBadge>
                     </td>
                   </tr>

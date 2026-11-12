@@ -100,7 +100,7 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
             <p className="cf-muted">{isFilterActive(filter) ? 'Nenhum lançamento atende aos filtros. Use "Limpar filtros" para ver todos.' : 'Nenhum lançamento.'}</p>
           ) : (
             <div className="cf-table-wrap">
-              <table className="cf-table" aria-label="Lançamentos">
+              <table className="cf-table cf-table--stack-lg" role="table" aria-label="Lançamentos">
                 <thead>
                   <tr>
                     <th scope="col">Vencimento</th>
@@ -119,14 +119,14 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
                     const open = openId === e.id;
                     return (
                       <Fragment key={e.id}>
-                        <tr data-entry-id={e.id}>
-                          <td>{formatBR(e.dueDate)}</td>
-                          <td>{e.direction === 'in' ? 'Receber' : 'Pagar'}</td>
-                          <td style={{ whiteSpace: 'normal' }}>{e.description}</td>
-                          <td>{e.category || '—'}</td>
-                          <td className="cf-num">{formatBRL(BigInt(e.amountCents))}</td>
-                          <td>{ORIGIN_LABELS[e.origin]}</td>
-                          <td>
+                        <tr data-entry-id={e.id} role="row">
+                          <td role="cell" data-label="Vencimento">{formatBR(e.dueDate)}</td>
+                          <td role="cell" data-label="Tipo">{e.direction === 'in' ? 'Receber' : 'Pagar'}</td>
+                          <td role="cell" data-label="Descrição" style={{ whiteSpace: 'normal' }}>{e.description}</td>
+                          <td role="cell" data-label="Categoria">{e.category || '—'}</td>
+                          <td className="cf-num" role="cell" data-label="Valor">{formatBRL(BigInt(e.amountCents))}</td>
+                          <td role="cell" data-label="Origem">{ORIGIN_LABELS[e.origin]}</td>
+                          <td role="cell" data-label="Situação">
                             {calculated ? (
                               <CfBadge tone="neutral">Calculada pela regra</CfBadge>
                             ) : e.state === 'settled' ? (
@@ -137,7 +137,7 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
                               <CfBadge tone="neutral">Agendado</CfBadge>
                             )}
                           </td>
-                          <td>
+                          <td role="cell" data-label="Ações" style={{ whiteSpace: 'normal' }}>
                             <div className="cf-row">
                               {trace && (
                                 <CfButton variant="ghost" onClick={() => setOpenId(open ? null : e.id)} aria-expanded={open} aria-controls={`detail-${e.id}`} aria-label={`Detalhes de ${e.description} em ${formatBR(e.dueDate)}`}>
@@ -158,8 +158,8 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
                           </td>
                         </tr>
                         {open && trace && (
-                          <tr>
-                            <td colSpan={8} id={`detail-${e.id}`} style={{ whiteSpace: 'normal' }}>
+                          <tr role="row">
+                            <td role="cell" colSpan={8} id={`detail-${e.id}`} style={{ whiteSpace: 'normal' }}>
                               <div className="cf-subcard" data-testid="entry-detail">
                                 <p>{traceText(trace(e))}</p>
                                 {calculated && <p>Ocorrência calculada pela regra recorrente; não está gravada. Para alterá-la, edite a regra ou pule esta data em Calendário.</p>}

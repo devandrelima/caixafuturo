@@ -75,7 +75,7 @@ export function DetailFilters({ filter, onChange, categories, origins, shown, to
         </div>
 
         {chips.length > 0 && (
-          <ul className="cf-row" aria-label="Filtros ativos">
+          <ul className="cf-row" aria-label="Filtros ativos" style={{ margin: 0, padding: 0 }}>
             {chips.map((text) => (
               <li key={text} style={{ listStyle: 'none' }}>
                 <CfBadge tone="neutral">{text}</CfBadge>

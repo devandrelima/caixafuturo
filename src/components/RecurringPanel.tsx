@@ -183,7 +183,7 @@ export function RecurringPanel({ rules, occurrences, covered, invalidRules, demo
           <p className="cf-muted">Nenhuma recorrência ainda. Cadastre aluguel, salários, assinaturas ou qualquer valor que se repete (semanal, quinzenal, mensal ou anual).</p>
         ) : (
           <div className="cf-table-wrap">
-            <table className="cf-table cf-table--compact" aria-label="Regras de recorrência">
+            <table className="cf-table cf-table--compact cf-table--stack" role="table" aria-label="Regras de recorrência">
               <thead>
                 <tr>
                   <th scope="col">Regra</th>
@@ -195,14 +195,14 @@ export function RecurringPanel({ rules, occurrences, covered, invalidRules, demo
               </thead>
               <tbody>
                 {rules.map((r) => (
-                  <tr key={r.id} data-rule-id={r.id}>
-                    <th scope="row" className="cf-wrap">
+                  <tr key={r.id} data-rule-id={r.id} role="row">
+                    <th scope="row" role="rowheader" className="cf-wrap">
                       {r.description} <CfBadge tone={r.direction === 'in' ? 'positive' : 'neutral'}>{r.direction === 'in' ? 'Receita' : 'Despesa'}</CfBadge>
                     </th>
-                    <td className="cf-num">{formatBRL(BigInt(r.amountCents))}</td>
-                    <td>{FREQUENCY_LABELS[r.frequency]}</td>
-                    <td className="cf-wrap">{periodText(r)}</td>
-                    <td>
+                    <td className="cf-num" role="cell" data-label="Valor">{formatBRL(BigInt(r.amountCents))}</td>
+                    <td role="cell" data-label="Periodicidade">{FREQUENCY_LABELS[r.frequency]}</td>
+                    <td className="cf-wrap" role="cell" data-label="Período">{periodText(r)}</td>
+                    <td role="cell" data-label="Ações">
                       <div className="cf-row">
                         <CfButton variant="ghost" onClick={() => setEditing(r)} disabled={busy} aria-label={`Editar recorrência ${r.description}`}>
                           Editar
@@ -226,7 +226,7 @@ export function RecurringPanel({ rules, occurrences, covered, invalidRules, demo
               <p className="cf-muted">Nenhuma ocorrência a calcular nas próximas 13 semanas.</p>
             ) : (
               <div className="cf-table-wrap">
-                <table className="cf-table cf-table--compact" aria-label="Próximas ocorrências calculadas">
+                <table className="cf-table cf-table--compact cf-table--stack" role="table" aria-label="Próximas ocorrências calculadas">
                   <thead>
                     <tr>
                       <th scope="col">Data</th>
@@ -239,13 +239,13 @@ export function RecurringPanel({ rules, occurrences, covered, invalidRules, demo
                     {upcoming.map((o) => {
                       const rule = ruleOf(o);
                       return (
-                        <tr key={o.id} data-entry-id={o.id}>
-                          <td>{formatBR(o.dueDate)}</td>
-                          <td className="cf-wrap">
+                        <tr key={o.id} data-entry-id={o.id} role="row">
+                          <td role="cell" data-label="Data">{formatBR(o.dueDate)}</td>
+                          <td className="cf-wrap" role="cell" data-label="Descrição">
                             {o.direction === 'in' ? 'Receber' : 'Pagar'} · {o.description}
                           </td>
-                          <td className="cf-num">{formatBRL(BigInt(o.amountCents))}</td>
-                          <td>
+                          <td className="cf-num" role="cell" data-label="Valor">{formatBRL(BigInt(o.amountCents))}</td>
+                          <td role="cell" data-label="Ação">
                             {rule && (
                               <CfButton variant="ghost" onClick={() => onSkip(rule, o.dueDate)} disabled={busy} aria-label={`Pular ${o.description} em ${formatBR(o.dueDate)}`}>
                                 Pular esta data

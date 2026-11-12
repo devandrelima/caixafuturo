@@ -42,6 +42,12 @@ Vista **Previsões**, sempre sobre **faturamento bruto** (não é dinheiro dispo
 5. **Sazonalidade** por dia da semana e período do mês só com amostra (≥ 28 dias e ≥ 4 observações por dia; ≥ 3 meses para período); outliers e dias sem venda são listados e excluídos do índice.
 6. Na demonstração, **Carregar histórico fictício de 12 semanas** (84 dias, um evento e uma lacuna; as 4 últimas semanas são idênticas às vendas fictícias da S02, então nada duplica). O padrão artificial faz o erro parecer baixo: isso só mostra que o cálculo funciona, não o que aconteceria com vendas reais.
 
+## Planejamento ampliado (Sprint 4)
+- **Calendário:** além do calendário de 30 dias, mostra as **próximas 13 semanas** (segunda a domingo; a 1ª pode ser parcial) com o alerta do pior dia de cada semana, a ressalva de que a incerteza cresce com o horizonte e as premissas (lançamentos, recorrências calculadas e repasses das vendas; nunca previsão de faturamento). Em **Recorrências** cadastre receitas/despesas semanais, quinzenais, mensais ou anuais (dia 31 cai no último dia dos meses curtos), pule uma data ou exclua a regra; excluir a regra não apaga o que já foi lançado.
+- **Movimentações:** filtros por período, categoria e origem com o estado em texto e "Limpar filtros". O somatório vem dos lançamentos listados e o alerta de saldo continua visível, calculado sobre todos. "Detalhes" mostra de qual dia do saldo vem cada lançamento.
+- **Demonstração:** na demonstração, Calendário → "Carregar recorrências fictícias" (dados fictícios; dia 31, semanal, data final e uma ocorrência já liquidada).
+- Decisões e limites (sem dias úteis/feriados): [ADR-0008](docs/decisoes/0008-recorrencias-13-semanas-exportacao.md). Evidências: `docs/evidencias/s04.md` e `s04-visual.md`.
+
 ## Desenvolvimento local
 
 Requer Node.js 20.19+ (testado com 22).
