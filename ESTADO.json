@@ -122,7 +122,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S05-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "a861295",
+      "evidence": "vitest src/domain/scenarios: 106 testes verdes (shocks.test.ts 45: meio-sobe em BigInt com tabela à mão, bruto×líquido (R$ 1.000 → R$ 672,07), período inclusivo, importadas/liquidadas intactas, idempotência por id e por campo, ordem atraso×choque, validações, propriedade em 80 casos com oráculo independente); cobertura scenarios: delay 96,15% linhas, engine 98,65%; tsc/build ok; mutação em shocks.ts (23) e registro no motor (2): 5 sobreviventes na 1ª rodada, todos mortos com testes novos",
+      "verification": "declarada; confira logs e Git"
     },
     "S05-P02-T02": {
       "status": "pendente"
