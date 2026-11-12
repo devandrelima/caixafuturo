@@ -128,7 +128,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S05-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "fb5292d",
+      "evidence": "vitest completo 850 testes verdes, cobertura global 95,92/91,25/94,61/97,00 e alterada 95,07% stmts; E2E 62/62 local e 62/62 no container (commit fb5292d, healthy); build, tsc e validar_design ok; mutação das telas 27 (2 sobreviventes reais mortos com testes novos, 1 equivalente); revisão visual 390/768/1440 com capturas conferidas e estouro de tabela corrigido; evidências em docs/evidencias/s05.md e s05-visual.md",
+      "verification": "declarada; confira logs e Git"
     },
     "S06-P01-T01": {
       "status": "pendente"

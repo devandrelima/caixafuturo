@@ -18,3 +18,6 @@ Responsividade 360px até desktop, menu colapsável, campos >=44px, foco visíve
 
 ## Futuras sprints
 S02 separa **faturamento bruto**, **recebimento líquido previsto** e **saldo projetado**; S03 traz método e métricas; S04 filtros e exportação; S05/S06 hipóteses e base imutável. O menu só cresce depois de cada incremento funcional aprovado. Inventariar skills de design realmente disponíveis por task; justificar escolha/fallback; não presumir screenshot ou resultado sem executar.
+
+## Simulador (S05)
+Vista `simulador` (menu "Simulador"): painel de hipóteses (atraso, variação de vendas, variação de despesas) + comparação Original × Alternativa (hipótese) × Diferença. Tudo da Alternativa é rotulado como hipótese em **texto e forma** (selo "Hipótese", borda tracejada), sem token de cor novo; o Original fica sempre visível (colunas lado a lado ≥ 768 px; abas Original | Alternativa + Diferença abaixo disso); CTA "Voltar ao original"; hipóteses só em memória; nenhum botão sugere execução real. Ver ADR-0009.

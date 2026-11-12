@@ -5,7 +5,7 @@ Usuário simula atrasos e choques, compara alternativas sem modificar o cenário
 
 Funcionalidades aprovadas preservadas: **F21** Atrasar recebíveis; **F22** Choque de vendas/despesas; **F27** Comparação de cenários.
 
-Situação: planejada, sem implementação. Evolução posterior à candidatura (15/11/2026).
+Situação: **implementada, aguardando avaliação humana** (12/11/2026; evidências em `docs/evidencias/s05.md`). Evolução posterior à candidatura (15/11/2026).
 
 ## Demonstração quando implementada
 `npm ci && npm run dev` → abrir URL local apresentada pelo Vite. Usar **dados fictícios** e verificar o incremento: Usuário simula atrasos e choques, compara alternativas sem modificar o cenário original. Executar roteiro de aceite manual: identificar entradas, mudar um dado, conferir saldos/resultado por cálculo independente, verificar erro e voltar ao estado anterior.
