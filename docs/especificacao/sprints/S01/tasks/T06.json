@@ -9,7 +9,8 @@
   "context": [
     "docs/especificacao/memoria/ui.md",
     "docs/especificacao/contratos/interface.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/especificacao/contratos/demo-s01.md"
   ],
   "reads": [
     "src/components/CashDashboard.tsx",
@@ -28,7 +29,7 @@
     "npm run build"
   ],
   "acceptance": [
-    "Demo reproduz falta de caixa em data verificável pela soma dos lançamentos",
+    "Com baseDate 2026-11-11, saldo R$ 3.000 e mínimo R$ 1.000: 12/11 fecha R$ 500 (déficit R$ 500), 13/11 fecha R$ 1.300, 14/11 fecha -R$ 700 (déficit R$ 1.700), 15/11 fecha R$ 3.300.",
     "Reimportação dupla não altera saldo e reset demo é explícito",
     "Logs de unit/E2E/build e cobertura >=80% medida são registrados, sem inventar resultados"
   ],
