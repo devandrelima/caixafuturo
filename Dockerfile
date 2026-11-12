@@ -15,8 +15,12 @@ ARG GIT_SHA=desconhecido
 LABEL org.opencontainers.image.title="CaixaFuturo" \
       org.opencontainers.image.source="https://github.com/devandrelima/caixafuturo" \
       org.opencontainers.image.revision="$GIT_SHA"
-COPY --chmod=0644 docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build --chmod=0755 /app/dist /usr/share/nginx/html
+USER root
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+# Não depender das permissões/ACL do host: o usuário nginx precisa apenas ler.
+RUN chmod 0644 /etc/nginx/conf.d/default.conf && chmod -R a+rX /usr/share/nginx/html
+USER 101
 EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
