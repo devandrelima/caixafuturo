@@ -24,6 +24,8 @@ jobs:
         run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . validar
       - name: Conferir tokens, contraste e contextos da UI
         run: python3 tools/validar_design.py
+      - name: Validar fronteiras entre tasks e pendência da S02
+        run: python3 tools/validar_fronteiras_tasks.py
       - name: Mostrar tasks prontas
         run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . prontas
       - name: Verificar carregamento seletivo da primeira task
