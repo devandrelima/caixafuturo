@@ -25,7 +25,37 @@
     "src/components/RecurringPanel.tsx",
     "src/components/WeeklyView.tsx",
     "src/components/DetailFilters.tsx",
-    "src/components/__tests__/filters.test.tsx"
+    "src/components/__tests__/filters.test.tsx",
+    "src/components/__tests__/recurringPanel.test.tsx",
+    "src/components/__tests__/weeklyView.test.tsx",
+    "src/domain/finance/filters.ts",
+    "src/domain/finance/__tests__/filters.test.ts",
+    "src/storage/db.ts",
+    "src/storage/recurrenceRepository.ts",
+    "src/storage/repository.ts",
+    "src/storage/__tests__/recurrenceRepository.test.ts",
+    "src/storage/__tests__/repository.test.ts",
+    "src/storage/__tests__/salesRepository.test.ts",
+    "src/components/AppShell.tsx",
+    "src/components/RiskCalendar.tsx",
+    "src/components/EntriesPanel.tsx",
+    "src/components/CashChart.tsx",
+    "src/components/CashDashboard.tsx",
+    "src/app/App.tsx",
+    "src/app/styles.css",
+    "src/components/__tests__/uiFoundation.test.tsx",
+    "src/components/__tests__/app.test.tsx",
+    "src/components/__tests__/dashboard.test.tsx",
+    "src/demo/recurringDemo.ts",
+    "src/demo/__tests__/recurringDemo.test.ts",
+    "tests/e2e/planning.spec.ts",
+    "tests/e2e/cash-flow.spec.ts",
+    "tests/e2e/sales-flow.spec.ts",
+    "tests/e2e/forecast.spec.ts",
+    "README.md",
+    "docs/evidencias/s04.md",
+    "docs/evidencias/s04-visual.md",
+    "docs/evidencias/capturas"
   ],
   "tests": [
     "npm run test:unit -- --run src/components/__tests__/filters.test.tsx"
@@ -37,7 +67,7 @@
     "Filtros/recorrências/13 semanas usam cards e campos do tema S01, sem perder detalhe no mobile.",
     "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado."
   ],
-  "context_budget_tokens": 10000,
+  "context_budget_tokens": 16000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

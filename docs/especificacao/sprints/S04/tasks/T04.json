@@ -15,7 +15,19 @@
   "writes": [
     "src/domain/export/csv.ts",
     "src/domain/export/__tests__/csv.test.ts",
-    "src/components/ExportMenu.tsx"
+    "src/components/ExportMenu.tsx",
+    "src/components/__tests__/exportMenu.test.tsx",
+    "src/components/EntriesPanel.tsx",
+    "src/components/WeeklyView.tsx",
+    "src/components/DetailFilters.tsx",
+    "src/app/App.tsx",
+    "src/app/styles.css",
+    "src/components/__tests__/app.test.tsx",
+    "tests/e2e/planning.spec.ts",
+    "README.md",
+    "docs/evidencias/s04.md",
+    "docs/evidencias/s04-visual.md",
+    "docs/evidencias/capturas"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/export/__tests__/csv.test.ts"
