@@ -275,7 +275,7 @@ describe('simulate — composição sem soma dupla', () => {
     expect(json(r.alternativeProjection)).toBe(json(r.baseProjection));
   });
 
-  it('o aplicador registrado no motor padrão é usado só para os tipos que existem (S05 sem aplicadores no T01 ⇒ aviso)', () => {
+  it('tipo sem aplicador registrado é ignorado com aviso', () => {
     const r = simulateWith({}, snap(), [delay('a1', 'demo-receita-02', 1)]);
     expect(r.effects[0]?.status).toBe('ignored');
   });
