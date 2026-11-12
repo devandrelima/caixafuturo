@@ -15,10 +15,14 @@
   "writes": [
     "src/domain/forecast/backtest.ts",
     "src/domain/forecast/intervals.ts",
-    "src/domain/forecast/__tests__/backtest.test.ts"
+    "src/domain/forecast/__tests__/backtest.test.ts",
+    "src/domain/forecast/__tests__/intervals.test.ts",
+    "src/domain/forecast/baseline.ts",
+    "src/domain/forecast/__tests__/baseline.test.ts",
+    "src/test/setup.ts"
   ],
   "tests": [
-    "npm run test:unit -- --run src/domain/forecast/__tests__/backtest.test.ts"
+    "npm run test:unit -- --run src/domain/forecast/__tests__/backtest.test.ts src/domain/forecast/__tests__/intervals.test.ts"
   ],
   "acceptance": [
     "Treino sempre termina antes da avaliação em cada dobra",

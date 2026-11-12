@@ -31,6 +31,7 @@ Modelo inelegível aparece com **motivo** e sem número. O baseline de média hi
 - Origens a cada 7 dias a partir de 28 dias de treino; cada dobra treina só com vendas ≤ origem e é avaliada nos `h` dias seguintes; dobra cujo período avaliado passa do último dia de dados **não existe**.
 - **Realizado** = faturamento bruto realmente importado do dia (dia sem venda dentro do período = R$ 0, marcado como preenchido; com `ignore` o dia não é avaliado).
 - **Comparação justa:** modelos são comparados só nas **dobras em que todos os modelos elegíveis no corte final são elegíveis** (mesmos pontos). Mínimo para comparar: ≥ 4 dobras. Abaixo disso, sem métrica comparativa e sem "menor erro".
+- **Modelo com poucas dobras próprias:** um modelo elegível na data-base, mas com **menos de 4 dobras** em que é elegível (p.ex. Holt-Winters com horizonte de 28 dias e 84 dias de histórico: 3 dobras) **sai da comparação com motivo** ("sem erro medido") e sua previsão aparece **sem faixa** e com `validated: false`; os demais seguem. Evita que um modelo exigente zere a medição de todos. Só há "menor erro" com ≥ 2 modelos comparados.
 - **Métricas:** MAE = média dos |erro| (centavos, arredondada); WAPE = Σ|erro| ÷ Σ realizado, em pontos-base; **denominador zero ⇒ WAPE indefinido** (`null`, nunca 0 nem infinito) e é exibido como "indefinido (realizado = R$ 0)". Cada métrica leva n de dias, n de dobras, janela de treino e de avaliação.
 - O modelo de **menor WAPE** é só "menor erro no período avaliado" (empate ⇒ o mais simples na ordem da tabela); nunca "melhor" ou "mais preciso".
 - **Previsões históricas:** o "previsto" de cada dobra é **recalculado de forma determinística** com os dados até a origem (previsão retrospectiva), não uma previsão gravada na época. Se vendas antigas forem corrigidas depois, a reconstrução muda. Não persiste nada (sem migração do IndexedDB). *Decisão de produto registrada na seção "Pendência".*
@@ -39,6 +40,9 @@ Modelo inelegível aparece com **motivo** e sem número. O baseline de média hi
 - Resíduos = realizado − previsto, agrupados (todos os passos) do modelo escolhido, **só nas dobras comuns**. Mínimo: ≥ 28 resíduos **e** ≥ 4 dobras; senão sem faixa ("histórico de erro insuficiente").
 - Faixa **empírica**: conservadora = previsão + 10º percentil dos resíduos; otimista = previsão + 90º percentil; central = previsão (percentil por posto mais próximo, inteiros). Piso 0.
 - Rótulo honesto: "faixa dos erros passados (10º–90º percentis de N dias avaliados)". **Não** é intervalo de confiança/credibilidade, não promete cobertura futura; resíduos têm dependência e escala própria (dias de maior venda erram mais), o que a faixa não modela.
+
+## D5b. Tipo `ForecastPoint`
+`lowerCents`/`upperCents` passam a `bigint | null` (null sem histórico de erro suficiente, em baseline, hipótese e ajuste manual). `validated` passa a `boolean` e significa **somente** "o erro deste método foi medido por backtesting com ≥ 4 dobras" — não é garantia nem "precisão". Ajuste manual descarta faixa e `validated`. Novos métodos: `naive_last`, `moving_average_7`, `seasonal_weekday_mean`, `holt_winters_additive`.
 
 ## D6. Unidades e dinheiro
 Previsão é faturamento bruto (`gross_sales`). **Não** vira dinheiro disponível; a S03 **não** converte previsão em caixa nem a coloca no saldo projetado (S02 mantém previsão fora do saldo). Dinheiro em BigInt/centavos; WAPE em pontos-base inteiros (razão BigInt).

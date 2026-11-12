@@ -293,6 +293,23 @@ describe('projeção manual — sempre hipótese, nunca modelo validado', () => 
     expect(adjustForecast(base, 33)[0]?.centralCents).toBe(42139n); // 42000 * 1,0033 = 42138,6 → 42139
   });
 
+  it('S03: ajuste manual de um ponto COM faixa e erro medido descarta ambos (hipótese não herda medição)', () => {
+    const [p] = baselineForecast(twoWeeks(), { asOf: '2026-11-08', horizonDays: 1 }).points;
+    const measured = { ...(p as NonNullable<typeof p>), lowerCents: 40000n, upperCents: 44000n, validated: true };
+    const [adjusted] = adjustForecast([measured], 1000);
+    expect(adjusted).toMatchObject({ lowerCents: null, upperCents: null, validated: false, isHypothesis: true });
+    expect(measured.lowerCents).toBe(40000n); // original intacto
+  });
+
+  it('baseline e hipótese manual seguem sem faixa e sem erro medido (S02 inalterada)', () => {
+    const base = baselineForecast(twoWeeks(), { asOf: '2026-11-08', horizonDays: 2 }).points;
+    const manual = manualProjection({ startDate: '2026-11-09', days: 2, dailyGrossCents: 1000n });
+    const manualPoints = manual.ok ? manual.points : [];
+    for (const point of [...base, ...manualPoints]) {
+      expect(point).toMatchObject({ lowerCents: null, upperCents: null, validated: false });
+    }
+  });
+
   it('ajuste que levaria a valor negativo (< -100%) é recusado', () => {
     const base = baselineForecast(twoWeeks(), { asOf: '2026-11-08', horizonDays: 1 }).points;
     expect(() => adjustForecast(base, -10001)).toThrow(RangeError);

@@ -6,7 +6,7 @@ import type { Sale } from '../sales/types';
 /**
  * Médias, tendência simples e baseline de FATURAMENTO BRUTO (contrato: contratos/previsoes.md, S02).
  * Nada aqui é dinheiro disponível: a conversão para caixa só ocorre pela regra de repasse (taxas e prazos).
- * Nenhum modelo é validado nesta sprint (backtesting é da S03): `validated` é sempre false.
+ * `validated` só é true quando o backtesting (S03, backtest.ts) mediu o erro do método; nunca para baseline/hipótese.
  */
 
 /** Abaixo disso (dias COM venda) não há previsão: aviso no lugar de precisão inventada. */
@@ -62,22 +62,30 @@ export interface SeriesStats {
   trend: Trend;
 }
 
-export type ForecastMethod = 'baseline_mean' | 'manual_hypothesis' | 'manual_adjustment';
+/** Modelos estatísticos da S03 (implementação em models.ts). */
+export type ModelMethod = 'naive_last' | 'moving_average_7' | 'seasonal_weekday_mean' | 'holt_winters_additive';
+export type ForecastMethod = 'baseline_mean' | 'manual_hypothesis' | 'manual_adjustment' | ModelMethod;
 
 export interface ForecastPoint {
   date: ISODate;
   centralCents: bigint;
-  /** Sem faixas na S02: só com erro histórico medido (S03). */
-  lowerCents: null;
-  upperCents: null;
+  /**
+   * Faixa EMPÍRICA dos erros passados (ADR-0007, D5): null sem histórico de erro suficiente, em baseline, hipótese e
+   * ajuste manual. Não é intervalo de confiança.
+   */
+  lowerCents: bigint | null;
+  upperCents: bigint | null;
   method: ForecastMethod;
   /** Última data de venda usada; null em hipótese manual. */
   trainEnd: ISODate | null;
   sampleDays: number;
   /** true = suposição do usuário (manual). */
   isHypothesis: boolean;
-  /** Nenhum modelo foi validado por backtesting. */
-  validated: false;
+  /**
+   * true = existe erro histórico MEDIDO por backtesting (dobras suficientes) para o método. Não é garantia de
+   * acerto futuro nem "precisão": só diz que há medição. false em baseline, hipótese e ajuste manual.
+   */
+  validated: boolean;
   /** Sempre faturamento bruto, nunca caixa. */
   unit: 'gross_sales';
   label: string;
@@ -288,6 +296,10 @@ export function adjustForecast(points: readonly ForecastPoint[], bps: number): F
     ...p,
     centralCents: divRound(p.centralCents * factor, 10_000n),
     method: 'manual_adjustment',
+    // ajuste manual é hipótese: não herda faixa nem erro medido do modelo original
+    lowerCents: null,
+    upperCents: null,
+    validated: false,
     isHypothesis: true,
     label: LABEL_ADJUST,
   }));
