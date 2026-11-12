@@ -135,8 +135,15 @@
       "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S02": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "Aprovada pelo usuário em 12/11/2026 após testar a demo no navegador ('achei top')",
+      "regression_evidence": "12/11/2026 no HEAD c05fc22: npm ci OK; npm run test:unit -- --run --coverage = 363/363 (16 arquivos); npm run build OK; npm run test:e2e = 31/31 (18 S01 + 13 S02), sem falha intermitente nesta rodada; fluxo.py validar OK",
+      "demo_evidence": "http://84.247.135.249:8084 — Explorar demonstração (12/11 R$ 500 · 13/11 R$ 1.300 · 14/11 -R$ 700 · 15/11 R$ 3.300); Vendas e recebimentos > Carregar vendas fictícias (84 vendas, R$ 14.580,00 brutos, média R$ 520,71); usuário testou no navegador",
+      "changed_coverage": 95.33,
+      "full_suite_evidence": "unit 363/363 + E2E 31/31 + build OK (medido hoje); E2E contra container 31/31 registrado na S02 (não repetido neste passo)",
+      "global_coverage": 94.47,
+      "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S03": {
       "status": "pendente",
