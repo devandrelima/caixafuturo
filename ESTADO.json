@@ -62,7 +62,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S03-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "4b79d94",
+      "evidence": "seasonality.test.ts 28/28 (visto falhar antes: módulo inexistente); índices, força (10000/2304/321/49 bps) e outliers conferidos por script Python independente com frações exatas e à mão; 6 mutações (corte, exclusão de outlier, mínimo por dia, limiar de força, piso 5%, limite de lacunas) derrubam 6/3/1/3/1/1 testes; alterar vendas depois do corte não muda o resultado; cobertura v8 domain/forecast 99.6% stmts/97.38% branches (seasonality 99.32%/96.55%, baseline 100%/98.48%); tsc --noEmit e build OK. Manifesto: writes += baseline.ts (export divRound/weekdayOf). Sem UI nem deploy nesta task.",
+      "verification": "declarada; confira logs e Git"
     },
     "S03-P01-T02": {
       "status": "pendente"
