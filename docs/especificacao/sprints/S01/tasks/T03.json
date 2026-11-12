@@ -1,7 +1,7 @@
 {
   "id": "S01-P01-T03",
   "kind": "backend",
-  "instruction": "Implementar importador CSV de contas (BOM, ;/,, aspas, valor pt-BR, datas DD/MM/YYYY/ISO), preview de erros por linha, chave externa/fingerprint SHA256 e idempotência. Não escrever storage diretamente.",
+  "instruction": "Implementar importador CSV de contas (BOM, ;/,, aspas, valor pt-BR, datas DD/MM/YYYY/ISO), preview de erros por linha, chave externa/fingerprint SHA-256 e idempotência. O SHA-256 deve ser implementado em TypeScript puro e síncrono (src/domain/import/sha256.ts), sem depender de crypto.subtle, que não existe em HTTP por IP (ADR-0005); proibido substituir por hash fraco. Não escrever storage diretamente.",
   "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
   "depends_on": [
     "S01-P01-T01"
@@ -9,23 +9,28 @@
   "context": [
     "docs/especificacao/memoria/importacao.md",
     "docs/especificacao/contratos/importacao.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/decisoes/0005-docker-e-contexto-http.md"
   ],
   "reads": [
     "src/domain/finance/types.ts"
   ],
   "writes": [
     "src/domain/import/csv.ts",
-    "src/domain/import/__tests__/csv.test.ts"
+    "src/domain/import/__tests__/csv.test.ts",
+    "src/domain/import/sha256.ts",
+    "src/domain/import/__tests__/sha256.test.ts"
   ],
   "tests": [
-    "npm run test:unit -- --run src/domain/import/__tests__/csv.test.ts"
+    "npm run test:unit -- --run src/domain/import/__tests__/csv.test.ts",
+    "npm run test:unit -- --run src/domain/import/__tests__/sha256.test.ts"
   ],
   "acceptance": [
     "Importação repetida da mesma linha não duplica lançamento",
     "Linhas inválidas mostram linha/motivo e não entram no lote válido",
-    "Duas contas iguais legítimas requerem IDs externos distintos"
+    "Duas contas iguais legítimas requerem IDs externos distintos",
+    "SHA-256 puro confere com vetores oficiais (vazio, 'abc', 448 bits, 1.000.000 de 'a', UTF-8 multibyte) e com node:crypto; funciona com crypto.subtle indefinido"
   ],
-  "context_budget_tokens": 8000,
+  "context_budget_tokens": 9000,
   "parallel_group": "s01-dominios-isolados"
 }

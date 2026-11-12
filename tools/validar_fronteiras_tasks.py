@@ -44,6 +44,20 @@ def check() -> int:
         issues.append("S01 T03 deve escrever somente E2E, revisão visual e evidências")
     if set(t02["writes"]) & set(t03["writes"]):
         issues.append("S01 T02 e T03 têm conflito de escrita")
+    docker = task("sprints/S01/tasks/T08.json")
+    if docker["id"] != "S01-P02-T05":
+        issues.append("S01 T08.json deve ser S01-P02-T05 (Docker)")
+    for required in ("Dockerfile", "compose.yaml", ".dockerignore", "docker/nginx.conf", "README.md"):
+        if required not in docker["writes"]:
+            issues.append(f"Task Docker sem {required} em writes")
+    if any(w.startswith("src/") for w in docker["writes"]):
+        issues.append("Task Docker não pode escrever em src/")
+    if docker["id"] not in t03["depends_on"]:
+        issues.append("S01 T03 precisa depender da task Docker")
+    if "S01-P02-T04" not in docker["depends_on"]:
+        issues.append("Task Docker precisa depender da fundação visual (S01-P02-T04)")
+    if set(docker["writes"]) & set(t03["writes"]):
+        issues.append("Task Docker e T03 têm conflito de escrita")
     pending = "docs/especificacao/pendencias/S02-conciliacao-recebiveis.md"
     if not (ROOT / pending).is_file():
         issues.append("Pendência de conciliação da S02 ausente")
@@ -57,7 +71,7 @@ def check() -> int:
         for issue in issues:
             print("ERRO: " + issue)
         return 1
-    print("Fronteiras OK: T02 possui dataset e integração; T03 apenas QA/E2E/evidências; PEND-S02-001 rastreada.")
+    print("Fronteiras OK: Docker isolado em infraestrutura; T02 possui dataset e integração; T03 apenas QA/E2E/evidências; PEND-S02-001 rastreada.")
     print("Nota: a CLI não impõe permissões reais de arquivos aos executores.")
     return 0
 

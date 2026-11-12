@@ -11,12 +11,13 @@
     {
       "id": "S01",
       "title": "Primeiro fluxo de caixa funcional",
-      "delivery": "Usuário carrega contas sintéticas, ajusta saldo, consulta 30 dias e identifica data e valor de falta de caixa.",
-      "demo_command": "npm ci && npm run dev",
+      "delivery": "Usuário carrega contas sintéticas, ajusta saldo, consulta 30 dias e identifica data e valor de falta de caixa. Executável também em container Docker (Nginx) acessível por IP e porta da VPS.",
+      "demo_command": "npm ci && npm run dev  |  docker compose up -d --build (http://IP_DA_VPS:8084)",
       "regression_tests": [
         "npm run test:unit -- --run --coverage",
         "npm run test:e2e",
-        "npm run build"
+        "npm run build",
+        "docker compose config -q && docker compose build"
       ],
       "risk": "high",
       "requires_full_suite": true,
@@ -36,6 +37,7 @@
           "tasks": [
             "sprints/S01/tasks/T04.json",
             "sprints/S01/tasks/T07.json",
+            "sprints/S01/tasks/T08.json",
             "sprints/S01/tasks/T05.json",
             "sprints/S01/tasks/T06.json"
           ]

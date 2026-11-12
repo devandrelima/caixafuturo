@@ -4,7 +4,7 @@ Hierarquia oficial: PROJETO → SPRINT → PROMPT-MAPA → TASK. Mapas humanos o
 
 [Visão e decisões](00_visao_geral_e_decisoes.md) | [Identidade visual](design/README.md) | [Plano JSON](plano.json) | [Sprints](sprints/S01/README.md) | [Memórias](memoria/global.md) | [Contratos](contratos/financeiro.md) | [Estado](../../ESTADO.json).
 
-Seis sprints cobrem as 31 funcionalidades sem exclusão; **12 prompts-mapa e 27 tasks**, incluindo uma task exclusiva da fundação visual S01. Sprint 1 é prioridade; nenhuma foi implementada até este momento. A próxima sprint somente começa após aprovação humana.
+Seis sprints cobrem as 31 funcionalidades sem exclusão; **12 prompts-mapa e 28 tasks**, incluindo uma task exclusiva da fundação visual S01 e a task operacional de Docker S01-P02-T05 (ADR-0005; não altera as 31 funcionalidades). Sprint 1 é prioridade; nenhuma foi implementada até este momento. A próxima sprint somente começa após aprovação humana.
 
 ## CLI oficial (Python 3.10+)
 Clonar a skill em diretório irmão, mantendo somente uma cópia da implementação do validador:

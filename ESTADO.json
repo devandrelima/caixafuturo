@@ -81,6 +81,9 @@
     },
     "S01-P02-T04": {
       "status": "pendente"
+    },
+    "S01-P02-T05": {
+      "status": "pendente"
     }
   },
   "sprints": {

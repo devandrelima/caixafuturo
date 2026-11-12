@@ -4,7 +4,8 @@
   "instruction": "Realizar exclusivamente testes E2E, revisão visual/acessibilidade e coleta de evidências da Sprint 1. Consumir, sem recriar nem alterar, o dataset src/demo/restaurant.ts e a integração de onboarding App.tsx já entregues pela T02. Criar cenários Playwright de primeiro acesso, carga de demo, saldo/risco, persistência, importação CSV idempotente, edição e reset; inspecionar viewports 390×844, 768×1024 e 1440×900; executar regressão completa, build e medição real de cobertura alterada/global. Registrar logs e achados nos arquivos de evidências. Se a UI ou a fixture falhar, devolver o problema à T02/replanejamento antes de editar código fora de writes, jamais corrigir silenciosamente arquivos de produção.",
   "result": "Testes E2E, revisão visual e documentos de evidência reproduzíveis sobre a interface e fixture já integradas na T02; sem alterações de aplicação, fixture ou README.",
   "depends_on": [
-    "S01-P02-T02"
+    "S01-P02-T02",
+    "S01-P02-T05"
   ],
   "context": [
     "docs/especificacao/memoria/ui.md",
@@ -14,7 +15,8 @@
     "docs/especificacao/design/tokens.json",
     "docs/especificacao/design/telas/S01.md",
     "docs/especificacao/design/qualidade.md",
-    "docs/especificacao/design/REVISAO_VISUAL_MODELO.md"
+    "docs/especificacao/design/REVISAO_VISUAL_MODELO.md",
+    "docs/decisoes/0005-docker-e-contexto-http.md"
   ],
   "reads": [
     "src/components/CashDashboard.tsx",
@@ -24,7 +26,10 @@
     "src/app/App.tsx",
     "src/components/Onboarding.tsx",
     "src/storage/repository.ts",
-    "README.md"
+    "README.md",
+    "Dockerfile",
+    "compose.yaml",
+    "playwright.config.ts"
   ],
   "writes": [
     "tests/e2e/cash-flow.spec.ts",
@@ -41,7 +46,8 @@
     "Importar a mesma origem duas vezes não altera saldo; editar lançamento recalcula projeção; recarga do browser preserva estado; reset/confirmar/cancelar não apagam dados sem confirmação",
     "Logs reais de unit/e2e/build, cobertura alterada >=80% e global >=80% (checkpoint alto risco) são registrados com comando, ambiente e resultado; se não houver medição, marcar pendente",
     "Checklist de visual, mobile, teclado, contraste e estados com evidências concretas ou 'não verificado' para 390×844, 768×1024, 1440×900",
-    "T03 modifica somente testes/e2e/cash-flow.spec.ts e documentos docs/evidencias/s01*.md; defeitos de T02 não autorizam edição de src/demo, App.tsx, CSS, README ou componentes sem replanejamento"
+    "T03 modifica somente testes/e2e/cash-flow.spec.ts e documentos docs/evidencias/s01*.md; defeitos de T02 não autorizam edição de src/demo, App.tsx, CSS, README ou componentes sem replanejamento",
+    "E2E também roda (E2E_BASE_URL) contra o container publicado, incluindo ao menos um fluxo de importação CSV via http://IP_PUBLICO:porta com window.isSecureContext === false; resposta HTTP, estado healthy e reload de rota SPA registrados em docs/evidencias/s01.md (ou 'não verificado')"
   ],
-  "context_budget_tokens": 14000
+  "context_budget_tokens": 15000
 }

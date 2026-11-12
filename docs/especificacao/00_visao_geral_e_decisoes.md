@@ -8,12 +8,13 @@ Produto web open source para comerciantes e restaurantes: antecipar riscos de ca
 Equipe/capacidade em horas: não informada; registrar execução real e ajustar prazo, sem presumir velocidade de agentes. Orçamento: priorizar execução local gratuita.
 
 ## Stack proposta
-Vite + React + TypeScript strict (app SPA); IndexedDB nativo (dados só no navegador; ausência de sincronização deve ser divulgada); domínio financeiro com funções puras; BigInt para centavos e strings decimais inteiras no JSON; datas civis ISO YYYY-MM-DD; Vitest + coverage-v8 + Testing Library + fake-indexeddb + Playwright. SVG/tabela acessível para gráficos inicialmente, sem exigir biblioteca pesada. npm ci e npm run dev após implementação. Nenhum código de aplicativo existe no planejamento.
+Vite + React + TypeScript strict (app SPA); IndexedDB nativo (dados só no navegador; ausência de sincronização deve ser divulgada); domínio financeiro com funções puras; BigInt para centavos e strings decimais inteiras no JSON; datas civis ISO YYYY-MM-DD; Vitest + coverage-v8 + Testing Library + fake-indexeddb + Playwright. SVG/tabela acessível para gráficos inicialmente, sem exigir biblioteca pesada. npm ci e npm run dev após implementação. Execução containerizada: Docker multi-stage (Node → Nginx), `compose.yaml`, sem credenciais (ADR-0005). Nenhum código de aplicativo existe no planejamento.
 
 ## Decisões e ADRs
 - ADR-0001: local-first, sem autenticação/servidor, por prazo, custo e simplicidade.
 - ADR-0002: saldos em centavos exatos, data-base conciliada, chaves de origem idempotentes.
 - ADR-0003: baseline estatístico, comparação temporal e previsão sem promessas de precisão.
+- ADR-0005: execução em Docker (Nginx estático, porta 8084) e SHA-256 puro por causa de contexto HTTP não seguro.
 - ADR-0004: direção visual minimalista quente com dourado e detalhes cartoonesco 2D originais, conforme referência enviada pelo usuário.
 
 ## Contratos canônicos

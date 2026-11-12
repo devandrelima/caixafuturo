@@ -1,0 +1,44 @@
+{
+  "id": "S01-P02-T05",
+  "kind": "backend",
+  "instruction": "Containerizar a SPA (requisito operacional, não funcionalidade; ver ADR-0005). Criar Dockerfile multi-stage (Node compila Vite com npm ci; Nginx serve dist/), docker/nginx.conf com fallback de SPA (try_files para /index.html), gzip, cache longo só para assets com hash e sem cache para index.html, compose.yaml (serviço único 'caixafuturo', porta host ${CAIXAFUTURO_PORT:-8084}:80, restart unless-stopped, healthcheck HTTP), .dockerignore e scripts/deploy.sh que: executa build da imagem com tag do commit, verifica a imagem, troca SOMENTE o serviço caixafuturo, aguarda healthy, testa HTTP e, em falha, restaura a imagem estável anterior sem derrubar outros projetos. Criar workflow .github/workflows/app-ci.yml (npm ci, unit com cobertura, build, docker build e smoke test; E2E somente se tests/e2e existir). Documentar no README a operação (iniciar, atualizar, logs, parar, porta, limitações de HTTP e IndexedDB). Não exigir chaves/credenciais, não usar docker compose down indiscriminado, não alterar firewall nem outros containers. Não implementar lógica financeira.",
+  "result": "Aplicativo executável em container Nginx saudável, acessível por http://IP:8084, com script de atualização segura, CI de aplicativo/Docker e documentação operacional verificadas por execução real.",
+  "depends_on": [
+    "S01-P02-T04"
+  ],
+  "context": [
+    "docs/decisoes/0005-docker-e-contexto-http.md",
+    "docs/especificacao/contratos/interface.md"
+  ],
+  "reads": [
+    "package.json",
+    "vite.config.ts",
+    "playwright.config.ts"
+  ],
+  "writes": [
+    "Dockerfile",
+    "compose.yaml",
+    ".dockerignore",
+    "docker/nginx.conf",
+    "scripts/deploy.sh",
+    ".github/workflows/app-ci.yml",
+    "README.md",
+    "docs/evidencias/s01-docker.md"
+  ],
+  "tests": [
+    "docker compose config -q",
+    "npm run build",
+    "docker compose build",
+    "scripts/deploy.sh"
+  ],
+  "acceptance": [
+    "docker compose up -d --build publica o app em http://IP_PUBLICO:8084 (porta 8080 ocupada pelo code-server, não alterada) e GET / retorna 200 com o HTML da SPA",
+    "Container reporta healthy; restart unless-stopped; sobrevive ao encerramento da sessão do agente",
+    "Rota profunda (ex.: /movimentacoes) recarregada retorna o index.html (fallback de SPA); asset inexistente com extensão retorna 404",
+    "Build multi-stage final contém apenas Nginx e dist/ (sem node_modules nem código-fonte); nenhuma variável de ambiente secreta é necessária",
+    "deploy.sh atualiza somente o serviço caixafuturo, valida healthy+HTTP e restaura a versão estável anterior quando a nova falha (testar com falha real simulada)",
+    "README documenta iniciar/atualizar/logs/parar, a porta, que dados ficam no IndexedDB do navegador sem sincronização e que HTTP público não é adequado a dados financeiros reais",
+    "app-ci.yml executa em GitHub Actions sem credenciais; evidências reais registradas em docs/evidencias/s01-docker.md"
+  ],
+  "context_budget_tokens": 8000
+}

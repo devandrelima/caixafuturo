@@ -1,7 +1,7 @@
 {
   "id": "S01-P01-T01",
   "kind": "backend",
-  "instruction": "Inicializar Vite/React/TypeScript strict, scripts npm para Vitest coverage-v8, Testing Library, fake-indexeddb e Playwright. Implementar money/dates/types com BigInt e ISO civil, primeiro teste falhando e depois passando. Sem backend, login ou IA no runtime.",
+  "instruction": "Inicializar Vite/React/TypeScript strict, scripts npm para Vitest coverage-v8, Testing Library, fake-indexeddb e Playwright. Implementar money/dates/types com BigInt e ISO civil, primeiro teste falhando e depois passando. Sem backend, login ou IA no runtime. playwright.config.ts deve aceitar E2E_BASE_URL (testar um app já publicado, p.ex. no container) e, sem ela, subir 'vite preview' local. Vite com base '/' e sem dependência de rede/fontes externas.",
   "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
   "depends_on": [],
   "context": [
@@ -31,7 +31,8 @@
   "acceptance": [
     "R$ 1.234,56 converte em 123456 centavos exatos; valores inválidos rejeitados",
     "Data de vencimento não muda por timezone; campo de data civil validado",
-    "npm run build e teste primitivo executam; nenhuma feature de caixa é alegada pronta"
+    "npm run build e teste primitivo executam; nenhuma feature de caixa é alegada pronta",
+    "playwright.config.ts usa E2E_BASE_URL quando definida; caso contrário inicia o app local"
   ],
   "context_budget_tokens": 8000
 }
