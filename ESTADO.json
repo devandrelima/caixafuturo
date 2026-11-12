@@ -158,8 +158,15 @@
       "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S03": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "Aprovada pelo usuário em 12/11/2026 (\"pode finalizar a sprint 3, aprovo\") após o relatório de execução e o roteiro de avaliação",
+      "regression_evidence": "12/11/2026 no HEAD 32d4e4c (código implantado 12100e0): npm run test:unit -- --run --coverage = 485/485 (22 arquivos); npm run build OK; npm run test:e2e = 40/40 local e 40/40 contra o container (rodadas em 12100e0, sem mudança de código depois); fluxo.py validar OK; app-ci e validar-planejamento-v2 verdes no HEAD",
+      "demo_evidence": "http://84.247.135.249:8084 — Explorar demonstração > Previsões > Carregar histórico fictício de 12 semanas: modelo sazonal (menor erro medido), 6 janelas, MAE R$ 8,15, WAPE 1,6%; 12/11 = R$ 380,00 (faixa R$ 378,47 a R$ 404,40); média móvel R$ 520,71; Holt-Winters a 28 dias sem erro medido e sem faixa; dados fictícios e sintéticos",
+      "changed_coverage": 96.57,
+      "full_suite_evidence": "unit 485/485 + E2E 40/40 (local e container) + build OK; dados sintéticos: o erro medido não prova precisão real",
+      "global_coverage": 95.45,
+      "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S04": {
       "status": "pendente",
