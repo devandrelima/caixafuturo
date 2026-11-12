@@ -47,5 +47,7 @@ Modelo inelegível aparece com **motivo** e sem número. O baseline de média hi
 ## D6. Unidades e dinheiro
 Previsão é faturamento bruto (`gross_sales`). **Não** vira dinheiro disponível; a S03 **não** converte previsão em caixa nem a coloca no saldo projetado (S02 mantém previsão fora do saldo). Dinheiro em BigInt/centavos; WAPE em pontos-base inteiros (razão BigInt).
 
-## Pendência (produto) — snapshots de previsões emitidas
-Contrato diz que "previsões históricas mantêm seus valores originais". A S03 entrega previsão **retrospectiva reconstruída** (D4), reproduzível e sem persistência. Gravar a previsão emitida em cada data exigiria IndexedDB v3 e só preencheria o comparativo com o passar dos dias de uso real. Recomendação: manter retrospectiva na S03 e rotular claramente; snapshots reais ficam como evolução se o usuário quiser.
+## Decisões do usuário (12/11/2026) — todas as opções recomendadas
+1. **Previsto × realizado = retrospectivo reconstruído** (D4), rotulado como "previsão retrospectiva, não a emitida na época". Sem persistência e sem migração do IndexedDB (continua na v2). Gravar previsões emitidas fica como evolução futura.
+2. **Modelo padrão = menor erro medido** quando a comparação é válida (≥ 4 dobras e ≥ 2 modelos), rotulado só como "menor erro no período avaliado" (nunca "melhor"/"mais preciso"). Sem medição, abre na **Média móvel de 7 dias** com aviso "sem erro medido". O usuário sempre pode trocar.
+3. **Só faturamento bruto:** a S03 não converte previsão em caixa nem estima recebimentos; legenda fixa "não é dinheiro disponível"; o saldo projetado não muda.

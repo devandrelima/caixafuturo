@@ -5,6 +5,7 @@ import { CashDashboard } from '../components/CashDashboard';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { EntriesPanel } from '../components/EntriesPanel';
 import { EntryForm, SettingsForm } from '../components/FinanceForm';
+import { ForecastPanel } from '../components/ForecastPanel';
 import { ImportPreview } from '../components/ImportPreview';
 import { Onboarding } from '../components/Onboarding';
 import { RiskCalendar } from '../components/RiskCalendar';
@@ -13,6 +14,7 @@ import { SalesView } from '../components/SalesView';
 import type { PendingSalesImport } from '../components/SalesPanel';
 import { CfAlert, CfButton, CfCard } from '../components/ui/UiPrimitives';
 import { createRestaurantDemo } from '../demo/restaurant';
+import { createForecastDemo } from '../demo/forecastDemo';
 import { createSalesDemo } from '../demo/salesDemo';
 import { todayISO, formatBR } from '../domain/finance/dates';
 import { formatBRL } from '../domain/finance/money';
@@ -28,11 +30,12 @@ import type { ReconciliationDecision, Sale, SettlementRules } from '../domain/sa
 import { getRepository, StorageError } from '../storage/repository';
 import type { DatasetKind, EntryDraft, Repository } from '../storage/repository';
 
-const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'vendas', 'calendario'];
+const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'vendas', 'previsoes', 'calendario'];
 const TITLES: Record<View, { title: string; subtitle: string }> = {
   'visao-geral': { title: 'Visão geral', subtitle: 'Fluxo projetado com base nos seus lançamentos.' },
   movimentacoes: { title: 'Movimentações', subtitle: 'Cadastre, importe e ajuste contas a pagar e a receber.' },
   vendas: { title: 'Vendas e recebimentos', subtitle: 'Importe vendas, configure repasses e separe faturamento, recebimentos e saldo.' },
+  previsoes: { title: 'Previsões', subtitle: 'Compare modelos de faturamento, veja o erro medido e o previsto versus realizado.' },
   calendario: { title: 'Calendário', subtitle: 'Veja o saldo e os lançamentos de cada data.' },
 };
 
@@ -284,6 +287,14 @@ export function App({ repository }: AppProps) {
     }, `Vendas fictícias carregadas: ${plan.summary.created} criada(s), ${plan.summary.ignored} já existiam.`);
   }
 
+  async function loadDemoHistory() {
+    const demo = createForecastDemo();
+    const plan = planSalesImport(previewSalesCsv(demo.csv), data.sales);
+    await run(async () => {
+      await repo.sales.importSales(plan.toCreate);
+    }, `Histórico fictício de 12 semanas carregado: ${plan.summary.created} venda(s) criada(s), ${plan.summary.ignored} já existiam.`);
+  }
+
   async function saveRules(rules: SettlementRules): Promise<string | null> {
     setBusy(true);
     try {
@@ -467,6 +478,15 @@ export function App({ repository }: AppProps) {
           </>
         ) : !data.settings ? (
           noSettingsCard
+        ) : view === 'previsoes' ? (
+          <ForecastPanel
+            sales={data.sales}
+            baseDate={data.settings.baseDate}
+            demoMode={demoMode}
+            busy={busy}
+            onLoadDemoHistory={() => void loadDemoHistory()}
+            onGoSales={() => navigate('vendas')}
+          />
         ) : projection.result ? (
           view === 'visao-geral' ? (
             <CashDashboard

@@ -2,7 +2,7 @@
 
 Projeto open source para projetar o caixa de pequenos comércios/restaurantes e simular decisões com cálculos verificáveis, **sem IA externa no runtime**, sem servidor de aplicação e sem login.
 
-**Status (12/11/2026):** Sprint 1 aprovada pelo usuário. Sprint 2 (vendas e recebimentos futuros) implementada e testada, **aguardando avaliação humana**: importação de vendas por CSV, regras de taxa/comissão/prazo, repasses líquidos derivados, conciliação com o CSV de contas sem dupla contagem ([ADR-0006](docs/decisoes/0006-conciliacao-recebiveis.md)), média/tendência/baseline com avisos, projeção manual como hipótese e explicação de cada risco. O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
+**Status (12/11/2026):** Sprints 1 e 2 aprovadas pelo usuário. Sprint 3 (inteligência estatística: sazonalidade, modelos, backtesting, faixas e previsto × realizado) implementada e testada, **aguardando avaliação humana** ([ADR-0007](docs/decisoes/0007-modelos-e-backtesting.md)). A Sprint 2 (vendas e recebimentos futuros) trouxe: importação de vendas por CSV, regras de taxa/comissão/prazo, repasses líquidos derivados, conciliação com o CSV de contas sem dupla contagem ([ADR-0006](docs/decisoes/0006-conciliacao-recebiveis.md)), média/tendência/baseline com avisos, projeção manual como hipótese e explicação de cada risco. O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
 
 - [Especificação v2, seis sprints e tasks](docs/especificacao/README.md)
 - [Decisões, arquitetura e riscos](docs/especificacao/00_visao_geral_e_decisoes.md)
@@ -30,6 +30,17 @@ Vista **Vendas e recebimentos**, com três áreas separadas: **Faturamento bruto
 4. **Previsão**: média diária e tendência (7 dias vs 7 anteriores), baseline **não validado** com aviso de série curta/insuficiente, e projeção manual sempre rotulada como **hipótese**; nenhuma das duas entra no saldo projetado.
 5. Na demonstração, o botão **Carregar vendas fictícias** adiciona 84 vendas de 28 dias (R$ 14.580,00 brutos).
 6. A **Visão geral** explica cada data de risco: lançamentos considerados, origem, repasses estimados e o que ficou de fora.
+
+## Previsões (Sprint 3)
+
+Vista **Previsões**, sempre sobre **faturamento bruto** (não é dinheiro disponível e **não** altera o saldo projetado).
+
+1. **Modelos** com parâmetros fixos e documentados: ingênuo (último dia), média móvel de 7 dias, sazonal por dia da semana (últimas 4 ocorrências) e Holt-Winters aditivo semanal (α 0,20 · β 0,05 · γ 0,30; exige ≥ 42 dias). Modelo sem amostra suficiente aparece **indisponível, com o motivo**, e não gera número.
+2. **Backtesting rolling-origin:** em cada janela semanal o modelo só vê dados até o corte e é comparado com o faturamento **realmente importado**. Mostra MAE, WAPE (indefinido quando o realizado é R$ 0), viés e a janela de treino/avaliação. Abre no modelo de **menor erro medido** (nunca "melhor"); sem ao menos 4 janelas nenhum erro é medido.
+3. **Faixas** conservadora/central/otimista: 10º e 90º percentis dos erros passados, só com ≥ 28 erros e ≥ 4 janelas. **Não é intervalo de confiança** e não promete cobertura futura.
+4. **Previsto × realizado** é **retrospectivo** (recalculado com os dados até cada corte; não é a previsão gravada na época; nada novo é persistido, IndexedDB segue na v2).
+5. **Sazonalidade** por dia da semana e período do mês só com amostra (≥ 28 dias e ≥ 4 observações por dia; ≥ 3 meses para período); outliers e dias sem venda são listados e excluídos do índice.
+6. Na demonstração, **Carregar histórico fictício de 12 semanas** (84 dias, um evento e uma lacuna; as 4 últimas semanas são idênticas às vendas fictícias da S02, então nada duplica). O padrão artificial faz o erro parecer baixo: isso só mostra que o cálculo funciona, não o que aconteceria com vendas reais.
 
 ## Desenvolvimento local
 

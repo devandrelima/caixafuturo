@@ -257,10 +257,10 @@ test.describe('navegação, teclado e acessibilidade básica', () => {
     await expect(page.getByText(/A pagar: Aluguel fictício/)).toBeVisible();
     await nav(page, 'Movimentações');
     await expect(page.getByRole('heading', { level: 1, name: 'Movimentações' })).toBeVisible();
-    // S02 acrescentou "Vendas e recebimentos"; nenhuma vista de sprint futura existe
+    // S02 acrescentou "Vendas e recebimentos" e S03 "Previsões"; nenhuma vista de sprint futura existe
     const items = page.getByRole('navigation', { name: 'Principal' }).getByRole('button');
-    await expect(items).toHaveCount(4);
-    await expect(items).toHaveText(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Calendário']);
+    await expect(items).toHaveCount(5);
+    await expect(items).toHaveText(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário']);
   });
 
   test('calendário: a data-base é clicável e mostra o saldo informado; dias anteriores ficam inativos', async ({ page }) => {

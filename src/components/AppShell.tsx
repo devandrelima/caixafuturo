@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { CfBadge } from './ui/UiPrimitives';
 
-export type View = 'visao-geral' | 'movimentacoes' | 'vendas' | 'calendario';
+export type View = 'visao-geral' | 'movimentacoes' | 'vendas' | 'previsoes' | 'calendario';
 
 export const NAV_ITEMS: ReadonlyArray<{ id: View; label: string; icon: ReactNode }> = [
   {
@@ -29,6 +29,15 @@ export const NAV_ITEMS: ReadonlyArray<{ id: View; label: string; icon: ReactNode
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M4 7h16l-1.5 9a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7L4 7zM4 7 3 3M9 21h.01M15 21h.01" />
+      </svg>
+    ),
+  },
+  {
+    id: 'previsoes',
+    label: 'Previsões',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M3 17l6-6 4 4 8-8M15 7h6v6" />
       </svg>
     ),
   },
