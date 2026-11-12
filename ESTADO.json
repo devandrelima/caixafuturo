@@ -110,7 +110,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S05-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "3b3f4c3",
+      "evidence": "vitest src/domain/scenarios: 33 testes verdes (base congelada e idêntica antes/depois, determinismo, delta alt−base por propriedade em 60 casos pseudoaleatórios, composição sem soma dupla, riscos, horizonte); tsc e build ok; mutação: 23 mutantes, 5 sobreviveram na 1ª rodada e foram mortos com testes novos (conjunto live, dedupe por id, ordem de chaves do JSON canônico, mensagem eliminar×reduzir)",
+      "verification": "declarada; confira logs e Git"
     },
     "S05-P01-T02": {
       "status": "pendente"
