@@ -5,7 +5,7 @@ Usuário compara baselines/modelos e erros históricos e vê estimativas justifi
 
 Funcionalidades aprovadas preservadas: **F08** Sazonalidade; **F09** Comparação modelos; **F10** Backtesting; **F11** Faixas de previsão; **F17** Previsto versus realizado.
 
-Situação: planejada, sem implementação. Evolução posterior à candidatura (15/11/2026).
+Situação: **implementada e aprovada pelo usuário em 12/11/2026** (evidências em `docs/evidencias/s03*.md`; ADR-0007).
 
 ## Demonstração quando implementada
 `npm ci && npm run dev` → abrir URL local apresentada pelo Vite. Usar **dados fictícios** e verificar o incremento: Usuário compara baselines/modelos e erros históricos e vê estimativas justificadas versus realizado. Executar roteiro de aceite manual: identificar entradas, mudar um dado, conferir saldos/resultado por cálculo independente, verificar erro e voltar ao estado anterior.

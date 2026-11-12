@@ -5,7 +5,7 @@ Usuário carrega contas sintéticas, ajusta saldo, consulta 30 dias e identifica
 
 Funcionalidades aprovadas preservadas: **F02** Contas pagar/receber; **F03** Saldo inicial e mínimo; **F06** Validação e duplicação; **F14** Fluxo 30 dias; **F18** Risco de saldo; **F19** Datas e déficits; **F28** Dashboard/gráficos/calendário; **F31** Demo sintética restaurante.
 
-Situação: planejada, sem implementação. S01 é prioridade para a candidatura, desejável demo até 13/11.
+Situação: **implementada e aprovada pelo usuário** (evidências em `docs/evidencias/s01*.md`).
 
 ## Demonstração quando implementada
 `npm ci && npm run dev` → abrir URL local apresentada pelo Vite; ou `docker compose up -d --build` → `http://IP_DA_VPS:8084` (porta 8080 ocupada por outro serviço da VPS; ver ADR-0005). Usar **dados fictícios** e verificar o incremento: Usuário carrega contas sintéticas, ajusta saldo, consulta 30 dias e identifica data e valor de falta de caixa. Executar roteiro de aceite manual: identificar entradas, mudar um dado, conferir saldos/resultado por cálculo independente, verificar erro e voltar ao estado anterior.

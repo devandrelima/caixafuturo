@@ -181,8 +181,15 @@
       "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S04": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "Aprovada pelo usuário em 12/11/2026 (\"aprovo\") após o relatório de execução e o roteiro de avaliação",
+      "regression_evidence": "12/11/2026 no HEAD ab98a5a: npm run test:unit -- --run --coverage = 693/693 (32 arquivos); npm run build OK; npx tsc --noEmit OK; npm run test:e2e = 54/54 local e 54/54 contra o container (caixafuturo:ab98a5a, healthy, version.txt = ab98a5a); fluxo.py validar, validar_fronteiras_tasks e validar_design OK; app-ci e validar-planejamento-v2 verdes no HEAD. Intermitência não reproduzida: 1 falha em sales-flow (511 ms) na 1ª rodada completa da T03, mensagem não capturada, 3/3 isolado e rodada completa passaram",
+      "demo_evidence": "http://84.247.135.249:8084 — Explorar demonstração > Calendário: 13 semanas (1ª fecha em R$ 3.300,00); Carregar recorrências fictícias: 1ª semana R$ 4.500,00 e 13ª −R$ 5.100,00; pular 30/11 do condomínio; excluir seguro mantém o liquidado; Movimentações: filtro Fixas (6 de 24, saídas R$ 7.180,00) com alerta de 14/11 visível; Exportar CSV; dados fictícios",
+      "changed_coverage": 94.6,
+      "full_suite_evidence": null,
+      "global_coverage": null,
+      "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S05": {
       "status": "pendente",

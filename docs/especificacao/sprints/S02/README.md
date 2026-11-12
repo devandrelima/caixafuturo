@@ -5,7 +5,7 @@ Usuário importa vendas, configura repasses e distingue faturamento, recebimento
 
 Funcionalidades aprovadas preservadas: **F01** CSV histórico de vendas; **F04** Pix/cartão/taxas/prazos; **F07** Médias e tendências; **F12** Projeção manual; **F13** Venda -> recebível; **F16** Confirmado/previsto/hipotético; **F20** Explicação de riscos.
 
-Situação: planejada, sem implementação. S02 somente após aceite humano de S01 e se houver tempo antes de 15/11.
+Situação: **implementada e aprovada pelo usuário** (evidências em `docs/evidencias/s02*.md`; ADR-0006).
 
 ## Pendência técnica obrigatória — PEND-S02-001
 Conciliação **entre recebíveis do CSV de contas da S01 e recebíveis derivados do CSV de vendas da S02**: IDs distintos não impedem dupla contagem do mesmo repasse. A política de vínculo (1:1, parcelas e lotes), prioridade, ambiguidades e revisão humana ainda precisa ser fechada antes da implementação do serviço de repasse. Responsável principal **S02-P01-T02**; interface/regressão **S02-P02-T02**. O gate S02 exige testes com ambas as ordens de importação e reimportações. [Registro e critérios completos](../../pendencias/S02-conciliacao-recebiveis.md).

@@ -5,7 +5,7 @@ Usuário acompanha recorrências e 13 semanas, filtra lançamentos e exporta CSV
 
 Funcionalidades aprovadas preservadas: **F05** Recorrências; **F15** Fluxo 13 semanas; **F29** Filtros/detalhe; **F30** Exportação CSV.
 
-Situação: planejada, sem implementação. Evolução posterior à candidatura (15/11/2026).
+Situação: **implementada e aprovada pelo usuário em 12/11/2026** (evidências em `docs/evidencias/s04*.md`; ADR-0008).
 
 ## Demonstração quando implementada
 `npm ci && npm run dev` → abrir URL local apresentada pelo Vite. Usar **dados fictícios** e verificar o incremento: Usuário acompanha recorrências e 13 semanas, filtra lançamentos e exporta CSV consistente. Executar roteiro de aceite manual: identificar entradas, mudar um dado, conferir saldos/resultado por cálculo independente, verificar erro e voltar ao estado anterior.
