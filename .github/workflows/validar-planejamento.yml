@@ -1,0 +1,28 @@
+name: validar-planejamento-v2
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  planejamento:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CaixaFuturo
+        uses: actions/checkout@v4
+      - name: Checkout skill 2.0 oficial
+        uses: actions/checkout@v4
+        with:
+          repository: devandrelima/planejamento-de-sistemas
+          ref: 76c187894d15ff2ecd744a25cc195feb68d72b0d
+          path: _planejamento_skill
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validar plano
+        run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . validar
+      - name: Mostrar tasks prontas
+        run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . prontas
+      - name: Verificar carregamento seletivo da primeira task
+        run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . contexto S01-P01-T01 --saida /tmp/caixafuturo-primeira-task.md
