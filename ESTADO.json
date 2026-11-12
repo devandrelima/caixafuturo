@@ -2,7 +2,10 @@
   "schema_version": "2.0",
   "tasks": {
     "S01-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "cf551d6",
+      "evidence": "npm run test:unit -- --run primitives.test.ts: 43/43 passam (TZ padrão, America/Sao_Paulo, Pacific/Kiritimati); cobertura v8 do código da task 96.25% stmts/94.11% branches; npm run build OK",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P01-T02": {
       "status": "pendente"
