@@ -28,5 +28,12 @@ jobs:
         run: python3 tools/validar_fronteiras_tasks.py
       - name: Mostrar tasks prontas
         run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . prontas
-      - name: Verificar carregamento seletivo da primeira task
-        run: python3 _planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py --repo . contexto S01-P01-T01 --saida /tmp/caixafuturo-primeira-task.md
+      - name: Verificar carregamento seletivo de uma task liberada
+        run: |
+          FLUXO=_planejamento_skill/skills/planejamento-de-sistemas/scripts/fluxo.py
+          TASK=$(python3 $FLUXO --repo . prontas | python3 -c "import json,sys; r=json.load(sys.stdin)['ready']; print(r[0] if r else '')")
+          if [ -z "$TASK" ]; then
+            echo "Nenhuma task liberada (sprint aguardando avaliação humana ou projeto aprovado)."
+          else
+            python3 $FLUXO --repo . contexto "$TASK" --saida /tmp/caixafuturo-task.md
+          fi
