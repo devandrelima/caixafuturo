@@ -1,26 +1,35 @@
 {
   "id": "S01-P02-T02",
   "kind": "interface",
-  "instruction": "Integrar UI real de cadastro e importação com preview, configuração de saldos e dashboard de 30 dias, gráfico/tabela e calendário de alertas. Não usar números estáticos. Revisar estados vazio e falhas.",
+  "instruction": "Integrar UI financeira real sobre AppShell, Onboarding e tokens da task S01-P02-T04: configuração de saldos, cadastro/edição/exclusão, importação CSV com preview e erros, dashboard de 30 dias, gráfico+tabela e calendário. Navegação limitada às três vistas funcionais, sem números fixos, links falsos ou cálculo independente nos componentes. Respeitar wireframes S01 e não mudar tema sem justificativa/atualização do contrato.",
   "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
   "depends_on": [
     "S01-P01-T02",
     "S01-P01-T03",
-    "S01-P02-T01"
+    "S01-P02-T01",
+    "S01-P02-T04"
   ],
   "context": [
     "docs/especificacao/memoria/ui.md",
     "docs/especificacao/contratos/interface.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/design/README.md",
+    "docs/especificacao/design/tokens.json",
+    "docs/especificacao/design/componentes.md",
+    "docs/especificacao/design/qualidade.md",
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/especificacao/design/telas/S01.md"
   ],
   "reads": [
     "src/storage/repository.ts",
     "src/domain/finance/projection.ts",
-    "src/domain/import/csv.ts"
+    "src/domain/import/csv.ts",
+    "src/app/styles.css",
+    "src/components/AppShell.tsx",
+    "src/components/Onboarding.tsx",
+    "src/components/ui/UiPrimitives.tsx"
   ],
   "writes": [
     "src/app/App.tsx",
-    "src/app/styles.css",
     "src/components/FinanceForm.tsx",
     "src/components/ImportPreview.tsx",
     "src/components/CashDashboard.tsx",
@@ -34,11 +43,13 @@
   "acceptance": [
     "Editar uma conta ou saldo atualiza data e valor do risco imediatamente",
     "Labels R$, datas, origem e saldo inicial/projetado não se confundem",
-    "Teclado, foco, estados vazio/erro e visual móvel funcionam"
+    "Teclado, foco, estados vazio/erro e visual móvel funcionam",
+    "Gráfico, tabela e calendário recebem dados do mesmo motor, sem saldo recalculado na apresentação",
+    "Visual segue tokens; riscos são identificáveis por texto e data; não há scroll horizontal da página em mobile"
   ],
-  "context_budget_tokens": 8000,
+  "context_budget_tokens": 12000,
   "design": {
-    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
-    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+    "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
+    "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."
   }
 }

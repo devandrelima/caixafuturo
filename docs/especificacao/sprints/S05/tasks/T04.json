@@ -1,7 +1,7 @@
 {
   "id": "S05-P02-T02",
   "kind": "interface",
-  "instruction": "Oferecer controles de atraso/choque e comparação lado a lado entre cenário original/alternativos, sem persistir alterações reais.",
+  "instruction": "Oferecer controles de atraso/choque e comparação lado a lado entre cenário original/alternativos, sem persistir alterações reais. Preservar visual canônico clean/minimalista com ilustrações originais discretas e critérios de acessibilidade, consultando design/evolucao.md.",
   "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
   "depends_on": [
     "S05-P01-T02",
@@ -10,9 +10,18 @@
   "context": [
     "docs/especificacao/memoria/ui.md",
     "docs/especificacao/contratos/interface.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/design/README.md",
+    "docs/especificacao/design/tokens.json",
+    "docs/especificacao/design/componentes.md",
+    "docs/especificacao/design/qualidade.md",
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/especificacao/design/evolucao.md"
   ],
-  "reads": [],
+  "reads": [
+    "src/app/styles.css",
+    "src/components/AppShell.tsx",
+    "src/components/ui/UiPrimitives.tsx"
+  ],
   "writes": [
     "src/components/ScenarioPanel.tsx",
     "src/components/ScenarioCompare.tsx",
@@ -26,11 +35,13 @@
   "acceptance": [
     "Trocar hipóteses altera alternativa, não original",
     "Diferenças em cada dia conciliam com dois saldos",
-    "E2E confirma retorno ao original sem perda"
+    "E2E confirma retorno ao original sem perda",
+    "Comparação de cenários claramente rotulada e adaptada ao mobile, mantendo base intacta.",
+    "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado."
   ],
-  "context_budget_tokens": 8000,
+  "context_budget_tokens": 10000,
   "design": {
-    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
-    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+    "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
+    "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."
   }
 }

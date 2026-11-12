@@ -1,0 +1,44 @@
+{
+  "id": "S01-P02-T04",
+  "kind": "interface",
+  "instruction": "Implementar SOMENTE a base visual S01: tokens.json convertidos em CSS variables, AppShell com navegação local entre as três vistas, Onboarding opcional de duas ações reais por callbacks e primitivos tipados Button/Card/Badge/Field. Estilo creme/areia/grafite/dourado clean com cartoon 2D original discreto, sem mascote de terceiros. Não integrar storage nem simular gráficos/números ou criar páginas futuras.",
+  "result": "Base de interface reutilizável e testada, pronta para integração do motor financeiro.",
+  "depends_on": [
+    "S01-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/design/README.md",
+    "docs/especificacao/design/tokens.json",
+    "docs/especificacao/design/componentes.md",
+    "docs/especificacao/design/qualidade.md",
+    "docs/especificacao/design/telas/S01.md"
+  ],
+  "reads": [
+    "src/app/App.tsx"
+  ],
+  "writes": [
+    "src/app/styles.css",
+    "src/components/AppShell.tsx",
+    "src/components/Onboarding.tsx",
+    "src/components/ui/UiPrimitives.tsx",
+    "src/components/__tests__/uiFoundation.test.tsx"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/components/__tests__/uiFoundation.test.tsx",
+    "npm run build"
+  ],
+  "acceptance": [
+    "CSS variables correspondem aos tokens canônicos, sem cores arbitrárias ou cópia do biip.club",
+    "AppShell apresenta apenas três vistas funcionais (o integrador ligará conteúdos), menu mobile com Tab/Escape/foco",
+    "Onboarding com callbacks Explorar demonstração e Começar com meus dados não carrega dados sozinho",
+    "Alvos de controle >=44px, estados disabled/loading e texto grafite no botão dourado",
+    "Testes locais e build reais registrados, sem alegar inspeção visual ainda não realizada"
+  ],
+  "context_budget_tokens": 10000,
+  "design": {
+    "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
+    "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."
+  }
+}

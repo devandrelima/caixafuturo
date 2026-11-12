@@ -1,7 +1,7 @@
 {
   "id": "S01-P02-T03",
   "kind": "integration",
-  "instruction": "Criar demo explícita com dados totalmente sintéticos de restaurante e fluxo completo de importação, edição e risco; Playwright E2E; atualizar README com passos realmente executados, medir cobertura alterada e global por risco alto, sem aprovar sprint.",
+  "instruction": "Criar demo explícita com dados totalmente sintéticos de restaurante e fluxo completo de importação, edição e risco; Playwright E2E; atualizar README com passos realmente executados, medir cobertura alterada e global por risco alto, sem aprovar sprint. Revisar front-end real em 3 viewports e documentar QA visual/acessibilidade com capturas se ambiente permitir. Não declarar revisão realizada sem evidência.",
   "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
   "depends_on": [
     "S01-P02-T02"
@@ -10,7 +10,11 @@
     "docs/especificacao/memoria/ui.md",
     "docs/especificacao/contratos/interface.md",
     "docs/especificacao/contratos/financeiro.md",
-    "docs/especificacao/contratos/demo-s01.md"
+    "docs/especificacao/contratos/demo-s01.md",
+    "docs/especificacao/design/tokens.json",
+    "docs/especificacao/design/telas/S01.md",
+    "docs/especificacao/design/qualidade.md",
+    "docs/especificacao/design/REVISAO_VISUAL_MODELO.md"
   ],
   "reads": [
     "src/components/CashDashboard.tsx",
@@ -21,7 +25,8 @@
     "src/demo/__tests__/restaurant.test.ts",
     "tests/e2e/cash-flow.spec.ts",
     "README.md",
-    "docs/evidencias/s01.md"
+    "docs/evidencias/s01.md",
+    "docs/evidencias/s01-visual.md"
   ],
   "tests": [
     "npm run test:unit -- --run --coverage",
@@ -31,7 +36,9 @@
   "acceptance": [
     "Com baseDate 2026-11-11, saldo R$ 3.000 e mínimo R$ 1.000: 12/11 fecha R$ 500 (déficit R$ 500), 13/11 fecha R$ 1.300, 14/11 fecha -R$ 700 (déficit R$ 1.700), 15/11 fecha R$ 3.300.",
     "Reimportação dupla não altera saldo e reset demo é explícito",
-    "Logs de unit/E2E/build e cobertura >=80% medida são registrados, sem inventar resultados"
+    "Logs de unit/E2E/build e cobertura >=80% medida são registrados, sem inventar resultados",
+    "Checklist de visual, mobile, teclado, contraste e estados é preenchido com evidências concretas ou não verificado, em 390x844, 768x1024, 1440x900",
+    "O layout possui identidade original, cartões e formulários conforme especificação, sem números estáticos enganadores"
   ],
-  "context_budget_tokens": 8000
+  "context_budget_tokens": 12000
 }

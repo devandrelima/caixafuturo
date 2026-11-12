@@ -35,6 +35,7 @@
           "map": "sprints/S01/P02.md",
           "tasks": [
             "sprints/S01/tasks/T04.json",
+            "sprints/S01/tasks/T07.json",
             "sprints/S01/tasks/T05.json",
             "sprints/S01/tasks/T06.json"
           ]
