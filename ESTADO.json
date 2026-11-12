@@ -104,7 +104,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S04-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "66c059c",
+      "evidence": "Testes escritos antes e vistos falhar (módulo inexistente). csv.test.ts 43/43 (neutralização de = + - @ TAB CR inclusive após espaços, escape de aspas/;/CR/LF, decimal pt-BR por BigInt, propriedade com 300 textos adversariais lidos de volta por leitor RFC 4180 independente, filtro = lista exportada, ida e volta com o importador real) + exportMenu.test.tsx 12/12. Mutação: 25 mutantes de csv/ExportMenu/ligação derrubados; 1 sobreviveu (separador de ids no diário) e gerou teste; 1 equivalente (NBSP redundante com \\s) levou a simplificar o regex. Erros dos TESTES: tokenize do importador não trata CRLF; readAsText descarta o BOM (verificado por bytes); linha inútil que esperava botão inexistente. Achado do CÓDIGO: NBSP literal no regex, trocado por escape. Unit 693/693, cobertura global 95,76% stmts/90,84% branches, código alterado da sprint 94,60%/90,04%. E2E local 54/54 (4 novos: download real com BOM e filtro, injeção digitada pela tela, ida e volta pelo importador real, 13 semanas e diária). tsc e build OK. LIMITES verificados e documentados (ADR-0008 D12): manual/recorrente/demo reimportados no mesmo banco entram como novos; descrição neutralizada e id externo iniciado por =+-@ mudam a chave. Não verificado: Excel/LibreOffice/Google Planilhas. Manifesto: writes ampliado (ExportMenu test, EntriesPanel, WeeklyView, DetailFilters, App, styles, E2E, evidências).",
+      "verification": "declarada; confira logs e Git"
     },
     "S05-P01-T01": {
       "status": "pendente"
