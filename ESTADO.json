@@ -14,7 +14,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S01-P01-T03": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "b7829c4",
+      "evidence": "csv.test.ts + sha256.test.ts 52/52 passam (vetores FIPS 180-4, 1M de 'a', fronteiras de padding e 200 textos aleatórios iguais a node:crypto; funciona com crypto.subtle indefinido); cobertura v8 domain/import ver relatório de suíte; build OK",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T01": {
       "status": "concluida",
