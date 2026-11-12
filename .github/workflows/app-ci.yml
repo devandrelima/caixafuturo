@@ -1,0 +1,51 @@
+name: app-ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Testes unitários com cobertura (mínimo 80%)
+        run: npm run test:unit -- --run --coverage
+      - name: Build
+        run: npm run build
+      - name: E2E (somente se já existirem)
+        run: |
+          if [ -d tests/e2e ] && [ -n "$(ls -A tests/e2e)" ]; then
+            npx playwright install --with-deps chromium
+            npm run test:e2e
+          else
+            echo "tests/e2e ainda não existe; etapa ignorada."
+          fi
+  docker:
+    runs-on: ubuntu-latest
+    needs: app
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar compose
+        run: docker compose config -q
+      - name: Build da imagem
+        run: docker build -t caixafuturo:ci --build-arg GIT_SHA=${{ github.sha }} .
+      - name: Smoke test do contêiner (saúde, HTTP e fallback de SPA)
+        run: |
+          docker run -d --name cf -p 8084:8080 caixafuturo:ci
+          for i in $(seq 1 30); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' cf)" = healthy ] && break
+            sleep 2
+          done
+          test "$(docker inspect -f '{{.State.Health.Status}}' cf)" = healthy
+          curl -fsS http://127.0.0.1:8084/ | grep -q '<div id="root">'
+          curl -fsS http://127.0.0.1:8084/movimentacoes | grep -q '<div id="root">'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8084/assets/inexistente.js)" = 404
+          docker rm -f cf
