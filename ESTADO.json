@@ -47,7 +47,10 @@
       "status": "pendente"
     },
     "S02-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "61ced39",
+      "evidence": "baseline.test.ts 27/27 (visto falhar antes: módulo inexistente); valores esperados calculados à mão (14 dias, soma R$ 5.880, média R$ 420,00, tendência +1000 bps, médias por dia da semana, arredondamento, zeros preenchidos, limites 7/28 dias); suíte total 271/271; cobertura v8 domain/forecast 100% stmts/98.48% branches, global 94.21%/89.1%; tsc --noEmit e build OK. Backtesting e faixas ficam para S03; sem UI nesta task, sem deploy.",
+      "verification": "declarada; confira logs e Git"
     },
     "S02-P02-T02": {
       "status": "pendente"
