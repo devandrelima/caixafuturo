@@ -92,7 +92,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S04-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "c8b5798",
+      "evidence": "Testes escritos antes e vistos falhar (módulo inexistente). weekly.test.ts 18/18: fixture à mão (data-base quinta 12/11/2026, 13 semanas até 07/02/2027, 1ª parcial de 3 dias, virada de ano em 28/12–03/01, semana 8 termina em R$ 5.300,00 mas passou por −R$ 2.700,00 em 31/12 e marca risco negativo; lançamento de 08/02 fora do horizonte e o da data-base não entram); datas-base domingo (91 dias) e segunda (90); propriedade com 120 rodadas determinísticas (saldo semanal = fechamento diário do último dia, comparado a cálculo independente por entradas; encadeamento; totais; risco = pior dia). Mutação: 16 mutantes (sem corte, corte em 12, fechamento errado, semana iniciando no domingo, risco do último dia, horizonte +1, validações do ponto, encadeamento, lacuna, parcial, abertura, menor saldo, shortfall, beyondHorizon, riskDays); 1 sobreviveu (checagem de encadeamento abertura=fechamento anterior) e gerou teste novo; os 16 derrubados. Cobertura v8 weekly.ts 100% stmts/100% branches/100% funções. tsc --noEmit e build OK. Correção de decisão documentada: ADR-0008 D9 e contrato (parcial é a 1ª semana). Sem UI/deploy.",
+      "verification": "declarada; confira logs e Git"
     },
     "S04-P02-T01": {
       "status": "pendente"
