@@ -1,6 +1,6 @@
 # PEND-S02-001 — Conciliação de recebíveis importados versus derivados de vendas
 
-**Status:** pendência técnica aberta para **Sprint 2** (não foi resolvida nem implementada na Sprint 1).  
+**Status:** **decisão registrada em 12/11/2026** ([ADR-0006](../../decisoes/0006-conciliacao-recebiveis.md)); implementação e prova (testes/E2E/UI) ainda exigidas pelo gate abaixo. Parcelas e lotes: **limitação documentada** (não suportados).  
 **Responsável por resolução e prova:** executor/integrador de `S02-P01-T02`, revisado em `S02-P02-T02`; aprovação pelo humano no gate da Sprint 2.  
 **Risco:** alta prioridade — **duplicação de entradas financeiras e saldo projetado incorreto**.
 

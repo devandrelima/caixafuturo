@@ -13,5 +13,11 @@ DailyPoint = {date, openingCents, incomingCents, outgoingCents, closingCents, en
 Vendas não são dinheiro disponível. Vendas geram expectativa de recebível líquido por regra de repasse, ligada à origem. Realizado/confirmado substitui ou concilia previsto, nunca soma ambos. Preservar IDs causais em saldo/alerta. Reimportar por chave estável não duplica eventos. Saldo real da data-base não é sobrescrito por hipótese, previsão ou cenário. Testar zero, negativo, reimportação, fim de mês e diferença entre datas.
 
 
-## Ponto ainda não resolvido da Sprint 2
-A prioridade "confirmado > previsto" não define **como** reconhecer que um recebível CSV e um gerado a partir de venda representam o mesmo repasse. A definição é pendente [PEND-S02-001](../pendencias/S02-conciliacao-recebiveis.md). Não presumir equivalência apenas por valor/data nem agregar os dois automaticamente. O contrato de vínculo deve ser consolidado antes de `S02-P01-T02` implementar liquidação, com regressão obrigatória do motor de projeção.
+## Conciliação entre origens (S02) — decidida em [ADR-0006](../../decisoes/0006-conciliacao-recebiveis.md)
+Resolve a PEND-S02-001. Resumo normativo:
+- `CashEntry.saleReference?` guarda o `identificador_venda` informado na coluna `referencia_venda` do CSV de contas (`A|B` = lote, não suportado). Vínculo automático **somente** por essa referência; nunca por valor+data.
+- Recebível derivado de venda é **calculado** (não gravado) por regra de repasse: líquido = bruto − round_half_up(bruto × (taxa+comissão)/10000); data = venda + prazo (dias corridos). Mudar taxa/prazo muda data e valor do caixa.
+- Prioridade: importado > derivado. Estados do derivado: `derived` (conta), `reconciled`, `pending`, `covered_batch`, `covered_installments`, `before_base_date`; só `derived` entra no saldo. Pendente = há conta importada sem referência a ≤ 3 dias do derivado; no saldo entra só a importada até decisão humana (`same` ou `standalone`).
+- O resultado independe da ordem de importação (vínculo recalculado do estado). Editar/liquidar mantém o vínculo; excluir a conta devolve o derivado ao saldo.
+- **Limitações:** parcelas e lotes não suportados (sinalizados); prazo em dias corridos; sem estorno/pagamento parcial.
+- Regressão obrigatória do `project()` da S01 (demo 12/11 R$ 500 · 13/11 R$ 1.300 · 14/11 −R$ 700 · 15/11 R$ 3.300) inalterada: derivados chegam ao motor como `CashEntry` comuns (`origin: 'sale'`, `sourceKey: sale-settlement:<id>`).

@@ -10,20 +10,30 @@
     "docs/especificacao/memoria/financeiro.md",
     "docs/especificacao/contratos/financeiro.md",
     "docs/especificacao/pendencias/S02-conciliacao-recebiveis.md",
-    "docs/especificacao/contratos/importacao.md"
+    "docs/especificacao/contratos/importacao.md",
+    "docs/decisoes/0006-conciliacao-recebiveis.md"
   ],
   "reads": [
-    "src/storage/repository.ts",
     "src/domain/finance/projection.ts",
     "src/domain/sales/importSales.ts"
   ],
   "writes": [
     "src/domain/sales/settlement.ts",
+    "src/domain/sales/reconcile.ts",
+    "src/domain/sales/types.ts",
     "src/domain/sales/__tests__/settlement.test.ts",
-    "src/storage/salesRepository.ts"
+    "src/domain/sales/__tests__/reconcile.test.ts",
+    "src/storage/salesRepository.ts",
+    "src/storage/__tests__/salesRepository.test.ts",
+    "src/storage/db.ts",
+    "src/storage/repository.ts",
+    "src/domain/finance/types.ts",
+    "src/domain/import/csv.ts",
+    "src/domain/import/__tests__/csv.test.ts"
   ],
   "tests": [
-    "npm run test:unit -- --run src/domain/sales/__tests__/settlement.test.ts"
+    "npm run test:unit -- --run src/domain/sales src/storage src/domain/import",
+    "npx tsc --noEmit"
   ],
   "acceptance": [
     "Datas de repasse e valores líquidos coincidem com exemplos calculados manualmente",
