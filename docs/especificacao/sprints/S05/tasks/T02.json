@@ -9,12 +9,16 @@
   "context": [
     "docs/especificacao/memoria/simulacao.md",
     "docs/especificacao/contratos/simulacao.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/decisoes/0009-simulador-de-cenarios.md"
   ],
   "reads": [],
   "writes": [
     "src/domain/scenarios/delay.ts",
-    "src/domain/scenarios/__tests__/delay.test.ts"
+    "src/domain/scenarios/engine.ts",
+    "src/domain/scenarios/types.ts",
+    "src/domain/scenarios/__tests__/delay.test.ts",
+    "src/domain/scenarios/__tests__/engine.test.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/scenarios/__tests__/delay.test.ts"
@@ -24,5 +28,5 @@
     "Cenário base fica intacto",
     "Data/valor crítico são recalculados"
   ],
-  "context_budget_tokens": 8000
+  "context_budget_tokens": 10000
 }

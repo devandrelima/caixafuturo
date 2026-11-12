@@ -9,7 +9,8 @@
   "context": [
     "docs/especificacao/memoria/simulacao.md",
     "docs/especificacao/contratos/simulacao.md",
-    "docs/especificacao/contratos/financeiro.md"
+    "docs/especificacao/contratos/financeiro.md",
+    "docs/decisoes/0009-simulador-de-cenarios.md"
   ],
   "reads": [],
   "writes": [
@@ -25,5 +26,5 @@
     "Mesmo input retorna mesmo resultado",
     "Diferença diária é aritmética exata"
   ],
-  "context_budget_tokens": 8000
+  "context_budget_tokens": 10000
 }
