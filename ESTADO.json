@@ -14,7 +14,10 @@
       "status": "pendente"
     },
     "S01-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "9572b1d",
+      "evidence": "projection.test.ts 37/37 passam (inclui dataset demo-s01 e propriedade com 25 rodadas pseudoaleatórias); suíte total 99 passam; cobertura v8 global 97.14% stmts/93.66% branches (projection.ts 98.7%); domínio também verde com TZ=America/Sao_Paulo e Pacific/Kiritimati; build OK",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T02": {
       "status": "pendente"
