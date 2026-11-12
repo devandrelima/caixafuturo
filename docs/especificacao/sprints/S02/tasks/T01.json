@@ -15,7 +15,8 @@
   "writes": [
     "src/domain/sales/importSales.ts",
     "src/domain/sales/types.ts",
-    "src/domain/sales/__tests__/importSales.test.ts"
+    "src/domain/sales/__tests__/importSales.test.ts",
+    "src/domain/import/csv.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/sales/__tests__/importSales.test.ts"

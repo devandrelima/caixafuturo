@@ -37,9 +37,9 @@ const fatal = (message: string): CsvPreview => ({ ...EMPTY, valid: [], duplicate
 
 const REQUIRED = ['tipo', 'descricao', 'valor', 'vencimento'] as const;
 const KNOWN = [...REQUIRED, 'categoria', 'identificador_externo'] as const;
-const DELIMITERS = [';', ',', '\t'] as const;
+export const DELIMITERS = [';', ',', '\t'] as const;
 
-const headerName = (raw: string): string =>
+export const headerName = (raw: string): string =>
   raw
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -47,13 +47,13 @@ const headerName = (raw: string): string =>
     .toLowerCase()
     .replace(/[\s-]+/g, '_');
 
-interface RawRecord {
+export interface RawRecord {
   line: number;
   fields: string[];
 }
 
 /** Tokenizador RFC 4180: aspas, aspas escapadas ("") e quebras de linha dentro de campos. */
-function tokenize(text: string, delimiter: string): { records: RawRecord[]; unclosedAtLine: number | null } {
+export function tokenize(text: string, delimiter: string): { records: RawRecord[]; unclosedAtLine: number | null } {
   const records: RawRecord[] = [];
   let fields: string[] = [];
   let field = '';
@@ -102,7 +102,7 @@ function tokenize(text: string, delimiter: string): { records: RawRecord[]; uncl
   return { records, unclosedAtLine: null };
 }
 
-const isBlank = (r: RawRecord) => r.fields.every((f) => f.trim() === '');
+export const isBlank = (r: RawRecord) => r.fields.every((f) => f.trim() === '');
 
 function detectDelimiter(headerLine: string): { delimiter: string; columns: string[] } {
   let best = { delimiter: ';', columns: [] as string[], score: -1 };
