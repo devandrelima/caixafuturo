@@ -8,15 +8,25 @@ import { EntryForm, SettingsForm } from '../components/FinanceForm';
 import { ForecastPanel } from '../components/ForecastPanel';
 import { ImportPreview } from '../components/ImportPreview';
 import { Onboarding } from '../components/Onboarding';
+import { RecurringPanel } from '../components/RecurringPanel';
 import { RiskCalendar } from '../components/RiskCalendar';
 import { RiskExplanation } from '../components/RiskExplanation';
 import { SalesView } from '../components/SalesView';
+import { WeeklyView } from '../components/WeeklyView';
+import { riskSentence } from '../components/riskText';
 import type { PendingSalesImport } from '../components/SalesPanel';
 import { CfAlert, CfButton, CfCard } from '../components/ui/UiPrimitives';
 import { createRestaurantDemo } from '../demo/restaurant';
 import { createForecastDemo } from '../demo/forecastDemo';
+import { createRecurringDemo } from '../demo/recurringDemo';
 import { createSalesDemo } from '../demo/salesDemo';
-import { todayISO, formatBR } from '../domain/finance/dates';
+import { addDays, todayISO, formatBR } from '../domain/finance/dates';
+import { traceEntry } from '../domain/finance/filters';
+import type { EntryTrace } from '../domain/finance/filters';
+import { expandRecurrences } from '../domain/finance/recurrence';
+import type { RecurrenceRule } from '../domain/finance/recurrence';
+import { projectWeekly, weeklyHorizonDays } from '../domain/finance/weekly';
+import type { WeeklyProjection } from '../domain/finance/weekly';
 import { formatBRL } from '../domain/finance/money';
 import { ProjectionError, project } from '../domain/finance/projection';
 import type { ProjectionResult } from '../domain/finance/projection';
@@ -27,6 +37,7 @@ import { planSalesImport, previewSalesCsv } from '../domain/sales/importSales';
 import { reconcile } from '../domain/sales/reconcile';
 import { DEFAULT_SETTLEMENT_RULES } from '../domain/sales/settlement';
 import type { ReconciliationDecision, Sale, SettlementRules } from '../domain/sales/types';
+import { newRuleId } from '../storage/recurrenceRepository';
 import { getRepository, StorageError } from '../storage/repository';
 import type { DatasetKind, EntryDraft, Repository } from '../storage/repository';
 
@@ -36,7 +47,7 @@ const TITLES: Record<View, { title: string; subtitle: string }> = {
   movimentacoes: { title: 'Movimentações', subtitle: 'Cadastre, importe e ajuste contas a pagar e a receber.' },
   vendas: { title: 'Vendas e recebimentos', subtitle: 'Importe vendas, configure repasses e separe faturamento, recebimentos e saldo.' },
   previsoes: { title: 'Previsões', subtitle: 'Compare modelos de faturamento, veja o erro medido e o previsto versus realizado.' },
-  calendario: { title: 'Calendário', subtitle: 'Veja o saldo e os lançamentos de cada data.' },
+  calendario: { title: 'Calendário', subtitle: 'Veja o saldo de cada data, as próximas 13 semanas e as recorrências.' },
 };
 
 interface Data {
@@ -46,6 +57,7 @@ interface Data {
   sales: Sale[];
   rules: SettlementRules;
   decisions: ReconciliationDecision[];
+  recurrences: RecurrenceRule[];
 }
 type Phase = { status: 'loading' } | { status: 'ready' } | { status: 'error'; message: string };
 type Notice = { tone: 'positive' | 'negative' | 'warning'; text: string } | null;
@@ -53,6 +65,7 @@ type Confirm =
   | { type: 'demo' }
   | { type: 'clear' }
   | { type: 'delete'; entry: CashEntry }
+  | { type: 'rule'; rule: RecurrenceRule }
   | null;
 interface PendingImport {
   fileName: string;
@@ -92,7 +105,7 @@ export interface AppProps {
 export function App({ repository }: AppProps) {
   const repo = useMemo(() => repository ?? getRepository(), [repository]);
   const [phase, setPhase] = useState<Phase>({ status: 'loading' });
-  const [data, setData] = useState<Data>({ settings: null, entries: [], kind: null, sales: [], rules: DEFAULT_SETTLEMENT_RULES, decisions: [] });
+  const [data, setData] = useState<Data>({ settings: null, entries: [], kind: null, sales: [], rules: DEFAULT_SETTLEMENT_RULES, decisions: [], recurrences: [] });
   const [view, setView] = useState<View>(viewFromHash);
   const [started, setStarted] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
@@ -106,15 +119,16 @@ export function App({ repository }: AppProps) {
   const [selectedDate, setSelectedDate] = useState<ISODate | null>(null);
 
   const reload = useCallback(async () => {
-    const [settings, entries, kind, sales, rules, decisions] = await Promise.all([
+    const [settings, entries, kind, sales, rules, decisions, recurrences] = await Promise.all([
       repo.getSettings(),
       repo.listEntries(),
       repo.getDatasetKind(),
       repo.sales.listSales(),
       repo.sales.getRules(),
       repo.sales.listDecisions(),
+      repo.recurrence.listRules(),
     ]);
-    setData({ settings, entries, kind, sales, rules, decisions });
+    setData({ settings, entries, kind, sales, rules, decisions, recurrences });
   }, [repo]);
 
   useEffect(() => {
@@ -147,17 +161,30 @@ export function App({ repository }: AppProps) {
     [data.settings, data.sales, data.rules, data.entries, data.decisions],
   );
 
-  // Motor: única origem de saldos, riscos e datas exibidos.
-  const projection = useMemo<{ result: ProjectionResult | null; error: string | null }>(() => {
-    if (!data.settings || !reconciliation) return { result: null, error: null };
-    try {
-      return { result: project(data.settings, reconciliation.projectionEntries), error: null };
-    } catch (error) {
-      return { result: null, error: error instanceof ProjectionError ? error.message : 'Não foi possível calcular a projeção.' };
-    }
-  }, [data.settings, reconciliation]);
+  // Recorrências (ADR-0008): ocorrências CALCULADAS das regras, ainda não gravadas, depois da data-base.
+  const expansion = useMemo(
+    () =>
+      data.settings && data.recurrences.length > 0
+        ? expandRecurrences(data.recurrences, data.entries, { from: addDays(data.settings.baseDate, 1), to: addDays(data.settings.baseDate, weeklyHorizonDays(data.settings.baseDate)) })
+        : { entries: [] as CashEntry[], covered: [], invalidRules: [] },
+    [data.settings, data.recurrences, data.entries],
+  );
+  const planningEntries = useMemo(() => [...(reconciliation?.projectionEntries ?? []), ...expansion.entries], [reconciliation, expansion]);
 
-  const entriesById = useMemo(() => new Map((reconciliation?.projectionEntries ?? data.entries).map((e) => [e.id, e] as const)), [reconciliation, data.entries]);
+  // Motor: única origem de saldos, riscos e datas exibidos (a visão de 13 semanas agrega o MESMO cálculo diário).
+  const projection = useMemo<{ result: ProjectionResult | null; weekly: WeeklyProjection | null; error: string | null }>(() => {
+    if (!data.settings || !reconciliation) return { result: null, weekly: null, error: null };
+    try {
+      return { result: project(data.settings, planningEntries), weekly: projectWeekly(data.settings, planningEntries), error: null };
+    } catch (error) {
+      return { result: null, weekly: null, error: error instanceof ProjectionError ? error.message : 'Não foi possível calcular a projeção.' };
+    }
+  }, [data.settings, reconciliation, planningEntries]);
+
+  const entriesById = useMemo(() => new Map([...(reconciliation?.projectionEntries ?? data.entries), ...expansion.entries].map((e) => [e.id, e] as const)), [reconciliation, data.entries, expansion]);
+  const movements = useMemo(() => [...data.entries, ...expansion.entries].sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.id.localeCompare(b.id)), [data.entries, expansion]);
+  const calculatedIds = useMemo(() => new Set(expansion.entries.map((e) => e.id)), [expansion]);
+  const traceOf = (entry: CashEntry): EntryTrace => (projection.weekly ? traceEntry(entry, projection.weekly.projection) : { kind: 'not_counted' });
   const flaggedIds = useMemo(() => new Set(projection.result?.flagged.map((f) => f.entryId) ?? []), [projection.result]);
   const effectiveSelected = selectedDate ?? projection.result?.summary.firstRisk?.date ?? projection.result?.points[0]?.date ?? null;
   const hasData = data.settings !== null || data.entries.length > 0;
@@ -309,6 +336,32 @@ export function App({ repository }: AppProps) {
     }
   }
 
+  async function saveRecurrence(rule: RecurrenceRule): Promise<string | null> {
+    setBusy(true);
+    try {
+      await repo.recurrence.saveRule({ ...rule, id: rule.id || newRuleId() });
+      await reload();
+      setNotice({ tone: 'positive', text: 'Recorrência salva; as ocorrências futuras e os saldos foram recalculados. O que já foi lançado não mudou.' });
+      return null;
+    } catch (error) {
+      return messageOf(error);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function skipOccurrence(rule: RecurrenceRule, date: ISODate) {
+    await run(() => repo.recurrence.saveRule({ ...rule, skippedDates: [...new Set([...(rule.skippedDates ?? []), date])].sort() }), `Ocorrência de ${formatBR(date)} pulada; as demais continuam.`);
+  }
+
+  async function loadDemoRecurrences() {
+    const demo = createRecurringDemo();
+    await run(async () => {
+      for (const rule of demo.rules) await repo.recurrence.saveRule(rule);
+      await repo.importEntries(demo.entries); // idempotente por chave de origem
+    }, 'Recorrências fictícias carregadas (dia 31, semanal, com data final e uma ocorrência já liquidada).');
+  }
+
   async function decide(decision: ReconciliationDecision) {
     await run(() => repo.sales.saveDecision(decision), 'Decisão de conciliação registrada.');
   }
@@ -325,6 +378,9 @@ export function App({ repository }: AppProps) {
       await loadDemo();
     } else if (current.type === 'delete') {
       await run(() => repo.deleteEntry(current.entry.id), 'Lançamento excluído.');
+      setConfirm(null);
+    } else if (current.type === 'rule') {
+      await run(() => repo.recurrence.removeRule(current.rule.id), 'Recorrência excluída. Lançamentos já gravados ou liquidados foram mantidos.');
       setConfirm(null);
     } else {
       const ok = await run(() => repo.clearAll({ confirmed: true }), 'Todos os dados foram apagados deste navegador.');
@@ -385,6 +441,20 @@ export function App({ repository }: AppProps) {
       title="Comece informando seus saldos"
     />
   );
+
+  // O alerta global mostra o pior caso (negativo antes de "abaixo do mínimo"), como o painel.
+  const alertPoint = projection.result ? (projection.result.summary.firstNegative ?? projection.result.summary.firstRisk) : null;
+  const globalAlert = projection.result ? (
+    alertPoint ? (
+      <CfAlert tone={alertPoint.risk === 'negative' ? 'negative' : 'warning'} title="Alerta de saldo (não filtrado)">
+        {riskSentence(alertPoint)}; faltam {formatBRL(alertPoint.shortfallCents)} para o saldo mínimo.
+      </CfAlert>
+    ) : (
+      <CfAlert tone="positive" title="Sem alerta de saldo nos próximos 30 dias">
+        Nenhum dia fica abaixo do mínimo com todos os lançamentos.
+      </CfAlert>
+    )
+  ) : undefined;
 
   return (
     <AppShell activeView={view} onNavigate={navigate} demoMode={demoMode}>
@@ -456,7 +526,10 @@ export function App({ repository }: AppProps) {
             )}
 
             <EntriesPanel
-              entries={data.entries}
+              entries={movements}
+              calculatedIds={calculatedIds}
+              trace={traceOf}
+              globalAlert={globalAlert}
               flaggedIds={flaggedIds}
               disabled={busy}
               onAdd={() => { setFormError(undefined); setEditing('new'); }}
@@ -519,7 +592,22 @@ export function App({ repository }: AppProps) {
               onGoOverview={() => navigate('visao-geral')}
             />
           ) : (
-            <CalendarOnly result={projection.result} entriesById={entriesById} selectedDate={effectiveSelected} onSelectDate={setSelectedDate} />
+            <>
+              <CalendarOnly result={projection.result} entriesById={entriesById} selectedDate={effectiveSelected} onSelectDate={setSelectedDate} />
+              {projection.weekly && <WeeklyView weekly={projection.weekly.weekly} entriesById={entriesById} />}
+              <RecurringPanel
+                rules={data.recurrences}
+                occurrences={expansion.entries}
+                covered={expansion.covered}
+                invalidRules={expansion.invalidRules}
+                demoMode={demoMode}
+                busy={busy}
+                onSave={saveRecurrence}
+                onRemove={(rule) => setConfirm({ type: 'rule', rule })}
+                onSkip={(rule, date) => void skipOccurrence(rule, date)}
+                onLoadDemo={() => void loadDemoRecurrences()}
+              />
+            </>
           )
         ) : null}
       </div>
@@ -532,6 +620,13 @@ export function App({ repository }: AppProps) {
       {confirm?.type === 'clear' && (
         <ConfirmDialog title="Apagar todos os dados?" confirmLabel="Apagar tudo" busy={busy} onConfirm={() => void onConfirm()} onCancel={() => setConfirm(null)}>
           <p>Saldos e lançamentos salvos neste navegador serão apagados. Isso não pode ser desfeito.</p>
+        </ConfirmDialog>
+      )}
+      {confirm?.type === 'rule' && (
+        <ConfirmDialog title="Excluir esta recorrência?" confirmLabel="Excluir recorrência" busy={busy} onConfirm={() => void onConfirm()} onCancel={() => setConfirm(null)}>
+          <p>
+            {confirm.rule.description} ({formatBRL(BigInt(confirm.rule.amountCents))}) deixa de gerar ocorrências futuras. Lançamentos já gravados ou liquidados permanecem e os saldos serão recalculados.
+          </p>
         </ConfirmDialog>
       )}
       {confirm?.type === 'delete' && (
