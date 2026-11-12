@@ -32,7 +32,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T03": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "c84bdcf",
+      "evidence": "unit 219/219 e cobertura global 93.16% stmts/87.66% branches; E2E 17/17 no build local e 17/17 contra o container via IP publico (isSecureContext=false); build OK; docker healthy; capturas e achados A/B/C em docs/evidencias/s01*.md; sem aprovacao humana",
+      "verification": "declarada; confira logs e Git"
     },
     "S02-P01-T01": {
       "status": "pendente"
