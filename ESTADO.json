@@ -44,7 +44,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S02-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "b35276b",
+      "evidence": "Testes escritos antes e vistos falhar (módulos inexistentes; csv/ref 6 falhas). settlement 19, reconcile 23, csv +7, salesRepository 19 (inclui migração v1→v2 de banco populado e ponta a ponta contas→vendas = vendas→contas, reimportação sem duplicar, enriquecimento de referencia_venda): suíte total 338/338; 3 mutações em reconcile (pendente soma, janela, decisão sobre coberto) derrubam testes; cobertura v8: domain/sales 99.25% stmts/93.54% br, reconcile 100%/92.1%, settlement 96.4%, storage 92.1%/83.3%, global 94.8%/89.4%; tsc, build e E2E S01 18/18 com DB v2. 2 erros foram dos TESTES (conta à mão do débito 498c; ordenação por id-hash), não do app. Decisão do usuário em ADR-0006; parcelas/lotes = limitação sinalizada; sem UI (T04), sem deploy ainda.",
+      "verification": "declarada; confira logs e Git"
     },
     "S02-P02-T01": {
       "status": "concluida",
