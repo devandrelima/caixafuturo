@@ -262,6 +262,19 @@ test.describe('navegação, teclado e acessibilidade básica', () => {
     await expect(items).toHaveCount(3);
   });
 
+  test('calendário: a data-base é clicável e mostra o saldo informado; dias anteriores ficam inativos', async ({ page }) => {
+    await loadDemo(page);
+    await nav(page, 'Calendário');
+    const base = page.getByRole('button', { name: /^11\/11\/2026, data-base, saldo informado R\$ 3\.000,00/ });
+    await expect(base).toBeVisible();
+    await base.click();
+    await expect(base).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText(/Saldo informado ao fim do dia:/)).toContainText('R$ 3.000,00');
+    await expect(page.getByText(/conferido por você, não projetado/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /^10\/11\/2026/ })).toHaveCount(0);
+    await page.screenshot({ path: `${SHOTS}/e2e-calendario-data-base.png` });
+  });
+
   test('foco visível, nomes acessíveis e alvos de toque >= 44px', async ({ page }, info) => {
     await loadDemo(page);
     await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR');

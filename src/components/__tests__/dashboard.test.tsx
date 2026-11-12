@@ -122,7 +122,7 @@ describe('RiskCalendar', () => {
   it('lista os 30 dias do horizonte em dois meses e navega entre eles', async () => {
     const { result, byId } = demo();
     const onSelect = vi.fn();
-    render(<RiskCalendar points={result.points} entriesById={byId} selectedDate="2026-11-14" onSelectDate={onSelect} firstRiskDate="2026-11-12" />);
+    render(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate="2026-11-14" onSelectDate={onSelect} firstRiskDate="2026-11-12" />);
     expect(screen.getByText(/novembro de 2026/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /mês anterior/i })).toBeDisabled();
     expect(screen.getAllByRole('button', { name: /^\d{2}\/\d{2}\/2026, saldo/ })).toHaveLength(19); // 12..30/11
@@ -134,7 +134,7 @@ describe('RiskCalendar', () => {
 
   it('dia crítico tem rótulo textual e detalhe com a origem do cálculo', () => {
     const { result, byId } = demo();
-    render(<RiskCalendar points={result.points} entriesById={byId} selectedDate="2026-11-14" onSelectDate={() => {}} firstRiskDate="2026-11-12" />);
+    render(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate="2026-11-14" onSelectDate={() => {}} firstRiskDate="2026-11-12" />);
     const day = screen.getByRole('button', { name: /14\/11\/2026, saldo -R\$ 700,00, Saldo negativo, pagamento/ });
     expect(day).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText(/faltam R\$ 1\.700,00 para o mínimo/)).toBeInTheDocument();
@@ -144,7 +144,7 @@ describe('RiskCalendar', () => {
   it('selecionar data e "Ir para a próxima data crítica" notificam a data do motor', async () => {
     const { result, byId } = demo();
     const onSelect = vi.fn();
-    render(<RiskCalendar points={result.points} entriesById={byId} selectedDate="2026-11-20" onSelectDate={onSelect} firstRiskDate="2026-11-12" />);
+    render(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate="2026-11-20" onSelectDate={onSelect} firstRiskDate="2026-11-12" />);
     await userEvent.click(screen.getByRole('button', { name: /13\/11\/2026, saldo R\$ 1\.300,00/ }));
     expect(onSelect).toHaveBeenLastCalledWith('2026-11-13');
     await userEvent.click(screen.getByRole('button', { name: /ir para a próxima data crítica/i }));
@@ -154,9 +154,37 @@ describe('RiskCalendar', () => {
 
   it('sem risco não oferece o atalho; sem pontos mostra estado vazio', () => {
     const { result, byId } = demo();
-    const { rerender } = render(<RiskCalendar points={result.points} entriesById={byId} selectedDate={null} onSelectDate={() => {}} firstRiskDate={null} />);
+    const { rerender } = render(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate={null} onSelectDate={() => {}} firstRiskDate={null} />);
     expect(screen.queryByRole('button', { name: /próxima data crítica/i })).toBeNull();
-    rerender(<RiskCalendar points={[]} entriesById={byId} selectedDate={null} onSelectDate={() => {}} firstRiskDate={null} />);
+    rerender(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={[]} entriesById={byId} selectedDate={null} onSelectDate={() => {}} firstRiskDate={null} />);
     expect(screen.getByText(/sem dados para exibir/i)).toBeInTheDocument();
+  });
+
+  it('a data-base é destacada e clicável e mostra o saldo INFORMADO (não projetado)', async () => {
+    const { result, byId } = demo();
+    const onSelect = vi.fn();
+    const { rerender } = render(
+      <RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate="2026-11-14" onSelectDate={onSelect} firstRiskDate="2026-11-12" />,
+    );
+    const base = screen.getByRole('button', { name: /^11\/11\/2026, data-base, saldo informado R\$ 3\.000,00/ });
+    expect(base).toBeEnabled();
+    expect(base).toHaveTextContent('base');
+    // dias anteriores à data-base continuam inativos
+    expect(screen.queryByRole('button', { name: /^10\/11\/2026/ })).toBeNull();
+    await userEvent.click(base);
+    expect(onSelect).toHaveBeenLastCalledWith('2026-11-11');
+    rerender(<RiskCalendar baseDate="2026-11-11" openingCents={300000n} points={result.points} entriesById={byId} selectedDate="2026-11-11" onSelectDate={onSelect} firstRiskDate="2026-11-12" />);
+    expect(screen.getByText('Data-base')).toBeInTheDocument();
+    expect(screen.getByText(/Saldo informado ao fim do dia:/)).toHaveTextContent('R$ 3.000,00');
+    expect(screen.getByText(/conferido por você, não projetado/)).toBeInTheDocument();
+    expect(screen.getByText(/projeção começa no dia seguinte/i)).toBeInTheDocument();
+    expect(screen.queryByText(/faltam R\$/)).toBeNull();
+  });
+
+  it('data-base no último dia do mês: o mês da data-base continua navegável', () => {
+    const settings = { baseDate: '2026-11-30', openingBalanceCents: '100000', minimumBalanceCents: '0' };
+    const result = project(settings, []);
+    render(<RiskCalendar baseDate="2026-11-30" openingCents={100000n} points={result.points} entriesById={new Map()} selectedDate={null} onSelectDate={() => {}} firstRiskDate={null} />);
+    expect(screen.getByRole('button', { name: /^30\/11\/2026, data-base/ })).toBeInTheDocument();
   });
 });

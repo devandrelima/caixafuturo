@@ -279,6 +279,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .cf-cal__day--off { background: transparent; border-color: transparent; color: var(--cf-disabled-text); cursor: default; }
 .cf-cal__day:hover:not(.cf-cal__day--off) { background: var(--cf-surface-hover); }
 .cf-cal__day[aria-pressed='true'] { border: 2px solid var(--cf-text); font-weight: 700; }
+.cf-cal__day--base { border: 1px dashed var(--cf-border-strong); background: var(--cf-surface-secondary); }
 .cf-cal__day--below_minimum { background: var(--cf-warning-surface); color: var(--cf-warning); }
 .cf-cal__day--negative { background: var(--cf-negative-surface); color: var(--cf-negative); }
 .cf-cal__marks { font-size: var(--cf-fs-caption); line-height: 1; min-height: 12px; }

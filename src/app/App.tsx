@@ -407,5 +407,5 @@ export function App({ repository }: AppProps) {
 }
 
 function CalendarOnly({ result, entriesById, selectedDate, onSelectDate }: { result: ProjectionResult; entriesById: ReadonlyMap<string, CashEntry>; selectedDate: ISODate | null; onSelectDate: (d: ISODate) => void }) {
-  return <RiskCalendar points={result.points} entriesById={entriesById} selectedDate={selectedDate} onSelectDate={onSelectDate} firstRiskDate={result.summary.firstRisk?.date ?? null} />;
+  return <RiskCalendar baseDate={result.summary.baseDate} openingCents={result.summary.openingCents} points={result.points} entriesById={entriesById} selectedDate={selectedDate} onSelectDate={onSelectDate} firstRiskDate={result.summary.firstRisk?.date ?? null} />;
 }

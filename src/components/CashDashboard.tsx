@@ -125,7 +125,7 @@ export function CashDashboard({ settings, result, entriesById, selectedDate, onS
       </CfCard>
 
       <div className="cf-grid cf-grid--two">
-        <RiskCalendar points={points} entriesById={entriesById} selectedDate={selectedDate} onSelectDate={onSelectDate} firstRiskDate={summary.firstRisk?.date ?? null} />
+        <RiskCalendar baseDate={settings.baseDate} openingCents={summary.openingCents} points={points} entriesById={entriesById} selectedDate={selectedDate} onSelectDate={onSelectDate} firstRiskDate={summary.firstRisk?.date ?? null} />
         <CfCard title={riskPoints.length > 0 ? 'Alertas por data' : 'Próximos lançamentos'} description={riskPoints.length > 0 ? 'Dias abaixo do mínimo ou negativos, com a origem.' : 'Os próximos lançamentos agendados.'}>
           {(riskPoints.length > 0 ? riskPoints.slice(0, 8) : upcoming).length === 0 ? (
             <p className="cf-muted">Nenhum lançamento agendado nos próximos 30 dias.</p>
