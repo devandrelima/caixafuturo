@@ -284,3 +284,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .cf-cal__day--negative { background: var(--cf-negative-surface); color: var(--cf-negative); }
 .cf-cal__marks { font-size: var(--cf-fs-caption); line-height: 1; min-height: 12px; }
 .cf-cal__detail { margin-top: 16px; border-top: 1px solid var(--cf-border); padding-top: 16px; }
+
+/* ---- S02: vendas e recebimentos ---- */
+.cf-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 640px) { .cf-grid--three { grid-template-columns: minmax(0, 1fr); } }
+.cf-fieldset { border: 1px solid var(--cf-border); border-radius: var(--cf-radius-field); padding: 12px 16px 16px; margin: 0; min-width: 0; }
+.cf-fieldset legend { padding: 0 8px; font-weight: 600; color: var(--cf-text); }
+.cf-subcard { border: 1px solid var(--cf-border); border-radius: var(--cf-radius-field); background: var(--cf-surface-secondary); padding: 12px 16px; }
+.cf-subcard p { margin: 0 0 8px; }
+.cf-details { border: 1px solid var(--cf-border); border-radius: var(--cf-radius-field); background: var(--cf-surface); }
+.cf-details > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.cf-details > summary:focus-visible { outline: 3px solid var(--cf-focus); outline-offset: 2px; }
+.cf-details__body { padding: 0 16px 16px; }
+.cf-details__body p { margin: 8px 0; }

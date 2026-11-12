@@ -8,22 +8,31 @@ import { EntryForm, SettingsForm } from '../components/FinanceForm';
 import { ImportPreview } from '../components/ImportPreview';
 import { Onboarding } from '../components/Onboarding';
 import { RiskCalendar } from '../components/RiskCalendar';
+import { RiskExplanation } from '../components/RiskExplanation';
+import { SalesView } from '../components/SalesView';
+import type { PendingSalesImport } from '../components/SalesPanel';
 import { CfAlert, CfButton, CfCard } from '../components/ui/UiPrimitives';
 import { createRestaurantDemo } from '../demo/restaurant';
+import { createSalesDemo } from '../demo/salesDemo';
 import { todayISO, formatBR } from '../domain/finance/dates';
 import { formatBRL } from '../domain/finance/money';
 import { ProjectionError, project } from '../domain/finance/projection';
 import type { ProjectionResult } from '../domain/finance/projection';
 import type { CashEntry, CashSettings, ISODate } from '../domain/finance/types';
-import { planImport, previewAccountsCsv } from '../domain/import/csv';
+import { planImport, planReferenceUpdates, previewAccountsCsv } from '../domain/import/csv';
 import type { CsvPreview, ImportPlan } from '../domain/import/csv';
+import { planSalesImport, previewSalesCsv } from '../domain/sales/importSales';
+import { reconcile } from '../domain/sales/reconcile';
+import { DEFAULT_SETTLEMENT_RULES } from '../domain/sales/settlement';
+import type { ReconciliationDecision, Sale, SettlementRules } from '../domain/sales/types';
 import { getRepository, StorageError } from '../storage/repository';
 import type { DatasetKind, EntryDraft, Repository } from '../storage/repository';
 
-const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'calendario'];
+const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'vendas', 'calendario'];
 const TITLES: Record<View, { title: string; subtitle: string }> = {
   'visao-geral': { title: 'Visão geral', subtitle: 'Fluxo projetado com base nos seus lançamentos.' },
   movimentacoes: { title: 'Movimentações', subtitle: 'Cadastre, importe e ajuste contas a pagar e a receber.' },
+  vendas: { title: 'Vendas e recebimentos', subtitle: 'Importe vendas, configure repasses e separe faturamento, recebimentos e saldo.' },
   calendario: { title: 'Calendário', subtitle: 'Veja o saldo e os lançamentos de cada data.' },
 };
 
@@ -31,6 +40,9 @@ interface Data {
   settings: CashSettings | null;
   entries: CashEntry[];
   kind: DatasetKind | null;
+  sales: Sale[];
+  rules: SettlementRules;
+  decisions: ReconciliationDecision[];
 }
 type Phase = { status: 'loading' } | { status: 'ready' } | { status: 'error'; message: string };
 type Notice = { tone: 'positive' | 'negative' | 'warning'; text: string } | null;
@@ -43,6 +55,8 @@ interface PendingImport {
   fileName: string;
   preview: CsvPreview;
   plan: ImportPlan;
+  /** Contas já gravadas que receberão uma referência de venda nova. */
+  referenceUpdates: { entryId: string; saleReference: string }[];
 }
 
 const viewFromHash = (): View => {
@@ -75,7 +89,7 @@ export interface AppProps {
 export function App({ repository }: AppProps) {
   const repo = useMemo(() => repository ?? getRepository(), [repository]);
   const [phase, setPhase] = useState<Phase>({ status: 'loading' });
-  const [data, setData] = useState<Data>({ settings: null, entries: [], kind: null });
+  const [data, setData] = useState<Data>({ settings: null, entries: [], kind: null, sales: [], rules: DEFAULT_SETTLEMENT_RULES, decisions: [] });
   const [view, setView] = useState<View>(viewFromHash);
   const [started, setStarted] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
@@ -84,12 +98,20 @@ export function App({ repository }: AppProps) {
   const [editing, setEditing] = useState<CashEntry | 'new' | null>(null);
   const [editingSettings, setEditingSettings] = useState(false);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
+  const [pendingSales, setPendingSales] = useState<PendingSalesImport | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [selectedDate, setSelectedDate] = useState<ISODate | null>(null);
 
   const reload = useCallback(async () => {
-    const [settings, entries, kind] = await Promise.all([repo.getSettings(), repo.listEntries(), repo.getDatasetKind()]);
-    setData({ settings, entries, kind });
+    const [settings, entries, kind, sales, rules, decisions] = await Promise.all([
+      repo.getSettings(),
+      repo.listEntries(),
+      repo.getDatasetKind(),
+      repo.sales.listSales(),
+      repo.sales.getRules(),
+      repo.sales.listDecisions(),
+    ]);
+    setData({ settings, entries, kind, sales, rules, decisions });
   }, [repo]);
 
   useEffect(() => {
@@ -113,17 +135,26 @@ export function App({ repository }: AppProps) {
     setView(next);
   };
 
+  // Conciliação (ADR-0006): contas importadas + repasses derivados de vendas, sem dupla contagem.
+  const reconciliation = useMemo(
+    () =>
+      data.settings
+        ? reconcile({ baseDate: data.settings.baseDate, sales: data.sales, rules: data.rules, entries: data.entries, decisions: data.decisions })
+        : null,
+    [data.settings, data.sales, data.rules, data.entries, data.decisions],
+  );
+
   // Motor: única origem de saldos, riscos e datas exibidos.
   const projection = useMemo<{ result: ProjectionResult | null; error: string | null }>(() => {
-    if (!data.settings) return { result: null, error: null };
+    if (!data.settings || !reconciliation) return { result: null, error: null };
     try {
-      return { result: project(data.settings, data.entries), error: null };
+      return { result: project(data.settings, reconciliation.projectionEntries), error: null };
     } catch (error) {
       return { result: null, error: error instanceof ProjectionError ? error.message : 'Não foi possível calcular a projeção.' };
     }
-  }, [data.settings, data.entries]);
+  }, [data.settings, reconciliation]);
 
-  const entriesById = useMemo(() => new Map(data.entries.map((e) => [e.id, e] as const)), [data.entries]);
+  const entriesById = useMemo(() => new Map((reconciliation?.projectionEntries ?? data.entries).map((e) => [e.id, e] as const)), [reconciliation, data.entries]);
   const flaggedIds = useMemo(() => new Set(projection.result?.flagged.map((f) => f.entryId) ?? []), [projection.result]);
   const effectiveSelected = selectedDate ?? projection.result?.summary.firstRisk?.date ?? projection.result?.points[0]?.date ?? null;
   const hasData = data.settings !== null || data.entries.length > 0;
@@ -153,6 +184,7 @@ export function App({ repository }: AppProps) {
       setSelectedDate(null);
       setEditing(null);
       setPendingImport(null);
+      setPendingSales(null);
       navigate('visao-geral');
     }
   }
@@ -193,7 +225,12 @@ export function App({ repository }: AppProps) {
     try {
       const text = await readCsvFile(file);
       const preview = previewAccountsCsv(text);
-      setPendingImport({ fileName: file.name, preview, plan: planImport(preview, data.entries.map((e) => e.sourceKey)) });
+      setPendingImport({
+        fileName: file.name,
+        preview,
+        plan: planImport(preview, data.entries.map((e) => e.sourceKey)),
+        referenceUpdates: planReferenceUpdates(preview, data.entries),
+      });
     } catch (error) {
       setNotice({ tone: 'negative', text: messageOf(error) });
     }
@@ -206,10 +243,11 @@ export function App({ repository }: AppProps) {
     try {
       // Reconsulta as chaves atuais: a gravação é a fonte de verdade da idempotência.
       const result = await repo.importEntries(pendingImport.plan.toCreate);
+      const refs = await repo.sales.applyReferenceUpdates(pendingImport.referenceUpdates);
       await reload();
       setNotice({
         tone: 'positive',
-        text: `Importação concluída: ${result.created.length} criado(s), ${result.skipped.length + pendingImport.plan.summary.ignored} ignorado(s) por já existirem, ${pendingImport.plan.summary.errors} linha(s) com erro não importada(s).`,
+        text: `Importação concluída: ${result.created.length} criado(s), ${result.skipped.length + pendingImport.plan.summary.ignored} ignorado(s) por já existirem, ${pendingImport.plan.summary.errors} linha(s) com erro não importada(s)${refs > 0 ? `, ${refs} referência(s) de venda atualizada(s)` : ''}.`,
       });
       setPendingImport(null);
     } catch (error) {
@@ -217,6 +255,55 @@ export function App({ repository }: AppProps) {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function pickSalesCsv(file: File) {
+    setNotice(null);
+    try {
+      const preview = previewSalesCsv(await readCsvFile(file));
+      setPendingSales({ fileName: file.name, preview, plan: planSalesImport(preview, data.sales) });
+    } catch (error) {
+      setNotice({ tone: 'negative', text: messageOf(error) });
+    }
+  }
+
+  async function confirmSalesImport() {
+    if (!pendingSales) return;
+    const { plan } = pendingSales;
+    const ok = await run(async () => {
+      await repo.sales.importSales(plan.toCreate);
+    }, `Importação de vendas concluída: ${plan.summary.created} criada(s), ${plan.summary.ignored} ignorada(s) por já existirem, ${plan.summary.errors} linha(s) com erro não importada(s).`);
+    if (ok) setPendingSales(null);
+  }
+
+  async function loadDemoSales() {
+    const demo = createSalesDemo();
+    const plan = planSalesImport(previewSalesCsv(demo.csv), data.sales);
+    await run(async () => {
+      await repo.sales.importSales(plan.toCreate);
+    }, `Vendas fictícias carregadas: ${plan.summary.created} criada(s), ${plan.summary.ignored} já existiam.`);
+  }
+
+  async function saveRules(rules: SettlementRules): Promise<string | null> {
+    setBusy(true);
+    try {
+      await repo.sales.saveRules(rules);
+      await reload();
+      setNotice({ tone: 'positive', text: 'Regras de repasse salvas; recebimentos e saldo foram recalculados.' });
+      return null;
+    } catch (error) {
+      return messageOf(error);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function decide(decision: ReconciliationDecision) {
+    await run(() => repo.sales.saveDecision(decision), 'Decisão de conciliação registrada.');
+  }
+
+  async function undoDecision(decision: ReconciliationDecision) {
+    await run(() => repo.sales.removeDecision(decision), 'Decisão desfeita.');
   }
 
   async function onConfirm() {
@@ -235,6 +322,7 @@ export function App({ repository }: AppProps) {
         setStarted(false);
         setEditing(null);
         setPendingImport(null);
+        setPendingSales(null);
         setSelectedDate(null);
       }
     }
@@ -349,6 +437,7 @@ export function App({ repository }: AppProps) {
                 fileName={pendingImport.fileName}
                 preview={pendingImport.preview}
                 plan={pendingImport.plan}
+                referenceUpdates={pendingImport.referenceUpdates.length}
                 importing={busy}
                 onConfirm={() => void confirmImport()}
                 onCancel={() => setPendingImport(null)}
@@ -380,7 +469,35 @@ export function App({ repository }: AppProps) {
           noSettingsCard
         ) : projection.result ? (
           view === 'visao-geral' ? (
-            <CashDashboard settings={data.settings} result={projection.result} entriesById={entriesById} selectedDate={effectiveSelected} onSelectDate={setSelectedDate} />
+            <CashDashboard
+              settings={data.settings}
+              result={projection.result}
+              entriesById={entriesById}
+              selectedDate={effectiveSelected}
+              onSelectDate={setSelectedDate}
+              riskDetail={<RiskExplanation points={projection.result.points} entriesById={entriesById} receivables={reconciliation?.receivables ?? []} />}
+            />
+          ) : view === 'vendas' && reconciliation ? (
+            <SalesView
+              settings={data.settings}
+              sales={data.sales}
+              rules={data.rules}
+              decisions={data.decisions}
+              reconciliation={reconciliation}
+              projection={projection.result}
+              entriesById={entriesById}
+              pendingImport={pendingSales}
+              busy={busy}
+              demoMode={demoMode}
+              onPickCsv={(f) => void pickSalesCsv(f)}
+              onConfirmImport={() => void confirmSalesImport()}
+              onCancelImport={() => setPendingSales(null)}
+              onLoadDemoSales={() => void loadDemoSales()}
+              onSaveRules={saveRules}
+              onDecide={(d) => void decide(d)}
+              onUndo={(d) => void undoDecision(d)}
+              onGoOverview={() => navigate('visao-geral')}
+            />
           ) : (
             <CalendarOnly result={projection.result} entriesById={entriesById} selectedDate={effectiveSelected} onSelectDate={setSelectedDate} />
           )

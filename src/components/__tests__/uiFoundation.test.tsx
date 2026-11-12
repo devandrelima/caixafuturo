@@ -54,8 +54,8 @@ describe('AppShell', () => {
     );
     const nav = screen.getByRole('navigation', { name: /principal/i });
     const items = within(nav).getAllByRole('button');
-    expect(items.map((i) => i.textContent)).toEqual(['Visão geral', 'Movimentações', 'Calendário']);
-    expect(NAV_ITEMS).toHaveLength(3);
+    expect(items.map((i) => i.textContent)).toEqual(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Calendário']);
+    expect(NAV_ITEMS).toHaveLength(4);
     expect(within(nav).getByRole('button', { name: 'Visão geral' })).toHaveAttribute('aria-current', 'page');
     expect(within(nav).getByRole('button', { name: 'Calendário' })).not.toHaveAttribute('aria-current');
     expect(screen.getByText('conteúdo')).toBeInTheDocument();
@@ -115,11 +115,13 @@ describe('AppShell', () => {
       </AppShell>,
     );
     await user.click(screen.getByRole('button', { name: /abrir menu/i }));
-    const names = ['Visão geral', 'Movimentações', 'Calendário'];
+    const names = ['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Calendário'];
     await user.tab();
     expect(screen.getByRole('button', { name: names[1]! })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('button', { name: names[2]! })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: names[3]! })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('button', { name: 'Fechar' })).toHaveFocus();
     await user.tab();

@@ -16,21 +16,37 @@
     "docs/especificacao/design/qualidade.md",
     "docs/especificacao/contratos/financeiro.md",
     "docs/especificacao/design/evolucao.md",
-    "docs/especificacao/pendencias/S02-conciliacao-recebiveis.md"
+    "docs/especificacao/pendencias/S02-conciliacao-recebiveis.md",
+    "docs/decisoes/0006-conciliacao-recebiveis.md"
   ],
   "reads": [
-    "src/app/styles.css",
-    "src/components/AppShell.tsx",
     "src/components/ui/UiPrimitives.tsx",
     "src/domain/sales/settlement.ts",
+    "src/domain/sales/reconcile.ts",
+    "src/domain/forecast/baseline.ts",
     "src/storage/salesRepository.ts"
   ],
   "writes": [
     "src/components/SalesPanel.tsx",
     "src/components/SettlementPanel.tsx",
     "src/components/RiskExplanation.tsx",
+    "src/components/SalesView.tsx",
     "src/components/__tests__/salesFlow.test.tsx",
-    "tests/e2e/sales-flow.spec.ts"
+    "tests/e2e/sales-flow.spec.ts",
+    "src/app/App.tsx",
+    "src/app/styles.css",
+    "src/components/AppShell.tsx",
+    "src/components/CashDashboard.tsx",
+    "src/storage/repository.ts",
+    "src/demo/salesDemo.ts",
+    "src/demo/__tests__/salesDemo.test.ts",
+    "docs/evidencias/s02.md",
+    "docs/evidencias/s02-visual.md",
+    "docs/evidencias/capturas",
+    "README.md",
+    "tests/e2e/cash-flow.spec.ts",
+    "src/components/__tests__/uiFoundation.test.tsx",
+    "src/components/ImportPreview.tsx"
   ],
   "tests": [
     "npm run test:unit -- --run src/components/__tests__/salesFlow.test.tsx",
@@ -44,7 +60,7 @@
     "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado.",
     "E2E com CSV de contas e CSV de vendas verifica que mesma disponibilidade não é projetada em duplicidade, inclusive importando em ordem inversa; UI sinaliza vinculação ambígua"
   ],
-  "context_budget_tokens": 12000,
+  "context_budget_tokens": 20000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

@@ -2,7 +2,7 @@
 
 Projeto open source para projetar o caixa de pequenos comércios/restaurantes e simular decisões com cálculos verificáveis, **sem IA externa no runtime**, sem servidor de aplicação e sem login.
 
-**Status (12/11/2026):** Sprint 1 em execução; funcionalidades implementadas e testadas em unidade/integração: projeção de 30 dias, risco por data, cadastro/edição/exclusão de contas, importação CSV idempotente, calendário e demonstração fictícia. **Os testes E2E, a revisão visual formal e a aprovação humana da Sprint 1 ainda estão pendentes.** O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
+**Status (12/11/2026):** Sprint 1 aprovada pelo usuário. Sprint 2 (vendas e recebimentos futuros) implementada e testada, **aguardando avaliação humana**: importação de vendas por CSV, regras de taxa/comissão/prazo, repasses líquidos derivados, conciliação com o CSV de contas sem dupla contagem ([ADR-0006](docs/decisoes/0006-conciliacao-recebiveis.md)), média/tendência/baseline com avisos, projeção manual como hipótese e explicação de cada risco. O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
 
 - [Especificação v2, seis sprints e tasks](docs/especificacao/README.md)
 - [Decisões, arquitetura e riscos](docs/especificacao/00_visao_geral_e_decisoes.md)
@@ -19,6 +19,17 @@ Prioridade candidatura iFood AI Builder 15/11/2026: S01 primeiro fluxo de caixa 
 3. **Visão geral**: indicadores, gráfico de 30 dias (com tabela de valores), calendário e alertas por data com a origem do cálculo. **Movimentações**: adicionar, editar e excluir (com confirmação) e importar CSV. **Calendário**: dia selecionável e atalho para a próxima data crítica.
 4. **CSV de contas** (UTF-8 ou Windows-1252, separador `;` ou `,`): colunas `tipo` (pagar/receber), `descricao`, `valor` (pt-BR, ex. `1.234,56`), `vencimento` (`DD/MM/AAAA` ou `AAAA-MM-DD`), `categoria` e `identificador_externo` (opcionais). A prévia mostra erro por linha antes de gravar. Reimportar o mesmo arquivo não duplica lançamentos; duas contas legítimas idênticas exigem identificadores externos distintos.
 5. Contas agendadas **até** a data-base já deveriam estar no saldo informado: são sinalizadas e **não** somadas.
+
+## Vendas e recebimentos (Sprint 2)
+
+Vista **Vendas e recebimentos**, com três áreas separadas: **Faturamento bruto** (não é dinheiro disponível), **Recebimentos previstos líquidos** e **Saldo projetado**.
+
+1. **CSV de vendas** (`;` `,` ou tab): `identificador_venda` (obrigatório), `data_venda`, `valor_bruto` (positivo), `meio_pagamento` (pix, débito, crédito, dinheiro, voucher) e `categoria` (opcional). Reimportar o mesmo arquivo não duplica faturamento; mesmo identificador com dados diferentes é conflito explícito (não sobrescreve). Estornos não são importados.
+2. **Regras de repasse** por meio de pagamento: taxa, comissão e prazo (dias corridos). Valores iniciais são **ilustrativos**. Mudar taxa ou prazo muda a data e o valor do caixa. Feriados e dias úteis não são considerados.
+3. **Conciliação** com o CSV de contas: a coluna opcional `referencia_venda` liga uma conta a receber à venda (`identificador_venda`). Sem referência, conta e repasse próximos ficam como **conciliação pendente** (só a conta importada soma) até você decidir; nada é vinculado só por valor e data. **Parcelas e lotes não são suportados** (sinalizados na tela). O resultado independe da ordem de importação.
+4. **Previsão**: média diária e tendência (7 dias vs 7 anteriores), baseline **não validado** com aviso de série curta/insuficiente, e projeção manual sempre rotulada como **hipótese**; nenhuma das duas entra no saldo projetado.
+5. Na demonstração, o botão **Carregar vendas fictícias** adiciona 84 vendas de 28 dias (R$ 14.580,00 brutos).
+6. A **Visão geral** explica cada data de risco: lançamentos considerados, origem, repasses estimados e o que ficou de fora.
 
 ## Desenvolvimento local
 

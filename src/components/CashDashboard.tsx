@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { formatBR } from '../domain/finance/dates';
 import { formatBRL } from '../domain/finance/money';
 import type { ProjectionResult } from '../domain/finance/projection';
@@ -14,6 +15,8 @@ export interface CashDashboardProps {
   entriesById: ReadonlyMap<string, CashEntry>;
   selectedDate: ISODate | null;
   onSelectDate: (date: ISODate) => void;
+  /** Explicação detalhada dos riscos (S02), exibida ao final. */
+  riskDetail?: ReactNode;
 }
 
 function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
@@ -34,7 +37,7 @@ function causes(point: DailyPoint, entriesById: ReadonlyMap<string, CashEntry>):
 }
 
 /** Painel de 30 dias. Todos os números vêm do motor (`ProjectionResult`); nada é recalculado aqui. */
-export function CashDashboard({ settings, result, entriesById, selectedDate, onSelectDate }: CashDashboardProps) {
+export function CashDashboard({ settings, result, entriesById, selectedDate, onSelectDate, riskDetail }: CashDashboardProps) {
   const [showTable, setShowTable] = useState(false);
   const { points, summary, flagged, duplicates } = result;
   const last = points[points.length - 1];
@@ -148,6 +151,7 @@ export function CashDashboard({ settings, result, entriesById, selectedDate, onS
           )}
         </CfCard>
       </div>
+      {riskDetail}
     </div>
   );
 }

@@ -39,7 +39,7 @@ test.describe('primeiro acesso e demonstração', () => {
     await expect(alert).toContainText('Saldo projetado negativo em 14/11/2026');
     await expect(alert).toContainText('R$ 1.700,00');
     await expect(page.getByText('Saldo informado em 11/11/2026')).toBeVisible();
-    await expect(page.getByText('R$ 3.000,00', { exact: true })).toBeVisible();
+    await expect(page.locator('.cf-stat__value', { hasText: 'R$ 3.000,00' })).toBeVisible();
     await expect(page.getByText('Menor saldo projetado')).toBeVisible();
   });
 
@@ -257,9 +257,10 @@ test.describe('navegação, teclado e acessibilidade básica', () => {
     await expect(page.getByText(/A pagar: Aluguel fictício/)).toBeVisible();
     await nav(page, 'Movimentações');
     await expect(page.getByRole('heading', { level: 1, name: 'Movimentações' })).toBeVisible();
-    // só existem as três vistas
+    // S02 acrescentou "Vendas e recebimentos"; nenhuma vista de sprint futura existe
     const items = page.getByRole('navigation', { name: 'Principal' }).getByRole('button');
-    await expect(items).toHaveCount(3);
+    await expect(items).toHaveCount(4);
+    await expect(items).toHaveText(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Calendário']);
   });
 
   test('calendário: a data-base é clicável e mostra o saldo informado; dias anteriores ficam inativos', async ({ page }) => {
@@ -363,7 +364,7 @@ test.describe('responsividade (390×844, 768×1024, 1440×900)', () => {
     await page.getByLabel(/^Saldo mínimo/).fill('1.000,00');
     await page.getByRole('button', { name: 'Salvar saldos' }).click();
     await expect(page.getByText('Risco de ficar abaixo do mínimo em 12/11/2026').first()).toBeVisible();
-    await expect(page.getByText(/Déficit para o mínimo: R\$ 500,00/)).toBeVisible();
+    await expect(page.locator('.cf-alert').getByText(/Déficit para o mínimo: R\$ 500,00/)).toBeVisible();
     await page.screenshot({ path: `${SHOTS}/estado-abaixo-minimo.png` });
     await page.getByRole('button', { name: 'Movimentações' }).click();
     await page.getByRole('button', { name: 'Editar saldos' }).click();

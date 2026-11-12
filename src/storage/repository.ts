@@ -1,6 +1,8 @@
 import { isValidISODate } from '../domain/finance/dates';
 import { centsFromString } from '../domain/finance/money';
 import { validateRules } from '../domain/sales/settlement';
+import { createSalesRepository } from './salesRepository';
+import type { SalesRepository } from './salesRepository';
 import { validateSale } from './validateSale';
 import type { CashEntry, CashSettings, Direction, EntryOrigin, ISODate } from '../domain/finance/types';
 import type { Sale, SettlementRules } from '../domain/sales/types';
@@ -53,6 +55,8 @@ export interface RepositoryOptions {
 }
 
 export interface Repository {
+  /** Vendas, regras de repasse e decisões de conciliação (S02), no mesmo banco. */
+  readonly sales: SalesRepository;
   getSettings(): Promise<CashSettings | null>;
   saveSettings(settings: CashSettings): Promise<void>;
   listEntries(): Promise<CashEntry[]>;
@@ -117,6 +121,7 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
   const factory = options.factory === undefined ? (globalThis.indexedDB ?? null) : options.factory;
   const dbName = options.dbName ?? DB_NAME;
   const newId = options.newId ?? defaultId;
+  const sales = createSalesRepository({ factory: options.factory, dbName });
   let connection: Promise<IDBDatabase> | undefined;
 
   function db(): Promise<IDBDatabase> {
@@ -153,6 +158,7 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
   }
 
   const api: Repository = {
+    sales,
     getSettings: () =>
       read<CashSettings | null>([STORE_SETTINGS], (tx, set) => {
         const req = tx.objectStore(STORE_SETTINGS).get(SETTINGS_KEY);
@@ -313,6 +319,7 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
     },
 
     close() {
+      sales.close();
       const current = connection;
       connection = undefined;
       current?.then((d) => d.close()).catch(() => undefined);

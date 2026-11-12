@@ -6,12 +6,14 @@ export interface ImportPreviewProps {
   preview: CsvPreview;
   plan: ImportPlan;
   importing?: boolean;
+  /** Contas já existentes que receberão uma referência de venda nova (S02). */
+  referenceUpdates?: number;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 /** Prévia da importação: nada é gravado antes de "Importar". Mostra erro por linha. */
-export function ImportPreview({ fileName, preview, plan, importing = false, onConfirm, onCancel }: ImportPreviewProps) {
+export function ImportPreview({ fileName, preview, plan, importing = false, referenceUpdates = 0, onConfirm, onCancel }: ImportPreviewProps) {
   const { created, ignored, errors } = plan.summary;
   return (
     <CfCard title="Prévia da importação" description={`Arquivo: ${fileName}`}>
@@ -26,6 +28,7 @@ export function ImportPreview({ fileName, preview, plan, importing = false, onCo
               <CfBadge tone="positive">{created} a importar</CfBadge>
               <CfBadge tone="neutral">{ignored} já importado(s) ou duplicado(s)</CfBadge>
               <CfBadge tone={errors > 0 ? 'negative' : 'neutral'}>{errors} com erro</CfBadge>
+              {referenceUpdates > 0 && <CfBadge tone="warning">{referenceUpdates} referência(s) de venda a atualizar</CfBadge>}
               <span className="cf-subtle">{preview.totalRows} linha(s) de dados</span>
             </div>
             {errors > 0 && (
@@ -49,12 +52,12 @@ export function ImportPreview({ fileName, preview, plan, importing = false, onCo
               </div>
             )}
             {errors > 0 && <p className="cf-subtle">As linhas com erro não serão importadas. Corrija o arquivo e envie de novo, se desejar.</p>}
-            {created === 0 && errors === 0 && <p className="cf-muted">Nada novo para importar: todas as linhas já existem.</p>}
+            {created === 0 && errors === 0 && referenceUpdates === 0 && <p className="cf-muted">Nada novo para importar: todas as linhas já existem.</p>}
           </>
         )}
         <div className="cf-row">
-          <CfButton variant="primary" loading={importing} disabled={created === 0 || preview.fatalError !== null} onClick={onConfirm}>
-            {created > 0 ? `Importar ${created} lançamento(s)` : 'Importar'}
+          <CfButton variant="primary" loading={importing} disabled={(created === 0 && referenceUpdates === 0) || preview.fatalError !== null} onClick={onConfirm}>
+            {created > 0 ? `Importar ${created} lançamento(s)` : referenceUpdates > 0 ? 'Atualizar referências de venda' : 'Importar'}
           </CfButton>
           <CfButton variant="ghost" onClick={onCancel} disabled={importing}>
             Cancelar
