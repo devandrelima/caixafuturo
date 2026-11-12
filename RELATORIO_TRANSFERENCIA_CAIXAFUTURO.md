@@ -56,3 +56,7 @@ Não codificar antes de autorização. Ao encerrar cada sprint: logs reais, regr
 
 ## Complemento frontend — 11/11/2026
 A direção enviada em capturas foi documentada de forma autocontida em `docs/especificacao/design/`: guia, tokens, componentes, telas S01, evolução S02–S06, critérios visuais e template de auditoria. O contrato UI foi atualizado para v2 e ADR-0004 registrado. Foi adicionada a task **S01-P02-T04** para construção do sistema visual antes da task S01-P02-T02 de integração; todas as tasks UI S02–S06 receberam contextos e aceites visuais seletivos. Agora são 27 tasks, 12 mapas, seis sprints, 31 funcionalidades. Verificar CI posterior em GitHub Actions; a aprovação estrutural não autoriza implementação.
+
+## Auditoria complementar da identidade visual (GitHub Actions)
+
+A execução oficial em https://github.com/devandrelima/caixafuturo/actions/runs/43137462086, no commit `4b2dbfc4466d98271f78a66485ca63a3d949d6f1`, terminou **success**. O comando `fluxo.py validar` registrou **0 errors, findings []**; `tools/validar_design.py` verificou **7 documentos**, **25 tokens de cor**, **7 tasks de interface** e contrastes principais de texto **>=4.5:1**. `prontas` manteve `S01-P01-T01` como única task inicial, e seu contexto foi carregado com estimativa de 1.004/8.000 tokens. Isso é validação documental/estrutural, não código de frontend, screenshot, teste do produto ou aceite humano. Relatórios posteriores devem apontar o run correspondente ao novo commit, quando aplicável.
