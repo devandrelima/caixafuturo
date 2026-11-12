@@ -106,8 +106,8 @@ const LABEL_BASELINE = 'Média histórica (baseline não validado)';
 const LABEL_MANUAL = 'Hipótese manual — não é previsão validada';
 const LABEL_ADJUST = 'Hipótese manual sobre o baseline — não é previsão validada';
 
-/** Divisão inteira arredondando ao mais próximo, meio longe do zero. */
-function divRound(numerator: bigint, denominator: bigint): bigint {
+/** Divisão inteira arredondando ao mais próximo, meio longe do zero (exportada: reutilizada por sazonalidade, modelos e backtest). */
+export function divRound(numerator: bigint, denominator: bigint): bigint {
   const negative = numerator < 0n !== denominator < 0n;
   const n = numerator < 0n ? -numerator : numerator;
   const d = denominator < 0n ? -denominator : denominator;
@@ -137,7 +137,8 @@ export function buildSalesSeries(sales: readonly Sale[], policy: MissingDayPolic
   return series;
 }
 
-function weekdayOf(date: ISODate): number {
+/** 0 = domingo … 6 = sábado (data civil, sem fuso). */
+export function weekdayOf(date: ISODate): number {
   const [y, m, d] = date.split('-').map(Number) as [number, number, number];
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
