@@ -26,7 +26,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "a463e33",
+      "evidence": "suíte 219 testes passam (dashboard 13, app integração ~20 com fake-indexeddb, demo 5); cobertura v8 global 93.2% stmts/87.7% branches; npm run build OK; smoke em Chromium real: demo carrega, persiste após reload, sem overflow-x e sem erros de console em 390/768/1440; imagem Docker implantada e saudável. E2E formal e revisão visual detalhada ficam para S01-P02-T03",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T03": {
       "status": "pendente"
