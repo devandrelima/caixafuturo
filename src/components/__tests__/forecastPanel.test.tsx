@@ -239,7 +239,7 @@ describe('dentro do aplicativo', () => {
     await screen.findByRole('heading', { level: 1, name: 'Visão geral' });
 
     const nav = within(screen.getByRole('navigation', { name: 'Principal' }));
-    expect(nav.getAllByRole('button').map((b) => b.textContent)).toEqual(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário']);
+    expect(nav.getAllByRole('button').map((b) => b.textContent)).toEqual(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário', 'Simulador']);
 
     await user.click(nav.getByRole('button', { name: 'Previsões' }));
     await screen.findByRole('heading', { level: 1, name: 'Previsões' });

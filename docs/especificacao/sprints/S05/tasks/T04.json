@@ -43,7 +43,11 @@
     "docs/evidencias/s05.md",
     "docs/evidencias/s05-visual.md",
     "docs/evidencias/capturas",
-    "docs/especificacao/contratos/interface.md"
+    "docs/especificacao/contratos/interface.md",
+    "src/domain/scenarios/base.ts",
+    "src/domain/scenarios/inputs.ts",
+    "src/domain/scenarios/__tests__/base.test.ts",
+    "src/components/__tests__/forecastPanel.test.tsx"
   ],
   "tests": [
     "npm run test:unit -- --run src/components/__tests__/scenarioCompare.test.tsx",

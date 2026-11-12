@@ -54,12 +54,13 @@ describe('AppShell', () => {
     );
     const nav = screen.getByRole('navigation', { name: /principal/i });
     const items = within(nav).getAllByRole('button');
-    expect(items.map((i) => i.textContent)).toEqual(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário']);
-    expect(NAV_ITEMS).toHaveLength(5);
+    expect(items.map((i) => i.textContent)).toEqual(['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário', 'Simulador']);
+    expect(NAV_ITEMS).toHaveLength(6);
     expect(within(nav).getByRole('button', { name: 'Visão geral' })).toHaveAttribute('aria-current', 'page');
     expect(within(nav).getByRole('button', { name: 'Calendário' })).not.toHaveAttribute('aria-current');
     expect(screen.getByText('conteúdo')).toBeInTheDocument();
-    expect(screen.queryByText(/previs(ão|oes) de vendas|simula/i)).toBeNull();
+    // o Simulador (S05) é funcional; nada de sprint futura (S06: compras, contratação, antecipação) aparece
+    expect(screen.queryByText(/previs(ão|oes) de vendas|antecip|contrata|compra de equipamento/i)).toBeNull();
   });
 
   it('navega pelo callback e fecha o menu', async () => {
@@ -115,7 +116,7 @@ describe('AppShell', () => {
       </AppShell>,
     );
     await user.click(screen.getByRole('button', { name: /abrir menu/i }));
-    const names = ['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário'];
+    const names = ['Visão geral', 'Movimentações', 'Vendas e recebimentos', 'Previsões', 'Calendário', 'Simulador'];
     await user.tab();
     expect(screen.getByRole('button', { name: names[1]! })).toHaveFocus();
     await user.tab();
@@ -124,6 +125,8 @@ describe('AppShell', () => {
     expect(screen.getByRole('button', { name: names[3]! })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('button', { name: names[4]! })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: names[5]! })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole('button', { name: 'Fechar' })).toHaveFocus();
     await user.tab();

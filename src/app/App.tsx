@@ -11,6 +11,7 @@ import { Onboarding } from '../components/Onboarding';
 import { RecurringPanel } from '../components/RecurringPanel';
 import { RiskCalendar } from '../components/RiskCalendar';
 import { RiskExplanation } from '../components/RiskExplanation';
+import { ScenarioPanel } from '../components/ScenarioPanel';
 import { SalesView } from '../components/SalesView';
 import { WeeklyView } from '../components/WeeklyView';
 import { riskSentence } from '../components/riskText';
@@ -33,6 +34,8 @@ import type { ProjectionResult } from '../domain/finance/projection';
 import type { CashEntry, CashSettings, ISODate } from '../domain/finance/types';
 import { planImport, planReferenceUpdates, previewAccountsCsv } from '../domain/import/csv';
 import type { CsvPreview, ImportPlan } from '../domain/import/csv';
+import { buildScenarioBase } from '../domain/scenarios/base';
+import type { Adjustment } from '../domain/scenarios/types';
 import { planSalesImport, previewSalesCsv } from '../domain/sales/importSales';
 import { reconcile } from '../domain/sales/reconcile';
 import { DEFAULT_SETTLEMENT_RULES } from '../domain/sales/settlement';
@@ -41,13 +44,14 @@ import { newRuleId } from '../storage/recurrenceRepository';
 import { getRepository, StorageError } from '../storage/repository';
 import type { DatasetKind, EntryDraft, Repository } from '../storage/repository';
 
-const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'vendas', 'previsoes', 'calendario'];
+const VIEWS: readonly View[] = ['visao-geral', 'movimentacoes', 'vendas', 'previsoes', 'calendario', 'simulador'];
 const TITLES: Record<View, { title: string; subtitle: string }> = {
   'visao-geral': { title: 'Visão geral', subtitle: 'Fluxo projetado com base nos seus lançamentos.' },
   movimentacoes: { title: 'Movimentações', subtitle: 'Cadastre, importe e ajuste contas a pagar e a receber.' },
   vendas: { title: 'Vendas e recebimentos', subtitle: 'Importe vendas, configure repasses e separe faturamento, recebimentos e saldo.' },
   previsoes: { title: 'Previsões', subtitle: 'Compare modelos de faturamento, veja o erro medido e o previsto versus realizado.' },
   calendario: { title: 'Calendário', subtitle: 'Veja o saldo de cada data, as próximas 13 semanas e as recorrências.' },
+  simulador: { title: 'Simulador', subtitle: 'Teste hipóteses (atrasos e variações) e compare com o original, sem alterar seus dados.' },
 };
 
 interface Data {
@@ -117,6 +121,8 @@ export function App({ repository }: AppProps) {
   const [pendingSales, setPendingSales] = useState<PendingSalesImport | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [selectedDate, setSelectedDate] = useState<ISODate | null>(null);
+  // Hipóteses do simulador (ADR-0009 D1): só memória da sessão; nada vai ao IndexedDB.
+  const [scenarioAdjustments, setScenarioAdjustments] = useState<Adjustment[]>([]);
 
   const reload = useCallback(async () => {
     const [settings, entries, kind, sales, rules, decisions, recurrences] = await Promise.all([
@@ -181,6 +187,16 @@ export function App({ repository }: AppProps) {
     }
   }, [data.settings, reconciliation, planningEntries]);
 
+  // Base imutável do simulador: exatamente o que alimenta o motor acima (nunca previsão de faturamento).
+  const scenarioBase = useMemo(() => {
+    if (!data.settings || !reconciliation) return null;
+    try {
+      return buildScenarioBase({ settings: data.settings, entries: planningEntries, receivables: reconciliation.receivables, rules: data.rules });
+    } catch {
+      return null;
+    }
+  }, [data.settings, reconciliation, planningEntries, data.rules]);
+
   const entriesById = useMemo(() => new Map([...(reconciliation?.projectionEntries ?? data.entries), ...expansion.entries].map((e) => [e.id, e] as const)), [reconciliation, data.entries, expansion]);
   const movements = useMemo(() => [...data.entries, ...expansion.entries].sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.id.localeCompare(b.id)), [data.entries, expansion]);
   const calculatedIds = useMemo(() => new Set(expansion.entries.map((e) => e.id)), [expansion]);
@@ -212,6 +228,7 @@ export function App({ repository }: AppProps) {
     if (ok) {
       setStarted(true);
       setSelectedDate(null);
+      setScenarioAdjustments([]);
       setEditing(null);
       setPendingImport(null);
       setPendingSales(null);
@@ -387,6 +404,7 @@ export function App({ repository }: AppProps) {
       setConfirm(null);
       if (ok) {
         setStarted(false);
+        setScenarioAdjustments([]);
         setEditing(null);
         setPendingImport(null);
         setPendingSales(null);
@@ -572,6 +590,14 @@ export function App({ repository }: AppProps) {
               onSelectDate={setSelectedDate}
               riskDetail={<RiskExplanation points={projection.result.points} entriesById={entriesById} receivables={reconciliation?.receivables ?? []} />}
             />
+          ) : view === 'simulador' ? (
+            scenarioBase ? (
+              <ScenarioPanel snapshot={scenarioBase} adjustments={scenarioAdjustments} onChange={setScenarioAdjustments} />
+            ) : (
+              <CfAlert tone="warning" title="Não foi possível montar a base do simulador">
+                Corrija o erro de cálculo acima para simular hipóteses.
+              </CfAlert>
+            )
           ) : view === 'vendas' && reconciliation ? (
             <SalesView
               settings={data.settings}

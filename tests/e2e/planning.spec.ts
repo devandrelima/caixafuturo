@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 const SHOTS = 'docs/evidencias/capturas';
-type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário';
+type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário' | 'Simulador';
 
 async function nav(page: Page, name: ViewName) {
   const toggle = page.getByRole('button', { name: 'Abrir menu' });

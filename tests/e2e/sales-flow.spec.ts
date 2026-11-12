@@ -7,7 +7,7 @@ const ACCOUNTS_HEADER = 'tipo;descricao;valor;vencimento;categoria;identificador
 const salesCsv = (rows: string[], name = 'vendas.csv') => ({ name, mimeType: 'text/csv', buffer: Buffer.from([SALES_HEADER, ...rows].join('\n'), 'utf-8') });
 const accountsCsv = (rows: string[], name = 'contas.csv') => ({ name, mimeType: 'text/csv', buffer: Buffer.from([ACCOUNTS_HEADER, ...rows].join('\n'), 'utf-8') });
 
-type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário';
+type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário' | 'Simulador';
 async function nav(page: Page, name: ViewName) {
   const toggle = page.getByRole('button', { name: 'Abrir menu' });
   if (await toggle.isVisible()) await toggle.click();

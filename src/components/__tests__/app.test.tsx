@@ -302,3 +302,95 @@ describe('calendário e navegação', () => {
     expect(screen.getByRole('table', { name: 'Lançamentos' })).toBeInTheDocument();
   });
 });
+
+describe('simulador (S05): hipóteses não tocam nos dados reais', () => {
+  it('atrasar R$ 4.000 de 15/11 por 2 dias: só a Alternativa muda, o IndexedDB fica idêntico e o painel real segue igual', async () => {
+    const user = await loadDemo();
+    const entriesBefore = JSON.stringify(await repo.listEntries());
+    const settingsBefore = JSON.stringify(await repo.getSettings());
+    await goTo(user, 'Simulador');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Simulador' })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#simulador');
+
+    await user.selectOptions(screen.getByLabelText('Recebimento'), 'demo-receita-02');
+    await user.type(screen.getByLabelText('Atraso (dias corridos)'), '2');
+    await user.click(screen.getByRole('button', { name: 'Adicionar atraso' }));
+
+    const table = screen.getByRole('table', { name: /Saldo por dia/ });
+    const row = (d: string) => table.querySelector(`[data-date="${d}"]`) as HTMLElement;
+    expect(row('2026-11-15').querySelector('[data-label="Original"]')).toHaveTextContent('R$ 3.300,00');
+    expect(row('2026-11-15').querySelector('[data-label="Alternativa (hipótese)"]')).toHaveTextContent('-R$ 700,00');
+    expect(row('2026-11-15').querySelector('[data-label="Diferença"]')).toHaveTextContent('-R$ 4.000,00');
+    expect(row('2026-11-16').querySelector('[data-label="Diferença"]')).toHaveTextContent('-R$ 4.000,00');
+    expect(row('2026-11-17').querySelector('[data-label="Diferença"]')).toHaveTextContent('R$ 0,00');
+
+    expect(JSON.stringify(await repo.listEntries())).toBe(entriesBefore);
+    expect(JSON.stringify(await repo.getSettings())).toBe(settingsBefore);
+
+    // o painel real continua com os números originais
+    await goTo(user, 'Visão geral');
+    expect(await screen.findByRole('alert')).toHaveTextContent('R$ 1.700,00');
+    expect(document.querySelector('[data-hypothetical]')).toBeNull();
+    expect(screen.queryByText(/Alternativa/)).toBeNull();
+    expect(screen.getByText(/Nenhuma previsão manual ou hipótese entra neste saldo/)).toBeInTheDocument();
+
+    // as hipóteses duram a sessão: voltar ao Simulador as mantém; recarregar (nova montagem) as descarta
+    await goTo(user, 'Simulador');
+    expect(screen.getByRole('list', { name: 'Hipóteses ativas' })).toBeInTheDocument();
+    document.body.innerHTML = '';
+    window.location.hash = '#simulador';
+    render(<App repository={createRepository({ factory, dbName: 'cf-app' })} />);
+    await screen.findByRole('heading', { level: 1, name: 'Simulador' });
+    expect(screen.queryByRole('list', { name: 'Hipóteses ativas' })).toBeNull();
+    expect(JSON.stringify(await repo.listEntries())).toBe(entriesBefore);
+  });
+
+  it('"Voltar ao original" devolve o simulador ao estado inicial sem perder nada dos dados', async () => {
+    const user = await loadDemo();
+    const entriesBefore = JSON.stringify(await repo.listEntries());
+    await goTo(user, 'Simulador');
+    await user.selectOptions(screen.getByLabelText('Categoria de despesa'), 'c:Aluguel');
+    await user.type(screen.getByLabelText('Despesas ficam em (%)'), '110');
+    await user.click(screen.getByRole('button', { name: 'Adicionar variação de despesas' }));
+    const table = screen.getByRole('table', { name: /Saldo por dia/ });
+    // aluguel de R$ 2.000,00 em 14/11 → R$ 2.200,00: diferença −R$ 200,00 a partir de 14/11
+    expect(table.querySelector('[data-date="2026-11-14"] [data-label="Diferença"]')).toHaveTextContent('-R$ 200,00');
+    await user.click(screen.getByRole('button', { name: 'Voltar ao original' }));
+    expect(table.querySelector('[data-date="2026-11-14"] [data-label="Diferença"]')).toHaveTextContent('R$ 0,00');
+    expect(screen.getByText(/Você está vendo o Original/)).toBeInTheDocument();
+    expect(JSON.stringify(await repo.listEntries())).toBe(entriesBefore);
+  });
+
+  it('a base do simulador inclui recorrências calculadas e repasses derivados de venda (os mesmos lançamentos do motor)', async () => {
+    const user = await loadDemo();
+    await goTo(user, 'Calendário');
+    await user.click(screen.getByRole('button', { name: 'Carregar recorrências fictícias' }));
+    await screen.findByRole('table', { name: 'Regras de recorrência' });
+    await goTo(user, 'Vendas e recebimentos');
+    await user.click(screen.getByRole('button', { name: 'Carregar vendas fictícias' }));
+    await screen.findByText(/vendas fictícias carregadas: 84 criada/i);
+    await goTo(user, 'Simulador');
+    const select = screen.getByLabelText('Recebimento');
+    expect(within(select).getByRole('option', { name: /Contrato de eventos fictício.*Recorrente/ })).toBeInTheDocument(); // ocorrência calculada (não gravada)
+    expect(within(select).getAllByRole('option', { name: /Repasse estimado da venda.*Venda/ }).length).toBeGreaterThan(0);
+    await user.type(screen.getByLabelText('Vendas ficam em (%)'), '70');
+    await user.click(screen.getByRole('button', { name: 'Adicionar variação de vendas' }));
+    const diffs = [...screen.getByRole('table', { name: /Saldo por dia/ }).querySelectorAll('[data-label="Diferença"]')].map((c) => c.textContent ?? '');
+    expect(diffs.some((d) => d.startsWith('-R$'))).toBe(true);
+    expect(diffs.every((d) => d.startsWith('-R$') || d === 'R$ 0,00')).toBe(true);
+  });
+
+  it('carregar a demonstração de novo descarta hipóteses antigas (a base mudou)', async () => {
+    const user = await loadDemo();
+    await goTo(user, 'Simulador');
+    await user.type(screen.getByLabelText('Vendas ficam em (%)'), '70');
+    await user.click(screen.getByRole('button', { name: 'Adicionar variação de vendas' }));
+    expect(screen.getByRole('list', { name: 'Hipóteses ativas' })).toBeInTheDocument();
+    await goTo(user, 'Movimentações');
+    await user.click(screen.getByRole('button', { name: 'Carregar demonstração' }));
+    await user.click(await screen.findByRole('button', { name: 'Substituir e carregar' }));
+    await screen.findByRole('heading', { level: 1, name: 'Visão geral' });
+    await goTo(user, 'Simulador');
+    expect(screen.queryByRole('list', { name: 'Hipóteses ativas' })).toBeNull();
+  });
+});

@@ -5,7 +5,7 @@ const SHOTS = 'docs/evidencias/capturas';
 const SALES_HEADER = 'identificador_venda;data_venda;valor_bruto;meio_pagamento;categoria';
 const salesCsv = (rows: string[]) => ({ name: 'vendas.csv', mimeType: 'text/csv', buffer: Buffer.from([SALES_HEADER, ...rows].join('\n'), 'utf-8') });
 
-type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário';
+type ViewName = 'Visão geral' | 'Movimentações' | 'Vendas e recebimentos' | 'Previsões' | 'Calendário' | 'Simulador';
 async function nav(page: Page, name: ViewName) {
   const toggle = page.getByRole('button', { name: 'Abrir menu' });
   if (await toggle.isVisible()) await toggle.click();
