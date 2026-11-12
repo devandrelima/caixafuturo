@@ -1,7 +1,7 @@
 {
   "id": "S01-P02-T03",
   "kind": "integration",
-  "instruction": "Realizar exclusivamente testes E2E, revisão visual/acessibilidade e coleta de evidências da Sprint 1. Consumir, sem recriar nem alterar, o dataset src/demo/restaurant.ts e a integração de onboarding App.tsx já entregues pela T02. Criar cenários Playwright de primeiro acesso, carga de demo, saldo/risco, persistência, importação CSV idempotente, edição e reset; inspecionar viewports 390×844, 768×1024 e 1440×900; executar regressão completa, build e medição real de cobertura alterada/global. Registrar logs e achados nos arquivos de evidências. Se a UI ou a fixture falhar, devolver o problema à T02/replanejamento antes de editar código fora de writes, jamais corrigir silenciosamente arquivos de produção.",
+  "instruction": "Realizar exclusivamente testes E2E, revisão visual/acessibilidade e coleta de evidências da Sprint 1. Consumir, sem recriar nem alterar, o dataset src/demo/restaurant.ts e a integração de onboarding App.tsx já entregues pela T02. Criar cenários Playwright de primeiro acesso, carga de demo, saldo/risco, persistência, importação CSV idempotente, edição e reset; inspecionar viewports 390×844, 768×1024 e 1440×900; executar regressão completa, build e medição real de cobertura alterada/global. Registrar logs e achados nos arquivos de evidências. Se a UI ou a fixture falhar, devolver o problema à T02/replanejamento antes de editar código fora de writes, jamais corrigir silenciosamente arquivos de produção. Ampliação do manifesto: capturas PNG geradas pelo próprio E2E são gravadas em docs/evidencias/capturas/. Orçamento contextual ampliado de 15000 para 24000: os arquivos de leitura obrigatórios são agora código real (~22k estimados).",
   "result": "Testes E2E, revisão visual e documentos de evidência reproduzíveis sobre a interface e fixture já integradas na T02; sem alterações de aplicação, fixture ou README.",
   "depends_on": [
     "S01-P02-T02",
@@ -34,7 +34,8 @@
   "writes": [
     "tests/e2e/cash-flow.spec.ts",
     "docs/evidencias/s01.md",
-    "docs/evidencias/s01-visual.md"
+    "docs/evidencias/s01-visual.md",
+    "docs/evidencias/capturas"
   ],
   "tests": [
     "npm run test:unit -- --run --coverage",
@@ -49,5 +50,5 @@
     "T03 modifica somente testes/e2e/cash-flow.spec.ts e documentos docs/evidencias/s01*.md; defeitos de T02 não autorizam edição de src/demo, App.tsx, CSS, README ou componentes sem replanejamento",
     "E2E também roda (E2E_BASE_URL) contra o container publicado, incluindo ao menos um fluxo de importação CSV via http://IP_PUBLICO:porta com window.isSecureContext === false; resposta HTTP, estado healthy e reload de rota SPA registrados em docs/evidencias/s01.md (ou 'não verificado')"
   ],
-  "context_budget_tokens": 15000
+  "context_budget_tokens": 24000
 }

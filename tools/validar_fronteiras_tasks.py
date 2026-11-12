@@ -39,6 +39,7 @@ def check() -> int:
         "tests/e2e/cash-flow.spec.ts",
         "docs/evidencias/s01.md",
         "docs/evidencias/s01-visual.md",
+        "docs/evidencias/capturas",  # capturas PNG geradas pelo E2E (evidência, não código)
     }
     if set(t03["writes"]) != allowed_t03:
         issues.append("S01 T03 deve escrever somente E2E, revisão visual e evidências")
