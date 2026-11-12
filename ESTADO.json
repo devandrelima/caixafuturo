@@ -68,7 +68,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S03-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "9af0a05",
+      "evidence": "models.test.ts 27/27 (visto falhar antes: módulo inexistente); valores à mão (ingênuo 20000, MA7 10000, sazonal e HW exatos em série semanal perfeita, MA 14500/ingênuo 14800 em tendência linear, sazonal 10500 nas últimas 4 segundas) e Holt-Winters conferido contra implementação independente em Python (alta com sazonalidade e queda com piso zero em 30 dias); 8 mutações (piso zero, mínimo HW, últimas 4 ocorrências, outliers, status sazonal, alfa, vazamento do corte, dias não consecutivos) derrubam 1/2/2/1/2/3/19/7 testes; inelegibilidade com motivo: HW <42 dias (fronteira 41/42), <7 dias com venda, lacunas >30%, dias não consecutivos, sazonal sem sazonalidade; vendas/valores depois do corte não alteram o resultado; tsc e build OK. Sem UI nem deploy.",
+      "verification": "declarada; confira logs e Git"
     },
     "S03-P02-T01": {
       "status": "pendente"
