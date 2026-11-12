@@ -83,7 +83,10 @@
       "status": "pendente"
     },
     "S01-P02-T04": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "bf8942f",
+      "evidence": "uiFoundation.test.tsx 19/19 passam; suíte 62 testes; cobertura global v8 >=95%; npm run build OK; capturas Playwright headless em 390x844/768x1024/1440x900 sem overflow-x (inspeção visual manual; contraste por tokens/validar_design.py, não por ferramenta automática de a11y)",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T05": {
       "status": "pendente"
