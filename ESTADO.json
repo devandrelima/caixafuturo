@@ -56,7 +56,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S02-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "500452e",
+      "evidence": "salesFlow.test.tsx 18/18 e salesDemo.test.ts 6/6 escritos antes e vistos falhar; E2E sales-flow 13/13 + S01 18/18 = 31/31 no build local e 31/31 contra o container via IP publico (isSecureContext=false); unit 363/363, cobertura global 94.47%/88.56% e do codigo tocado pela S02 95.33%/89.02%; tsc e build OK; conciliacao nas duas ordens com 30 saldos identicos conferidos a mao, ambiguidade pendente, lote/parcelas sinalizados, taxa/prazo mudando caixa, serie curta, hipotese manual, explicacao de risco; revisao visual em 390/768/1440 e reflow 320px sem estouro, 195px com estouro (achado C S01); erros de teste (nao do app) e achado real (historico ocupando a tabela) em docs/evidencias/s02.md. Nao verificado: acesso externo a 8084, outros navegadores, leitor de tela, migracao em IndexedDB real com dados reais. Manifesto T04: writes/reads/orcamento 20000 ajustados; E2E e uiFoundation da S01 atualizados (4 itens de menu, seletores escopados).",
+      "verification": "declarada; confira logs e Git"
     },
     "S03-P01-T01": {
       "status": "pendente"
