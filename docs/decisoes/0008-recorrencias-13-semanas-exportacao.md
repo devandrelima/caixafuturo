@@ -35,3 +35,6 @@ A S04 acrescenta recorrências (F05), visão semanal de até 13 semanas (F15), f
 - Nova store IndexedDB `recurrence` (v3), migração testada a partir de um banco v2 populado.
 - `project()` permanece a única fonte de saldo; recorrências chegam ao motor como `CashEntry` comuns (`origin: 'recurring'`), como os derivados de venda.
 - Filtros (F29) são só visualização: não alteram saldos nem escondem alertas globais.
+
+## Resultado verificado da exportação (T04, 12/11/2026)
+Ida e volta pelo importador real no Chromium: lançamentos de origem `csv` com id externo reimportam com 0 criados e saldo igual. Confirmados os limites de D12: manual/recorrente/demonstração reimportados no mesmo banco entram como novos na 1ª reimportação; descrição neutralizada (apóstrofo) e id externo iniciado por `=`, `+`, `-`, `@` mudam a chave. Detalhes e números em `docs/evidencias/s04.md`.

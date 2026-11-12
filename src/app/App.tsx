@@ -530,6 +530,8 @@ export function App({ repository }: AppProps) {
               calculatedIds={calculatedIds}
               trace={traceOf}
               globalAlert={globalAlert}
+              baseDate={data.settings?.baseDate}
+              dailyPoints={projection.result?.points}
               flaggedIds={flaggedIds}
               disabled={busy}
               onAdd={() => { setFormError(undefined); setEditing('new'); }}
@@ -594,7 +596,7 @@ export function App({ repository }: AppProps) {
           ) : (
             <>
               <CalendarOnly result={projection.result} entriesById={entriesById} selectedDate={effectiveSelected} onSelectDate={setSelectedDate} />
-              {projection.weekly && <WeeklyView weekly={projection.weekly.weekly} entriesById={entriesById} />}
+              {projection.weekly && <WeeklyView weekly={projection.weekly.weekly} entriesById={entriesById} baseDate={data.settings.baseDate} />}
               <RecurringPanel
                 rules={data.recurrences}
                 occurrences={expansion.entries}

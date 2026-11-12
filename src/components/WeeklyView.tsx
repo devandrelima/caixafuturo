@@ -1,8 +1,10 @@
+import { weeklyToCsv } from '../domain/export/csv';
 import { formatBR } from '../domain/finance/dates';
 import { ORIGIN_LABELS } from '../domain/finance/filters';
 import { formatBRL } from '../domain/finance/money';
-import type { CashEntry } from '../domain/finance/types';
+import type { CashEntry, ISODate } from '../domain/finance/types';
 import type { WeekSummary, WeeklyView as WeeklyData } from '../domain/finance/weekly';
+import { ExportMenu } from './ExportMenu';
 import { riskLabel, riskTone, shortDate } from './riskText';
 import { CfAlert, CfBadge, CfCard } from './ui/UiPrimitives';
 
@@ -10,6 +12,9 @@ export interface WeeklyViewProps {
   weekly: WeeklyData;
   /** Para nomear os lançamentos de cada semana (rastreio até a origem). */
   entriesById: ReadonlyMap<string, CashEntry>;
+  /** Data-base, só para nomear o arquivo exportado. Sem ela não há botão de exportação. */
+  baseDate?: ISODate;
+  onDownload?: (filename: string, csv: string) => void;
 }
 
 const range = (w: WeekSummary) => `${shortDate(w.startDate)} a ${shortDate(w.endDate)}`;
@@ -21,13 +26,30 @@ function riskText(w: WeekSummary): string {
 }
 
 /** Visão semanal (segunda a domingo) que apenas apresenta a agregação do mesmo cálculo diário do motor. */
-export function WeeklyView({ weekly, entriesById }: WeeklyViewProps) {
+export function WeeklyView({ weekly, entriesById, baseDate, onDownload }: WeeklyViewProps) {
   const { weeks } = weekly;
   const negative = weeks.find((w) => w.risk === 'negative');
   const below = weeks.find((w) => w.risk === 'below_minimum');
 
   return (
-    <CfCard title="Próximas 13 semanas" description="Saldo ao fim de cada semana (segunda a domingo), somado a partir do mesmo cálculo diário do painel.">
+    <CfCard title="Próximas 13 semanas" description="Saldo ao fim de cada semana (segunda a domingo), somado a partir do mesmo cálculo diário do painel."
+      actions={
+        baseDate && weekly.weeks.length > 0 ? (
+          <ExportMenu
+            onDownload={onDownload}
+            items={[
+              {
+                id: 'weekly',
+                label: 'Fluxo das semanas',
+                description: 'Uma semana por linha: abertura, entradas, saídas, saldo final, pior dia, risco e ids. Para análise; não é reimportável.',
+                filename: `caixafuturo-13-semanas-${baseDate}.csv`,
+                build: () => ({ csv: weeklyToCsv(weekly.weeks), rows: weekly.weeks.length }),
+              },
+            ]}
+          />
+        ) : undefined
+      }
+    >
       {weeks.length === 0 ? (
         <p className="cf-muted">Sem dados para exibir. Informe o saldo e cadastre lançamentos.</p>
       ) : (

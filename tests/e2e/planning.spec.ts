@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
@@ -201,6 +202,90 @@ test.describe('Sprint 4 — recorrências, 13 semanas, filtros e detalhe', () =>
         }),
     );
     expect(info).toEqual({ version: 3, stores: ['entries', 'meta', 'recurrence', 'reconciliation', 'sales', 'settings'].sort(), entries: 2, rules: 1 });
+  });
+
+  test('exportar CSV: download real no Chromium com BOM UTF-8, ; e vírgula, e o arquivo é EXATAMENTE o filtro mostrado', async ({ page }) => {
+    await loadDemo(page);
+    await loadRecurring(page);
+    await nav(page, 'Movimentações');
+    await page.getByLabel('Categoria', { exact: true }).selectOption('Fixas');
+    await page.getByRole('button', { name: 'Exportar CSV' }).click();
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Lançamentos do filtro atual' }).click()]);
+    expect(download.suggestedFilename()).toBe('caixafuturo-lancamentos-2026-11-11-filtrado.csv');
+    const bytes = readFileSync(await download.path());
+    expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+    const lines = bytes.subarray(3).toString('utf-8').split('\r\n').filter(Boolean);
+    expect(lines[0]).toBe('tipo;descricao;valor;vencimento;categoria;identificador_externo;referencia_venda');
+    // Fixas: condomínio ×3 + seguro ×2 agendados; o seguro de 20/11 está liquidado e fica de fora
+    expect(lines).toHaveLength(1 + 5);
+    expect(lines).toContain('pagar;Condomínio fictício (dia 31);1800,00;2026-11-30;Fixas;rec:demo-rec-condominio:2026-11-30;');
+    expect(lines.some((l) => l.includes('2026-11-20'))).toBe(false);
+    expect(lines.every((l, i) => i === 0 || l.includes(';Fixas;'))).toBe(true);
+    await expect(page.getByTestId('export-status')).toContainText('5 linhas geradas neste navegador; nada foi enviado a servidor. 1 liquidado(s) da lista não foram incluídos.');
+  });
+
+  test('exportar: descrições digitadas pela tela que parecem fórmula saem neutralizadas, e "-5% desconto" continua legível', async ({ page }) => {
+    await loadDemo(page);
+    await nav(page, 'Movimentações');
+    for (const [desc, date] of [['=1+1', '2026-11-20'], ['-5% desconto', '2026-11-21'], ['@SOMA(A1)', '2026-11-22']] as const) {
+      await page.getByRole('button', { name: 'Adicionar lançamento' }).click();
+      await page.getByLabel('Descrição', { exact: false }).fill(desc);
+      await page.getByLabel('Valor (R$)', { exact: false }).fill('10,00');
+      await page.getByLabel('Vencimento', { exact: false }).fill(date);
+      await page.getByRole('button', { name: 'Salvar lançamento' }).click();
+      await expect(page.getByText('Lançamento adicionado.')).toBeVisible();
+    }
+    await page.getByRole('button', { name: 'Exportar CSV' }).click();
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Todos os lançamentos agendados' }).click()]);
+    const text = readFileSync(await download.path()).subarray(3).toString('utf-8');
+    expect(text).toContain(";'=1+1;");
+    expect(text).toContain("'-5% desconto");
+    expect(text).toContain("'@SOMA(A1)");
+    expect(text).not.toMatch(/(^|;)=1\+1/m);
+    expect(text).not.toMatch(/\r\n[-+=@]/);
+    // na tela o texto original continua como o usuário digitou
+    await expect(page.getByRole('table', { name: 'Lançamentos' }).getByText('-5% desconto', { exact: true })).toBeVisible();
+  });
+
+  test('ida e volta pelo importador REAL: contas importadas com id externo → exportar → reimportar não cria nem altera nada', async ({ page }) => {
+    await loadDemo(page);
+    await nav(page, 'Movimentações');
+    const csv = ['tipo;descricao;valor;vencimento;categoria;identificador_externo', 'pagar;Fornecedor ida e volta;1200,50;2026-11-25;Compras;RT-1', 'receber;Cliente ida e volta;3000,00;2026-11-26;Vendas;RT-2'].join('\n');
+    await page.getByTestId('csv-input').setInputFiles({ name: 'contas.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf-8') });
+    await page.getByRole('button', { name: 'Importar 2 lançamento(s)' }).click();
+    await expect(page.getByText(/Importação concluída: 2 criado\(s\)/)).toBeVisible();
+    const before = await page.getByTestId('entries-summary').innerText();
+    await page.getByLabel('Origem', { exact: true }).selectOption('CSV');
+    await page.getByRole('button', { name: 'Exportar CSV' }).click();
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Lançamentos do filtro atual' }).click()]);
+    const exported = readFileSync(await download.path());
+    const lines = exported.subarray(3).toString('utf-8').split('\r\n').filter(Boolean);
+    expect(lines).toContain('pagar;Fornecedor ida e volta;1200,50;2026-11-25;Compras;RT-1;');
+    expect(lines).toContain('receber;Cliente ida e volta;3000,00;2026-11-26;Vendas;RT-2;');
+    await page.getByRole('button', { name: 'Limpar filtros' }).click();
+    // reimporta o arquivo EXPORTADO
+    await page.getByTestId('csv-input').setInputFiles({ name: 'exportado.csv', mimeType: 'text/csv', buffer: exported });
+    await expect(page.getByText('Nada novo para importar: todas as linhas já existem.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Importar', exact: true })).toBeDisabled();
+    expect(await page.getByTestId('entries-summary').innerText()).toBe(before); // nada mudou
+  });
+
+  test('exportar as 13 semanas e a projeção diária: nomes, número de linhas e saldo final iguais aos da tela', async ({ page }) => {
+    await loadDemo(page);
+    await loadRecurring(page);
+    await page.getByRole('button', { name: 'Exportar CSV' }).click();
+    const [weekly] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Fluxo das semanas' }).click()]);
+    expect(weekly.suggestedFilename()).toBe('caixafuturo-13-semanas-2026-11-11.csv');
+    const rows = readFileSync(await weekly.path()).subarray(3).toString('utf-8').split('\r\n').filter(Boolean).map((l) => l.split(';'));
+    expect(rows).toHaveLength(14);
+    expect(rows[13]?.[11]).toBe('-5100,00'); // saldo_final da 13ª semana = o mesmo -R$ 5.100,00 da tabela
+    expect(rows[13]?.[12]).toBe('-510000');
+    expect(rows[1]?.[11]).toBe('4500,00');
+    await nav(page, 'Movimentações');
+    await page.getByRole('button', { name: 'Exportar CSV' }).click();
+    const [daily] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Projeção diária de saldo' }).click()]);
+    const drows = readFileSync(await daily.path()).subarray(3).toString('utf-8').split('\r\n').filter(Boolean);
+    expect(drows).toHaveLength(31); // cabeçalho + 30 dias
   });
 
   for (const [w, h, tag] of [

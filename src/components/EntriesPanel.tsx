@@ -1,11 +1,14 @@
 import { Fragment, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { dailyToCsv, entriesToCsv } from '../domain/export/csv';
 import { formatBR } from '../domain/finance/dates';
 import { EMPTY_FILTER, ORIGIN_LABELS, applyFilter, categoriesOf, isFilterActive, originsOf, summarizeEntries } from '../domain/finance/filters';
 import type { EntryFilter, EntryTrace } from '../domain/finance/filters';
 import { formatBRL } from '../domain/finance/money';
-import type { CashEntry } from '../domain/finance/types';
+import type { CashEntry, DailyPoint, ISODate } from '../domain/finance/types';
 import { DetailFilters } from './DetailFilters';
+import { ExportMenu } from './ExportMenu';
+import type { ExportItem } from './ExportMenu';
 import { riskLabel } from './riskText';
 import { CfBadge, CfButton, CfCard } from './ui/UiPrimitives';
 
@@ -25,6 +28,10 @@ export interface EntriesPanelProps {
   onPickCsv: (file: File) => void;
   onEdit: (entry: CashEntry) => void;
   onDelete: (entry: CashEntry) => void;
+  /** Data-base (nome dos arquivos) e pontos diários do motor; sem eles não há exportação. */
+  baseDate?: ISODate;
+  dailyPoints?: readonly DailyPoint[];
+  onDownload?: (filename: string, csv: string) => void;
 }
 
 function traceText(t: EntryTrace): string {
@@ -44,7 +51,7 @@ function traceText(t: EntryTrace): string {
   }
 }
 
-export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, globalAlert, disabled = false, onAdd, onPickCsv, onEdit, onDelete }: EntriesPanelProps) {
+export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, globalAlert, disabled = false, onAdd, onPickCsv, onEdit, onDelete, baseDate, dailyPoints, onDownload }: EntriesPanelProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState<EntryFilter>(EMPTY_FILTER);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -53,6 +60,33 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
   const summary = useMemo(() => summarizeEntries(shown), [shown]);
   const categories = useMemo(() => categoriesOf(entries), [entries]);
   const origins = useMemo(() => originsOf(entries), [entries]);
+  const filtered = isFilterActive(filter);
+  const exportItems: ExportItem[] = baseDate
+    ? [
+        {
+          id: 'entries',
+          label: filtered ? 'Lançamentos do filtro atual' : 'Todos os lançamentos agendados',
+          description:
+            'Formato do CSV de contas (tipo, descricao, valor, vencimento…). Só lançamentos agendados da lista mostrada. Reimportar é seguro para lançamentos de origem CSV; manuais, recorrentes e da demonstração entrariam como novos no mesmo navegador.',
+          filename: `caixafuturo-lancamentos-${baseDate}${filtered ? '-filtrado' : ''}.csv`,
+          build: () => {
+            const out = entriesToCsv(shown);
+            return { csv: out.csv, rows: out.rowCount, note: out.skippedSettled > 0 ? `${out.skippedSettled} liquidado(s) da lista não foram incluídos.` : undefined };
+          },
+        },
+        ...(dailyPoints && dailyPoints.length > 0
+          ? [
+              {
+                id: 'daily',
+                label: 'Projeção diária de saldo',
+                description: 'Um dia por linha (abertura, entradas, saídas, fechamento, risco e ids), do mesmo cálculo do painel. Para análise; não é reimportável e não é afetada pelo filtro.',
+                filename: `caixafuturo-projecao-diaria-${baseDate}.csv`,
+                build: () => ({ csv: dailyToCsv(dailyPoints), rows: dailyPoints.length }),
+              },
+            ]
+          : []),
+      ]
+    : [];
   const isCalculated = (e: CashEntry) => calculatedIds?.has(e.id) ?? false;
 
   return (
@@ -67,6 +101,7 @@ export function EntriesPanel({ entries, calculatedIds, flaggedIds, trace, global
           <CfButton variant="secondary" onClick={() => fileRef.current?.click()} disabled={disabled}>
             Importar CSV
           </CfButton>
+          {exportItems.length > 0 && entries.length > 0 && <ExportMenu items={exportItems} disabled={disabled} onDownload={onDownload} />}
           <input
             ref={fileRef}
             type="file"

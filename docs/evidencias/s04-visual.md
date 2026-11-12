@@ -12,6 +12,7 @@ Capturas reais (Chromium headless 1.65, geradas pelo E2E em `docs/evidencias/cap
 | Alvos ≥ 44 px e controles com nome acessível (botões, campos, selects, summary) | aprovado | E2E ×3 |
 | Alerta de risco da semana visível em texto no celular (data e valor) | aprovado depois da correção | recorte 390 px |
 | Cor não é o único sinal (alertas por texto; filtro ativo por texto e chips) | aprovado (inspeção) | capturas |
+| Botão secundário "Exportar CSV" e menu de opções (foco inicial, Escape devolve o foco, descrição em texto, status "nada foi enviado") | aprovado | E2E + unit + recorte 390 px |
 | Teclado: Detalhes (Enter), `<details>` das semanas (Enter), Limpar filtros (Enter) | aprovado | E2E |
 | Reutiliza CfCard/CfButton/CfSelect/CfField/CfAlert/CfBadge, sem paleta nova | aprovado | código |
 | Leitor de tela, contraste medido, zoom 200%, outros navegadores | **não verificado** | — |
