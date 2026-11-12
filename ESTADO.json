@@ -38,7 +38,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S02-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "1df6624",
+      "evidence": "importSales.test.ts 23/23 (visto falhar antes: módulo inexistente; mutação na assinatura de conflito derruba 2 testes); suíte total 244/244 e estável sob 4 execuções simultâneas após testTimeout 20s (3 testes do app.test.tsx da S01 estouravam 5s sob CPU disputada); cobertura v8 do código da task: domain/sales 98.33% stmts/94.64% branches, importSales.ts 99.15%/94.64%; global 93.69%/88.34%; tsc --noEmit e npm run build OK; validar e validar_fronteiras_tasks OK. Manifesto T01: writes += src/domain/import/csv.ts (export do tokenizador). Sem UI nesta task, sem deploy.",
+      "verification": "declarada; confira logs e Git"
     },
     "S02-P01-T02": {
       "status": "pendente"
