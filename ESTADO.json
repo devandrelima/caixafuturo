@@ -98,7 +98,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S04-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "e56fa08",
+      "evidence": "Testes escritos antes e vistos falhar (módulos inexistentes) para filters, recurrenceRepository e recurringDemo. Unit 638/638 (30 arquivos), cobertura global 95,64% stmts/90,57% branches; código alterado 94,16% stmts/89,11% branches. E2E local 50/50 na 2ª rodada completa (10 novos da S04, incluindo migração real do IndexedDB v2→v3 no Chromium); 1ª rodada teve 1 falha intermitente em sales-flow (511 ms) cuja mensagem não foi capturada e não reproduziu em 3 execuções isoladas nem numa rodada completa. tsc e build OK. Mutação: filtros 11, persistência 8, UI 10 (todas derrubadas; 4 sobreviventes de rodadas anteriores geraram testes novos). Erros do APP achados: alerta global usava 1º risco em vez do pior caso; no Chromium a coluna Situação (alerta) das semanas e Período/Ações das regras ficavam fora da tela no celular, e meu botão Detalhes agravou o achado B (254→273 px) — corrigido empilhando tabelas (Lançamentos 616→0 e 254→0). Erros dos TESTES listados em docs/evidencias/s04.md. Validação visual 390/768/1440 com recortes inspecionados; sem leitor de tela, sem outros navegadores. Manifesto: writes ampliado e contexto 10000→16000 (estimativa 15262). Deploy ainda não feito neste commit.",
+      "verification": "declarada; confira logs e Git"
     },
     "S04-P02-T02": {
       "status": "pendente"
