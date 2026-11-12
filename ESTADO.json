@@ -112,8 +112,15 @@
   },
   "sprints": {
     "S01": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "Aprovada pelo usuário em 12/11/2026 após testar a demo no navegador",
+      "regression_evidence": "12/11/2026 no HEAD 6b68424: npm ci OK; npm run test:unit -- --run --coverage = 221/221 passam; npm run build OK; npm run test:e2e = 17/18 na 1a rodada (1 falha intermitente em 'MESMOS saldos do contrato', causa não identificada) e 18/18 na rodada seguinte; o teste isolado passou 1/1 e 12/12 em --repeat-each=12 (não reproduzido)",
+      "demo_evidence": "http://84.247.135.249:8084 — Explorar demonstração: 12/11 R$ 500 · 13/11 R$ 1.300 · 14/11 -R$ 700 (déficit R$ 1.700) · 15/11 R$ 3.300; usuário testou no navegador",
+      "changed_coverage": 93.18,
+      "full_suite_evidence": "unit 221/221 + E2E 18/18 (2a rodada) + build OK; E2E contra container via IP em S01 17/17 (não repetido neste passo)",
+      "global_coverage": 93.18,
+      "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S02": {
       "status": "pendente",
