@@ -1,7 +1,7 @@
 {
   "id": "S01-P02-T02",
   "kind": "interface",
-  "instruction": "Implementar e integrar a UI financeira REAL com dados persistidos: cadastro, edição/exclusão, importação CSV, configuração de saldos, dashboard 30 dias, gráfico/tabela e calendário no AppShell. **Na própria T02** criar dataset sintético determinístico em src/demo/restaurant.ts conforme contratos/demo-s01.md, testes unitários em src/demo/__tests__/restaurant.test.ts e conectar na src/app/App.tsx o callback 'Explorar demonstração' do Onboarding (persistir via repository, recalcular pelo motor, exibir selo 'Dados fictícios', confirmar antes de substituir dados existentes e permitir reset mediante confirmação). Documentar no README somente comportamento implementado. Não delegar a montagem/ligação do dataset à T03. Nunca calcular saldo no componente, usar valores fixos como KPI ou tocar arquivos fora de writes. A T02 também deve atualizar src/components/__tests__/uiFoundation.test.tsx, removendo o teste da ligação provisória do App substituída por esta integração.",
+  "instruction": "Implementar e integrar a UI financeira REAL com dados persistidos: cadastro, edição/exclusão, importação CSV, configuração de saldos, dashboard 30 dias, gráfico/tabela e calendário no AppShell. **Na própria T02** criar dataset sintético determinístico em src/demo/restaurant.ts conforme contratos/demo-s01.md, testes unitários em src/demo/__tests__/restaurant.test.ts e conectar na src/app/App.tsx o callback 'Explorar demonstração' do Onboarding (persistir via repository, recalcular pelo motor, exibir selo 'Dados fictícios', confirmar antes de substituir dados existentes e permitir reset mediante confirmação). Documentar no README somente comportamento implementado. Não delegar a montagem/ligação do dataset à T03. Nunca calcular saldo no componente, usar valores fixos como KPI ou tocar arquivos fora de writes. A T02 também deve atualizar src/components/__tests__/uiFoundation.test.tsx, removendo o teste da ligação provisória do App substituída por esta integração. Ampliação justificada do manifesto: styles.css (estilos de gráfico, calendário e diálogo ausentes da base), componentes auxiliares ConfirmDialog/CashChart/EntriesPanel/riskText (evitam ciclo de imports e arquivos gigantes), app.test.tsx (integração com fake-indexeddb) e src/test/setup.ts (polyfills de teste). A integração deve preservar src/main.tsx e o README (seção Docker da T05). Orçamento contextual ampliado de 15000 para 20000 tokens estimados: os arquivos de leitura obrigatórios (repository, projection, csv, UI base) agora são código real e somam ~19k.",
   "result": "Três vistas do CaixaFuturo e fluxo de demonstração sintética já funcionais e verificáveis localmente, incluindo fixture, testes unitários e onboarding conectado; T03 fará apenas QA/E2E/evidências.",
   "depends_on": [
     "S01-P01-T02",
@@ -24,7 +24,6 @@
     "src/storage/repository.ts",
     "src/domain/finance/projection.ts",
     "src/domain/import/csv.ts",
-    "src/app/styles.css",
     "src/components/AppShell.tsx",
     "src/components/Onboarding.tsx",
     "src/components/ui/UiPrimitives.tsx"
@@ -39,7 +38,14 @@
     "src/demo/restaurant.ts",
     "src/demo/__tests__/restaurant.test.ts",
     "README.md",
-    "src/components/__tests__/uiFoundation.test.tsx"
+    "src/components/__tests__/uiFoundation.test.tsx",
+    "src/app/styles.css",
+    "src/components/ConfirmDialog.tsx",
+    "src/components/CashChart.tsx",
+    "src/components/EntriesPanel.tsx",
+    "src/components/riskText.ts",
+    "src/components/__tests__/app.test.tsx",
+    "src/test/setup.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/demo/__tests__/restaurant.test.ts",
@@ -57,7 +63,7 @@
     "Resultados esperados do contrato demo-s01.md conferem com as funções de projeção (12/11 R$ 500; 14/11 -R$ 700), não com constantes do frontend",
     "README descreve como abrir a demo já funcional após T02; falhas de armazenamento não são mostradas como sucesso"
   ],
-  "context_budget_tokens": 15000,
+  "context_budget_tokens": 20000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

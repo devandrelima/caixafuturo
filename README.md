@@ -2,7 +2,7 @@
 
 Projeto open source para projetar o caixa de pequenos comércios/restaurantes e simular decisões com cálculos verificáveis, **sem IA externa no runtime**, sem servidor de aplicação e sem login.
 
-**Status (12/11/2026):** Sprint 1 em execução. Já existem a base de dinheiro/datas (centavos em BigInt, datas civis) e a fundação visual (tokens, navegação, onboarding). **As vistas financeiras (projeção de 30 dias, importação CSV, calendário e demonstração) ainda não estão ligadas.** O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
+**Status (12/11/2026):** Sprint 1 em execução; funcionalidades implementadas e testadas em unidade/integração: projeção de 30 dias, risco por data, cadastro/edição/exclusão de contas, importação CSV idempotente, calendário e demonstração fictícia. **Os testes E2E, a revisão visual formal e a aprovação humana da Sprint 1 ainda estão pendentes.** O estado real de cada task está em [`ESTADO.json`](ESTADO.json); nada é declarado pronto sem teste e commit registrados.
 
 - [Especificação v2, seis sprints e tasks](docs/especificacao/README.md)
 - [Decisões, arquitetura e riscos](docs/especificacao/00_visao_geral_e_decisoes.md)
@@ -11,6 +11,14 @@ Projeto open source para projetar o caixa de pequenos comércios/restaurantes e 
 - [Skill Planejamento de Sistemas 2.0](https://github.com/devandrelima/planejamento-de-sistemas), revisão 76c187894d15ff2ecd744a25cc195feb68d72b0d
 
 Prioridade candidatura iFood AI Builder 15/11/2026: S01 primeiro fluxo de caixa com 30 dias e risco; S02 só após aprovação humana da S01. As 31 funcionalidades do produto completo constam do planejamento.
+
+## Usar o aplicativo
+
+1. **Explorar demonstração** (tela inicial): carrega, após clique, dados **fictícios** de um restaurante (data-base 11/11/2026, saldo R$ 3.000,00, mínimo R$ 1.000,00 e quatro lançamentos). O motor calcula os saldos: 12/11 R$ 500,00 · 13/11 R$ 1.300,00 · 14/11 **-R$ 700,00** (déficit de R$ 1.700,00 para o mínimo) · 15/11 R$ 3.300,00. O selo "Dados fictícios" fica visível enquanto os dados forem da demonstração. Se já houver dados, o app pede confirmação antes de substituí-los.
+2. **Começar com meus dados**: informe data-base, saldo inicial (fotografia conciliada ao **fim** da data-base) e saldo mínimo; depois cadastre contas em *Movimentações* ou importe um CSV.
+3. **Visão geral**: indicadores, gráfico de 30 dias (com tabela de valores), calendário e alertas por data com a origem do cálculo. **Movimentações**: adicionar, editar e excluir (com confirmação) e importar CSV. **Calendário**: dia selecionável e atalho para a próxima data crítica.
+4. **CSV de contas** (UTF-8 ou Windows-1252, separador `;` ou `,`): colunas `tipo` (pagar/receber), `descricao`, `valor` (pt-BR, ex. `1.234,56`), `vencimento` (`DD/MM/AAAA` ou `AAAA-MM-DD`), `categoria` e `identificador_externo` (opcionais). A prévia mostra erro por linha antes de gravar. Reimportar o mesmo arquivo não duplica lançamentos; duas contas legítimas idênticas exigem identificadores externos distintos.
+5. Contas agendadas **até** a data-base já deveriam estar no saldo informado: são sinalizadas e **não** somadas.
 
 ## Desenvolvimento local
 

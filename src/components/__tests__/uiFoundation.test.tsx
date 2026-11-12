@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { App } from '../../app/App';
 import { AppShell, NAV_ITEMS } from '../AppShell';
 import { Onboarding } from '../Onboarding';
 import { CfAlert, CfBadge, CfButton, CfCard, CfField, CfSelect } from '../ui/UiPrimitives';
@@ -239,19 +238,5 @@ describe('primitivos', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('falhou');
     rerender(<CfAlert tone="neutral" title="Aviso">ok</CfAlert>);
     expect(screen.getByRole('status')).toHaveTextContent('ok');
-  });
-});
-
-describe('App (ligação provisória da fundação visual)', () => {
-  it('começa no onboarding, entra no shell vazio e navega entre as três vistas sem números', async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole('button', { name: /explorar demonstração/i }));
-    expect(screen.getByRole('alert')).toHaveTextContent(/ainda não foi conectada/i);
-    await user.click(screen.getByRole('button', { name: /começar com meus dados/i }));
-    expect(screen.getByRole('heading', { level: 1, name: 'Visão geral' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Calendário' }));
-    expect(screen.getByRole('heading', { level: 1, name: 'Calendário' })).toBeInTheDocument();
-    expect(document.body.textContent).not.toMatch(/R\$\s*\d/);
   });
 });

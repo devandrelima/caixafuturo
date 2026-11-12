@@ -241,3 +241,45 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Diálogo modal ---------- */
+.cf-modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; }
+.cf-modal__scrim { position: absolute; inset: 0; background: rgba(48, 43, 36, 0.4); }
+.cf-modal .cf-dialog { position: relative; }
+
+/* ---------- Gráfico ---------- */
+.cf-chart { position: relative; min-width: 0; }
+.cf-chart__focus { position: relative; border-radius: var(--cf-radius-field); }
+.cf-chart svg { display: block; max-width: 100%; touch-action: pan-y; }
+.cf-chart__grid { stroke: var(--cf-border); stroke-width: 1; }
+.cf-chart__zero { stroke: var(--cf-chart-reference); stroke-width: 1.5; }
+.cf-chart__min { stroke: var(--cf-chart-reference); stroke-width: 2; stroke-dasharray: 6 4; }
+.cf-chart__minlabel, .cf-chart__tick { fill: var(--cf-text-muted); font-size: 12px; font-family: var(--cf-font); }
+.cf-chart__line { fill: none; stroke: var(--cf-chart-primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cf-chart__mark { stroke: var(--cf-surface); stroke-width: 2; }
+.cf-chart__mark--neg { fill: var(--cf-negative); }
+.cf-chart__mark--warn { fill: var(--cf-warning); }
+.cf-chart__cross { stroke: var(--cf-border-strong); stroke-width: 1; }
+.cf-chart__hover { fill: var(--cf-chart-primary); stroke: var(--cf-surface); stroke-width: 2; }
+.cf-chart__tip {
+  position: absolute; top: 8px; z-index: 5; width: 180px; display: grid; gap: 2px; padding: 8px 12px;
+  background: var(--cf-surface); border: 1px solid var(--cf-border-strong); border-radius: var(--cf-radius-field);
+  box-shadow: var(--cf-shadow-popover); font-size: var(--cf-fs-small); pointer-events: none;
+}
+
+/* ---------- Calendário ---------- */
+.cf-cal__nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cf-cal__nav strong::first-letter { text-transform: uppercase; }
+.cf-cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cf-cal__week { text-align: center; font-size: var(--cf-fs-caption); color: var(--cf-text-muted); text-transform: uppercase; }
+.cf-cal__day {
+  min-height: var(--cf-control-height); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  border: 1px solid var(--cf-border); border-radius: var(--cf-radius-field); background: var(--cf-surface); font-size: var(--cf-fs-small); cursor: pointer;
+}
+.cf-cal__day--off { background: transparent; border-color: transparent; color: var(--cf-disabled-text); cursor: default; }
+.cf-cal__day:hover:not(.cf-cal__day--off) { background: var(--cf-surface-hover); }
+.cf-cal__day[aria-pressed='true'] { border: 2px solid var(--cf-text); font-weight: 700; }
+.cf-cal__day--below_minimum { background: var(--cf-warning-surface); color: var(--cf-warning); }
+.cf-cal__day--negative { background: var(--cf-negative-surface); color: var(--cf-negative); }
+.cf-cal__marks { font-size: var(--cf-fs-caption); line-height: 1; min-height: 12px; }
+.cf-cal__detail { margin-top: 16px; border-top: 1px solid var(--cf-border); padding-top: 16px; }
