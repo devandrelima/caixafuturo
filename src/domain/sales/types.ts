@@ -61,3 +61,65 @@ export interface SalesDay {
   grossCents: bigint;
   saleIds: string[];
 }
+
+/** Regra de repasse por meio de pagamento (ADR-0006, D1). Prazo em dias corridos. */
+export interface SettlementRule {
+  method: PaymentMethod;
+  /** Taxa do adquirente em pontos-base (199 = 1,99%). */
+  feeBps: number;
+  /** Comissão adicional em pontos-base. */
+  commissionBps: number;
+  lagDays: number;
+}
+export type SettlementRules = Record<PaymentMethod, SettlementRule>;
+
+/** Recebível líquido calculado de uma venda. Nunca é gravado: é função de (venda, regra). */
+export interface DerivedReceivable {
+  /** `rcv_<hash da venda>`: um por venda. */
+  id: string;
+  saleId: string;
+  saleKey: string;
+  externalId: string;
+  method: PaymentMethod;
+  saleDate: ISODate;
+  grossCents: bigint;
+  feeCents: bigint;
+  netCents: bigint;
+  dueDate: ISODate;
+}
+
+/** Decisão humana de conciliação (persistida). */
+export type ReconciliationDecision =
+  | { kind: 'same'; saleId: string; entryId: string }
+  | { kind: 'standalone'; entryId: string };
+
+export type ReceivableStatus =
+  | 'derived'
+  | 'reconciled'
+  | 'pending'
+  | 'covered_batch'
+  | 'covered_installments'
+  | 'before_base_date'
+  | 'zero_net';
+
+export interface ReceivableView {
+  receivable: DerivedReceivable;
+  status: ReceivableStatus;
+  /** true = entra no saldo projetado. */
+  counts: boolean;
+  /** Contas importadas que cobrem a venda (conciliado/lote/parcelas) ou que geram a pendência. */
+  entryIds: string[];
+  /** Conta importada menos líquido estimado, quando há exatamente um vínculo 1:1. */
+  differenceCents: bigint | null;
+  reason: string;
+}
+
+export type EntryLinkKind = 'imported' | 'reconciled' | 'orphan_reference' | 'batch' | 'installments' | 'standalone';
+export interface EntryView {
+  entryId: string;
+  link: EntryLinkKind;
+  saleIds: string[];
+  /** Vendas derivadas pendentes por causa desta conta. */
+  pendingSaleIds: string[];
+  reason: string;
+}

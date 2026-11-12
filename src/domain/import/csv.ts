@@ -8,6 +8,7 @@ export const MAX_ROWS = 5000;
 const MAX_DESCRIPTION = 200;
 const MAX_CATEGORY = 100;
 const MAX_EXTERNAL_ID = 100;
+const MAX_SALE_REFERENCE = 100;
 
 export interface CandidateRow {
   line: number;
@@ -36,7 +37,7 @@ const EMPTY: Omit<CsvPreview, 'fatalError'> = { totalRows: 0, valid: [], duplica
 const fatal = (message: string): CsvPreview => ({ ...EMPTY, valid: [], duplicates: [], invalid: [], fatalError: message });
 
 const REQUIRED = ['tipo', 'descricao', 'valor', 'vencimento'] as const;
-const KNOWN = [...REQUIRED, 'categoria', 'identificador_externo'] as const;
+const KNOWN = [...REQUIRED, 'categoria', 'identificador_externo', 'referencia_venda'] as const;
 export const DELIMITERS = [';', ',', '\t'] as const;
 
 export const headerName = (raw: string): string =>
@@ -150,6 +151,10 @@ function parseRow(get: (col: string) => string): { parsed: Parsed } | { errors: 
   const externalId = get('identificador_externo').trim();
   if (externalId.length > MAX_EXTERNAL_ID) errors.push(`Identificador externo muito longo (máximo ${MAX_EXTERNAL_ID} caracteres).`);
 
+  const saleReference = get('referencia_venda').trim();
+  if (saleReference.length > MAX_SALE_REFERENCE) errors.push(`Referência de venda muito longa (máximo ${MAX_SALE_REFERENCE} caracteres).`);
+  else if (saleReference !== '' && direction === 'out') errors.push('referencia_venda só se aplica a contas a receber.');
+
   if (errors.length > 0 || !direction || !money.ok || !dueDate) return { errors };
 
   // Assinatura normalizada do conteúdo (categoria fica de fora: recategorizar não cria outro lançamento).
@@ -168,6 +173,7 @@ function parseRow(get: (col: string) => string): { parsed: Parsed } | { errors: 
         origin: 'csv',
         sourceKey,
         state: 'scheduled',
+        ...(saleReference !== '' ? { saleReference } : {}),
       },
     },
   };
@@ -256,4 +262,24 @@ export function planImport(preview: CsvPreview, existingSourceKeys: Iterable<str
       errors: preview.invalid.length,
     },
   };
+}
+
+/**
+ * Contas já gravadas (mesma chave de origem) cuja referência de venda mudou ou é nova no arquivo.
+ * Só enriquece: referência vazia no arquivo nunca remove a existente; nenhuma conta é criada ou duplicada.
+ */
+export function planReferenceUpdates(
+  preview: CsvPreview,
+  existing: readonly CashEntry[],
+): { entryId: string; saleReference: string }[] {
+  if (preview.fatalError !== null) return [];
+  const byKey = new Map(existing.map((e) => [e.sourceKey, e] as const));
+  const updates: { entryId: string; saleReference: string }[] = [];
+  for (const { entry } of preview.valid) {
+    const current = byKey.get(entry.sourceKey);
+    if (current && entry.saleReference && current.saleReference !== entry.saleReference) {
+      updates.push({ entryId: current.id, saleReference: entry.saleReference });
+    }
+  }
+  return updates;
 }

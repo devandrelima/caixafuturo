@@ -1,9 +1,12 @@
 export const DB_NAME = 'caixafuturo';
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 export const STORE_SETTINGS = 'settings';
 export const STORE_ENTRIES = 'entries';
 export const STORE_META = 'meta';
+export const STORE_SALES = 'sales';
+export const STORE_RECONCILIATION = 'reconciliation';
 export const INDEX_SOURCE_KEY = 'sourceKey';
+export const INDEX_SALE_KEY = 'saleKey';
 
 export type StorageErrorCode =
   | 'unavailable'
@@ -50,6 +53,11 @@ function migrate(db: IDBDatabase, oldVersion: number): void {
     const entries = db.createObjectStore(STORE_ENTRIES, { keyPath: 'id' });
     entries.createIndex(INDEX_SOURCE_KEY, 'sourceKey', { unique: true });
     db.createObjectStore(STORE_META, { keyPath: 'key' });
+  }
+  // v2 (S02): vendas e decisões de conciliação. Só ADICIONA stores; settings/entries/meta ficam intactos.
+  if (oldVersion < 2) {
+    db.createObjectStore(STORE_SALES, { keyPath: 'id' }).createIndex(INDEX_SALE_KEY, 'saleKey', { unique: true });
+    db.createObjectStore(STORE_RECONCILIATION, { keyPath: 'key' });
   }
 }
 

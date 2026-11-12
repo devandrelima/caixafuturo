@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { MAX_ROWS, planImport, previewAccountsCsv } from '../csv';
+import { MAX_ROWS, planImport, planReferenceUpdates, previewAccountsCsv } from '../csv';
 
 const H = 'tipo;descricao;valor;vencimento;categoria;identificador_externo';
 const sha = (s: string) => createHash('sha256').update(s, 'utf8').digest('hex');
@@ -234,5 +234,60 @@ describe('planImport: importação repetida não duplica', () => {
     const plan = planImport(previewAccountsCsv(''), []);
     expect(plan.toCreate).toEqual([]);
     expect(plan.fatalError).toEqual(expect.any(String));
+  });
+});
+
+describe('referencia_venda (ADR-0006)', () => {
+  const HR = `${H};referencia_venda`;
+
+  it('lê a referência em conta a receber e a guarda sem espaços; sem coluna ou vazia, o campo não existe', () => {
+    const p = previewAccountsCsv(`${HR}\nreceber;Repasse;100,00;12/11/2026;;R-1; V-1 \nreceber;Outro;50,00;12/11/2026;;R-2;`);
+    expect(p.invalid).toEqual([]);
+    expect(p.valid[0]?.entry.saleReference).toBe('V-1');
+    expect('saleReference' in (p.valid[1]?.entry ?? {})).toBe(false);
+    const old = previewAccountsCsv(`${H}\nreceber;Repasse;100,00;12/11/2026;;R-1`);
+    expect('saleReference' in (old.valid[0]?.entry ?? {})).toBe(false);
+  });
+
+  it('lote "A|B" é aceito como texto (a conciliação o sinaliza como não suportado)', () => {
+    const p = previewAccountsCsv(`${HR}\nreceber;Lote;100,00;12/11/2026;;R-1;V-1|V-2`);
+    expect(p.valid[0]?.entry.saleReference).toBe('V-1|V-2');
+  });
+
+  it('referência em conta a pagar ou longa demais é erro por linha', () => {
+    const p = previewAccountsCsv(`${HR}\npagar;Fornecedor;100,00;12/11/2026;;R-1;V-1\nreceber;X;1,00;12/11/2026;;R-2;${'v'.repeat(101)}`);
+    expect(p.valid).toEqual([]);
+    expect(p.invalid.map((e) => e.line)).toEqual([2, 3]);
+    expect(p.invalid[0]?.message).toMatch(/referencia_venda.*receber/i);
+    expect(p.invalid[1]?.message).toMatch(/referência.*longa/i);
+  });
+
+  it('a referência não entra na chave idempotente: mesma conta, outra referência = mesma sourceKey', () => {
+    const a = previewAccountsCsv(`${HR}\nreceber;Repasse;100,00;12/11/2026;;;V-1`).valid[0]?.entry;
+    const b = previewAccountsCsv(`${HR}\nreceber;Repasse;100,00;12/11/2026;;;V-2`).valid[0]?.entry;
+    expect(a?.sourceKey).toBe(b?.sourceKey);
+    expect(a?.id).toBe(b?.id);
+  });
+});
+
+describe('planReferenceUpdates — reimportar com referência nova enriquece, não duplica', () => {
+  const HR = `${H};referencia_venda`;
+  const stored = previewAccountsCsv(`${HR}\nreceber;Repasse;100,00;12/11/2026;;R-1;\nreceber;Outro;50,00;12/11/2026;;R-2;V-7`).valid.map((v) => v.entry);
+
+  it('conta existente sem referência recebe a nova; com mesma ou sem referência no arquivo não muda; nunca remove', () => {
+    const again = previewAccountsCsv(`${HR}\nreceber;Repasse;100,00;12/11/2026;;R-1;V-1\nreceber;Outro;50,00;12/11/2026;;R-2;`);
+    expect(planImport(again, stored.map((e) => e.sourceKey)).summary).toEqual({ created: 0, ignored: 2, errors: 0 });
+    expect(planReferenceUpdates(again, stored)).toEqual([{ entryId: stored[0]?.id, saleReference: 'V-1' }]);
+    const same = previewAccountsCsv(`${HR}\nreceber;Outro;50,00;12/11/2026;;R-2;V-7`);
+    expect(planReferenceUpdates(same, stored)).toEqual([]);
+  });
+
+  it('referência diferente da armazenada também é atualizada; contas inexistentes são ignoradas', () => {
+    const other = previewAccountsCsv(`${HR}\nreceber;Outro;50,00;12/11/2026;;R-2;V-8\nreceber;Novo;9,00;12/11/2026;;R-3;V-9`);
+    expect(planReferenceUpdates(other, stored)).toEqual([{ entryId: stored[1]?.id, saleReference: 'V-8' }]);
+  });
+
+  it('erro fatal não gera atualizações', () => {
+    expect(planReferenceUpdates(previewAccountsCsv(''), stored)).toEqual([]);
   });
 });

@@ -25,6 +25,7 @@ O mesmo repasse de cartão/Pix pode existir como conta a receber importada (CSV 
 | `covered_batch` (lote não suportado) | conta importada referencia várias vendas (`A\|B\|C`) | não; a conta importada entra; aviso de limitação |
 | `covered_installments` (parcelas não suportadas) | ≥ 2 contas importadas referenciam a mesma venda | não; as contas importadas entram; aviso de limitação |
 | `before_base_date` | data calculada ≤ data-base (já está no saldo informado) | não (informativo) |
+| `zero_net` | líquido zero após taxas (taxa+comissão = 100%) | não |
 
 Conta importada: *importado* (sem vínculo), *conciliado* (vinculado), *referência sem venda* (a venda ainda não foi importada; a conta entra normalmente e o vínculo nasce quando a venda chegar), *lote/parcelas não suportados*.
 

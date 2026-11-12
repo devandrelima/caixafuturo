@@ -1,6 +1,9 @@
 import { isValidISODate } from '../domain/finance/dates';
 import { centsFromString } from '../domain/finance/money';
+import { validateRules } from '../domain/sales/settlement';
+import { validateSale } from './validateSale';
 import type { CashEntry, CashSettings, Direction, EntryOrigin, ISODate } from '../domain/finance/types';
+import type { Sale, SettlementRules } from '../domain/sales/types';
 import {
   DB_NAME,
   INDEX_SOURCE_KEY,
@@ -8,6 +11,8 @@ import {
   runTransaction,
   STORE_ENTRIES,
   STORE_META,
+  STORE_RECONCILIATION,
+  STORE_SALES,
   STORE_SETTINGS,
   StorageError,
 } from './db';
@@ -35,6 +40,9 @@ export interface ReplaceAllInput {
   settings: CashSettings;
   entries: CashEntry[];
   kind: DatasetKind;
+  /** Vendas e regras de repasse do novo conjunto (S02). Vendas, regras e decisões anteriores sempre são apagadas. */
+  sales?: Sale[];
+  rules?: SettlementRules;
 }
 
 export interface RepositoryOptions {
@@ -63,6 +71,7 @@ export interface Repository {
 }
 
 const SETTINGS_KEY = 'cash';
+const RULES_KEY = 'settlementRules';
 const META_KEY = 'dataset';
 const ORIGINS: ReadonlySet<EntryOrigin> = new Set(['manual', 'csv', 'demo', 'sale', 'recurring']);
 
@@ -260,15 +269,24 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
       });
     },
 
-    async replaceAll({ settings, entries, kind }) {
+    async replaceAll({ settings, entries, kind, sales = [], rules }) {
       validateSettings(settings);
       entries.forEach(validateEntry);
-      await write<void>([STORE_SETTINGS, STORE_ENTRIES], (tx) => {
+      sales.forEach(validateSale);
+      if (rules) {
+        const problem = validateRules(rules);
+        if (problem) throw invalid(problem);
+      }
+      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION], (tx) => {
         tx.objectStore(STORE_ENTRIES).clear();
         tx.objectStore(STORE_SETTINGS).clear();
+        tx.objectStore(STORE_SALES).clear();
+        tx.objectStore(STORE_RECONCILIATION).clear();
         tx.objectStore(STORE_SETTINGS).put({ key: SETTINGS_KEY, ...settings });
+        if (rules) tx.objectStore(STORE_SETTINGS).put({ key: RULES_KEY, rules });
         const store = tx.objectStore(STORE_ENTRIES);
         for (const entry of entries) store.add(entry);
+        for (const sale of sales) tx.objectStore(STORE_SALES).add(sale);
         tx.objectStore(STORE_META).put({ key: META_KEY, kind });
       });
     },
@@ -285,9 +303,11 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
       if (confirmation?.confirmed !== true) {
         throw new StorageError('confirmation_required', 'Confirme a exclusão de todos os dados para continuar.');
       }
-      await write<void>([STORE_SETTINGS, STORE_ENTRIES], (tx) => {
+      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION], (tx) => {
         tx.objectStore(STORE_ENTRIES).clear();
         tx.objectStore(STORE_SETTINGS).clear();
+        tx.objectStore(STORE_SALES).clear();
+        tx.objectStore(STORE_RECONCILIATION).clear();
         tx.objectStore(STORE_META).clear();
       });
     },

@@ -29,7 +29,8 @@
     "src/storage/repository.ts",
     "src/domain/finance/types.ts",
     "src/domain/import/csv.ts",
-    "src/domain/import/__tests__/csv.test.ts"
+    "src/domain/import/__tests__/csv.test.ts",
+    "src/storage/validateSale.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/sales src/storage src/domain/import",

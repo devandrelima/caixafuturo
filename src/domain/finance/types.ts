@@ -29,6 +29,8 @@ export interface CashEntry {
   state: EntryState;
   settledAt?: ISODate;
   linkedSaleId?: string;
+  /** identificador_venda informado no CSV de contas (`A|B` = lote). Só vínculo explícito (ADR-0006). */
+  saleReference?: string;
 }
 
 /** Resultado calculado de um dia (não persistido): valores em BigInt. */
