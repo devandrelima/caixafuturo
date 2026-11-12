@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    // Testes de integração com IndexedDB falso passam de 5 s quando a CPU está disputada (CI, execuções paralelas).
+    testTimeout: 20_000,
     setupFiles: ['src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
