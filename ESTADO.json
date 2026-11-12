@@ -204,8 +204,15 @@
       "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S05": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "aprovo (usuário, 12/11/2026), com pedido de gerar o prompt da Sprint 6 para outro chat",
+      "regression_evidence": "npm run test:unit -- --run --coverage: 38 arquivos, 850 testes verdes; npm run test:e2e: 62/62 local e 62/62 contra o container (commit fb5292d); npx tsc --noEmit, npm run build e tools/validar_design.py ok; GitHub Actions app-ci e validar-planejamento-v2 verdes em todos os pushes; S01 (500/1.300/-700/3.300), S02, S03 e S04 preservadas",
+      "demo_evidence": "http://84.247.135.249:8084 - carregar demonstração, Simulador, atraso de 2 dias em demo-receita-02 (15/11 vira -R$ 700,00 na Alternativa, diferença -R$ 4.000,00), Aluguel a 110%, Voltar ao original, recarregar; 390/768/1440 px",
+      "changed_coverage": 95.07,
+      "full_suite_evidence": null,
+      "global_coverage": null,
+      "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S06": {
       "status": "pendente",
