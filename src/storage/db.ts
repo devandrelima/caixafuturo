@@ -1,10 +1,11 @@
 export const DB_NAME = 'caixafuturo';
-export const DB_VERSION = 2;
+export const DB_VERSION = 3;
 export const STORE_SETTINGS = 'settings';
 export const STORE_ENTRIES = 'entries';
 export const STORE_META = 'meta';
 export const STORE_SALES = 'sales';
 export const STORE_RECONCILIATION = 'reconciliation';
+export const STORE_RECURRENCE = 'recurrence';
 export const INDEX_SOURCE_KEY = 'sourceKey';
 export const INDEX_SALE_KEY = 'saleKey';
 
@@ -58,6 +59,10 @@ function migrate(db: IDBDatabase, oldVersion: number): void {
   if (oldVersion < 2) {
     db.createObjectStore(STORE_SALES, { keyPath: 'id' }).createIndex(INDEX_SALE_KEY, 'saleKey', { unique: true });
     db.createObjectStore(STORE_RECONCILIATION, { keyPath: 'key' });
+  }
+  // v3 (S04): regras de recorrência. Só ADICIONA a store; nada existente é tocado (ADR-0008 D1).
+  if (oldVersion < 3) {
+    db.createObjectStore(STORE_RECURRENCE, { keyPath: 'id' });
   }
 }
 

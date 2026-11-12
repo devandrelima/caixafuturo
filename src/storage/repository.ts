@@ -1,6 +1,10 @@
 import { isValidISODate } from '../domain/finance/dates';
 import { centsFromString } from '../domain/finance/money';
+import { validateRule } from '../domain/finance/recurrence';
+import type { RecurrenceRule } from '../domain/finance/recurrence';
 import { validateRules } from '../domain/sales/settlement';
+import { createRecurrenceRepository } from './recurrenceRepository';
+import type { RecurrenceRepository } from './recurrenceRepository';
 import { createSalesRepository } from './salesRepository';
 import type { SalesRepository } from './salesRepository';
 import { validateSale } from './validateSale';
@@ -14,6 +18,7 @@ import {
   STORE_ENTRIES,
   STORE_META,
   STORE_RECONCILIATION,
+  STORE_RECURRENCE,
   STORE_SALES,
   STORE_SETTINGS,
   StorageError,
@@ -45,6 +50,8 @@ export interface ReplaceAllInput {
   /** Vendas e regras de repasse do novo conjunto (S02). Vendas, regras e decisões anteriores sempre são apagadas. */
   sales?: Sale[];
   rules?: SettlementRules;
+  /** Regras de recorrência do novo conjunto (S04). As anteriores sempre são apagadas. */
+  recurrences?: RecurrenceRule[];
 }
 
 export interface RepositoryOptions {
@@ -57,6 +64,8 @@ export interface RepositoryOptions {
 export interface Repository {
   /** Vendas, regras de repasse e decisões de conciliação (S02), no mesmo banco. */
   readonly sales: SalesRepository;
+  /** Regras de recorrência (S04); as ocorrências são calculadas, não gravadas. */
+  readonly recurrence: RecurrenceRepository;
   getSettings(): Promise<CashSettings | null>;
   saveSettings(settings: CashSettings): Promise<void>;
   listEntries(): Promise<CashEntry[]>;
@@ -122,6 +131,7 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
   const dbName = options.dbName ?? DB_NAME;
   const newId = options.newId ?? defaultId;
   const sales = createSalesRepository({ factory: options.factory, dbName });
+  const recurrence = createRecurrenceRepository({ factory: options.factory, dbName });
   let connection: Promise<IDBDatabase> | undefined;
 
   function db(): Promise<IDBDatabase> {
@@ -159,6 +169,7 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
 
   const api: Repository = {
     sales,
+    recurrence,
     getSettings: () =>
       read<CashSettings | null>([STORE_SETTINGS], (tx, set) => {
         const req = tx.objectStore(STORE_SETTINGS).get(SETTINGS_KEY);
@@ -275,19 +286,25 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
       });
     },
 
-    async replaceAll({ settings, entries, kind, sales = [], rules }) {
+    async replaceAll({ settings, entries, kind, sales = [], rules, recurrences = [] }) {
       validateSettings(settings);
       entries.forEach(validateEntry);
       sales.forEach(validateSale);
+      for (const recurrenceRule of recurrences) {
+        const problems = validateRule(recurrenceRule);
+        if (problems.length > 0) throw invalid(problems[0] as string);
+      }
       if (rules) {
         const problem = validateRules(rules);
         if (problem) throw invalid(problem);
       }
-      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION], (tx) => {
+      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION, STORE_RECURRENCE], (tx) => {
         tx.objectStore(STORE_ENTRIES).clear();
         tx.objectStore(STORE_SETTINGS).clear();
         tx.objectStore(STORE_SALES).clear();
         tx.objectStore(STORE_RECONCILIATION).clear();
+        tx.objectStore(STORE_RECURRENCE).clear();
+        for (const recurrenceRule of recurrences) tx.objectStore(STORE_RECURRENCE).add(recurrenceRule);
         tx.objectStore(STORE_SETTINGS).put({ key: SETTINGS_KEY, ...settings });
         if (rules) tx.objectStore(STORE_SETTINGS).put({ key: RULES_KEY, rules });
         const store = tx.objectStore(STORE_ENTRIES);
@@ -309,17 +326,19 @@ export function createRepository(options: RepositoryOptions = {}): Repository {
       if (confirmation?.confirmed !== true) {
         throw new StorageError('confirmation_required', 'Confirme a exclusão de todos os dados para continuar.');
       }
-      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION], (tx) => {
+      await write<void>([STORE_SETTINGS, STORE_ENTRIES, STORE_SALES, STORE_RECONCILIATION, STORE_RECURRENCE], (tx) => {
         tx.objectStore(STORE_ENTRIES).clear();
         tx.objectStore(STORE_SETTINGS).clear();
         tx.objectStore(STORE_SALES).clear();
         tx.objectStore(STORE_RECONCILIATION).clear();
+        tx.objectStore(STORE_RECURRENCE).clear();
         tx.objectStore(STORE_META).clear();
       });
     },
 
     close() {
       sales.close();
+      recurrence.close();
       const current = connection;
       connection = undefined;
       current?.then((d) => d.close()).catch(() => undefined);

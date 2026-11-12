@@ -61,8 +61,8 @@ async function seedV1(factory: IDBFactory): Promise<CashEntry[]> {
 }
 
 describe('migração do IndexedDB v1 → v2', () => {
-  it('a versão do esquema é 2', () => {
-    expect(DB_VERSION).toBe(2);
+  it('a versão do esquema é 3 (v2 → v3 acrescentou a store de recorrências)', () => {
+    expect(DB_VERSION).toBe(3);
   });
 
   it('banco v1 populado abre em v2 sem perder configurações, lançamentos, estado liquidado nem tipo do conjunto', async () => {
