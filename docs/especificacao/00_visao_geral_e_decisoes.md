@@ -14,9 +14,10 @@ Vite + React + TypeScript strict (app SPA); IndexedDB nativo (dados só no naveg
 - ADR-0001: local-first, sem autenticação/servidor, por prazo, custo e simplicidade.
 - ADR-0002: saldos em centavos exatos, data-base conciliada, chaves de origem idempotentes.
 - ADR-0003: baseline estatístico, comparação temporal e previsão sem promessas de precisão.
+- ADR-0004: direção visual minimalista quente com dourado e detalhes cartoonesco 2D originais, conforme referência enviada pelo usuário.
 
 ## Contratos canônicos
-[Financeiro](contratos/financeiro.md), [CSV](contratos/importacao.md), [Previsões](contratos/previsoes.md), [Simulação](contratos/simulacao.md), [Interface](contratos/interface.md). Alterar contratos compartilhados exige ADR e revisão dos contextos das tasks.
+[Financeiro](contratos/financeiro.md), [CSV](contratos/importacao.md), [Previsões](contratos/previsoes.md), [Simulação](contratos/simulacao.md), [Interface](contratos/interface.md), [design](design/README.md), [tokens](design/tokens.json), [telas](design/telas/S01.md). Alterar contratos compartilhados exige ADR e revisão dos contextos das tasks.
 
 ## Testes e gates
 Task: teste local reproduzível, antes de implementar quando possível. Sprint: regressão afetada, demonstração ponta a ponta, cobertura do código alterado >=80% medida. Checkpoint: S03 e S06, e antecipação por risco alto (S01/S02/S06), suíte completa e cobertura global >=80% medida. CLI valida manifestos e dependências, não testes do produto. Toda sprint precisa de aprovação humana antes de liberar a seguinte.

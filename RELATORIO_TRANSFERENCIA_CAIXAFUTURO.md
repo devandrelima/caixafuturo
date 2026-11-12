@@ -11,10 +11,10 @@ Skill oficial: https://github.com/devandrelima/planejamento-de-sistemas, versão
 
 ## 2. Arquivos criados
 - `README.md`; `docs/especificacao/README.md`; `docs/especificacao/00_visao_geral_e_decisoes.md`; `docs/especificacao/plano.json`; `ESTADO.json`.
-- `docs/especificacao/sprints/S01/` a `S06/`: seis resumos, **12 mapas humanos** (`P01.md` e `P02.md` por sprint), **26 tasks JSON** (`tasks/Tnn.json`).
+- `docs/especificacao/sprints/S01/` a `S06/`: seis resumos, **12 mapas humanos** (`P01.md` e `P02.md` por sprint), **27 tasks JSON** (`tasks/Tnn.json`).
 - `docs/especificacao/memoria/`: memórias `global.md`, `financeiro.md`, `importacao.md`, `previsoes.md`, `simulacao.md`, `ui.md`.
 - `docs/especificacao/contratos/`: `financeiro.md`, `importacao.md`, `previsoes.md`, `simulacao.md`, `interface.md`, `demo-s01.md`.
-- `docs/decisoes/`: três ADRs propostos; `docs/especificacao/evidencias/README.md`; `.github/workflows/validar-planejamento.yml`; este relatório.
+- `docs/decisoes/`: quatro ADRs (a quarta define direção visual do usuário); `docs/especificacao/evidencias/README.md`; `.github/workflows/validar-planejamento.yml`; este relatório.
 
 ## 3. Validação executada de verdade
 GitHub Actions: https://github.com/devandrelima/caixafuturo/actions/runs/43125706368
@@ -37,7 +37,7 @@ GitHub Actions: https://github.com/devandrelima/caixafuturo/actions/runs/4312570
 ## 5. Entrega exata da Sprint 1
 Vite + React + TypeScript com IndexedDB local; dinheiro BigInt/centavos strings, datas civis; cadastro/importação de pagar/receber com idempotência e erros por linha; saldo inicial/mínimo; motor determinístico de 30 dias, alertas negativos/abaixo mínimo, justificativa por lançamento; dashboard, gráfico/tabela, calendário; dataset de restaurante fictício, teste E2E e cobertura medida. O contrato `demo-s01.md` fixa resultados que o código futuro precisa reproduzir: 12/11 saldo R$ 500 e déficit R$ 500; 14/11 saldo -R$ 700 e déficit R$ 1.700.
 
-**6 tasks da S01:** P01 T01 (base financeira), T02 (persistência), T03 (CSV); P02 T01 (projeção), T02 (UI), T03 (demo/testes/E2E). Contratos definidos previamente; execução paralela somente depois da primeira task e com ausência de colisões.
+**7 tasks da S01:** P01 T01 (base financeira), T02 (persistência), T03 (CSV); P02 T01 (projeção), T04 (base visual), T02 (UI integrada), T03 (demo/E2E/revisão visual). Contratos definidos previamente; execução paralela somente depois da primeira task e com ausência de colisões.
 
 ## 6. Prioridade para candidatura e riscos
 Meta de candidatura **15/11/2026**: S01 confiável, testada e demonstrável até 13/11; S02 apenas se a S01 for aprovada e couber no tempo de 14/11. S03–S06 ficam no roadmap. Riscos: cronograma curto, deduplicação, reais/datas, dados armazenados apenas no browser, falta de backtesting, confiabilidade de testes E2E. Não utilizar dados pessoais nem bancários reais. A aprovação do planejamento é distinta da autorização de iniciar a programação.
@@ -53,3 +53,6 @@ python3 ../planejamento-de-sistemas/skills/planejamento-de-sistemas/scripts/flux
 ```
 
 Não codificar antes de autorização. Ao encerrar cada sprint: logs reais, regressão, cobertura, demo e aceite humano. Auditoria independente deve conferir GitHub Actions e os contratos, além de validar os resultados de produto quando vierem a existir.
+
+## Complemento frontend — 11/11/2026
+A direção enviada em capturas foi documentada de forma autocontida em `docs/especificacao/design/`: guia, tokens, componentes, telas S01, evolução S02–S06, critérios visuais e template de auditoria. O contrato UI foi atualizado para v2 e ADR-0004 registrado. Foi adicionada a task **S01-P02-T04** para construção do sistema visual antes da task S01-P02-T02 de integração; todas as tasks UI S02–S06 receberam contextos e aceites visuais seletivos. Agora são 27 tasks, 12 mapas, seis sprints, 31 funcionalidades. Verificar CI posterior em GitHub Actions; a aprovação estrutural não autoriza implementação.
