@@ -5,6 +5,7 @@ import { centsFromString } from '../finance/money';
 import type { CashEntry, CashSettings, ISODate } from '../finance/types';
 import { sha256Hex } from '../import/sha256';
 import { applyDelay } from './delay';
+import { applyScaleExpense, applyScaleSales } from './shocks';
 import { HYPOTHETICAL_LABEL, ScenarioError } from './types';
 import type {
   Adjustment,
@@ -26,8 +27,8 @@ import type {
  * de saldo própria: base e alternativa passam pelo mesmo `project()` do app.
  */
 
-/** Aplicadores reais por tipo de ajuste (choques entram na S05-P02-T01). */
-const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay };
+/** Aplicadores reais por tipo de ajuste . */
+const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense };
 
 // ───────────────────────────── utilitários ─────────────────────────────
 
