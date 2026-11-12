@@ -89,7 +89,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T05": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "bfd6f1f",
+      "evidence": "docker compose config OK; build multi-stage OK; container healthy em :8084 (restart unless-stopped, ro, não-root); GET / e rotas SPA 200, asset inexistente 404; deploy.sh testado com config inválida (versão estável preservada) e rollback simulado; detalhes em docs/evidencias/s01-docker.md; CI app-ci ainda não verificado no GitHub",
+      "verification": "declarada; confira logs e Git"
     }
   },
   "sprints": {
