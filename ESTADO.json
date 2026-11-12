@@ -116,7 +116,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S05-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "efdfa8e",
+      "evidence": "vitest src/domain/scenarios: 61 testes verdes (delay.test.ts 28: valor sai da data anterior e aparece 1x, id causal e soma preservados, fim de mês, fevereiro bissexto/não, virada de ano, fora do horizonte dito, 0 dia, dois ajustes no mesmo recebível, propriedade em 80 casos: nenhum dia melhora); tsc e build ok; mutação em delay.ts: 15 mutantes, 14 mortos e 1 redundante (checagem typeof) removida",
+      "verification": "declarada; confira logs e Git"
     },
     "S05-P02-T01": {
       "status": "pendente"
