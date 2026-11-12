@@ -1,7 +1,7 @@
 {
   "id": "S01-P02-T02",
   "kind": "interface",
-  "instruction": "Implementar e integrar a UI financeira REAL com dados persistidos: cadastro, edição/exclusão, importação CSV, configuração de saldos, dashboard 30 dias, gráfico/tabela e calendário no AppShell. **Na própria T02** criar dataset sintético determinístico em src/demo/restaurant.ts conforme contratos/demo-s01.md, testes unitários em src/demo/__tests__/restaurant.test.ts e conectar na src/app/App.tsx o callback 'Explorar demonstração' do Onboarding (persistir via repository, recalcular pelo motor, exibir selo 'Dados fictícios', confirmar antes de substituir dados existentes e permitir reset mediante confirmação). Documentar no README somente comportamento implementado. Não delegar a montagem/ligação do dataset à T03. Nunca calcular saldo no componente, usar valores fixos como KPI ou tocar arquivos fora de writes.",
+  "instruction": "Implementar e integrar a UI financeira REAL com dados persistidos: cadastro, edição/exclusão, importação CSV, configuração de saldos, dashboard 30 dias, gráfico/tabela e calendário no AppShell. **Na própria T02** criar dataset sintético determinístico em src/demo/restaurant.ts conforme contratos/demo-s01.md, testes unitários em src/demo/__tests__/restaurant.test.ts e conectar na src/app/App.tsx o callback 'Explorar demonstração' do Onboarding (persistir via repository, recalcular pelo motor, exibir selo 'Dados fictícios', confirmar antes de substituir dados existentes e permitir reset mediante confirmação). Documentar no README somente comportamento implementado. Não delegar a montagem/ligação do dataset à T03. Nunca calcular saldo no componente, usar valores fixos como KPI ou tocar arquivos fora de writes. A T02 também deve atualizar src/components/__tests__/uiFoundation.test.tsx, removendo o teste da ligação provisória do App substituída por esta integração.",
   "result": "Três vistas do CaixaFuturo e fluxo de demonstração sintética já funcionais e verificáveis localmente, incluindo fixture, testes unitários e onboarding conectado; T03 fará apenas QA/E2E/evidências.",
   "depends_on": [
     "S01-P01-T02",
@@ -38,7 +38,8 @@
     "src/components/__tests__/dashboard.test.tsx",
     "src/demo/restaurant.ts",
     "src/demo/__tests__/restaurant.test.ts",
-    "README.md"
+    "README.md",
+    "src/components/__tests__/uiFoundation.test.tsx"
   ],
   "tests": [
     "npm run test:unit -- --run src/demo/__tests__/restaurant.test.ts",

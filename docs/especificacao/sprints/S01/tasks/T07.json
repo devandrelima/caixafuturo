@@ -1,7 +1,7 @@
 {
   "id": "S01-P02-T04",
   "kind": "interface",
-  "instruction": "Implementar SOMENTE a base visual S01: tokens.json convertidos em CSS variables, AppShell com navegação local entre as três vistas, Onboarding opcional de duas ações reais por callbacks e primitivos tipados Button/Card/Badge/Field. Estilo creme/areia/grafite/dourado clean com cartoon 2D original discreto, sem mascote de terceiros. Não integrar storage nem simular gráficos/números ou criar páginas futuras.",
+  "instruction": "Implementar SOMENTE a base visual S01: tokens.json convertidos em CSS variables, AppShell com navegação local entre as três vistas, Onboarding opcional de duas ações reais por callbacks e primitivos tipados Button/Card/Badge/Field. Estilo creme/areia/grafite/dourado clean com cartoon 2D original discreto, sem mascote de terceiros. Não integrar storage nem simular gráficos/números ou criar páginas futuras. Ligação PROVISÓRIA em src/app/App.tsx (justificada para permitir pré-visualização contínua na VPS): monta Onboarding e AppShell com as três vistas em estado vazio explícito, sem números, sem storage e sem demo; a S01-P02-T02 a substitui integralmente. src/main.tsx importa ./app/styles.css (sem isso nenhum estilo é carregado).",
   "result": "Base de interface reutilizável e testada, pronta para integração do motor financeiro.",
   "depends_on": [
     "S01-P01-T01"
@@ -15,15 +15,15 @@
     "docs/especificacao/design/qualidade.md",
     "docs/especificacao/design/telas/S01.md"
   ],
-  "reads": [
-    "src/app/App.tsx"
-  ],
+  "reads": [],
   "writes": [
     "src/app/styles.css",
     "src/components/AppShell.tsx",
     "src/components/Onboarding.tsx",
     "src/components/ui/UiPrimitives.tsx",
-    "src/components/__tests__/uiFoundation.test.tsx"
+    "src/components/__tests__/uiFoundation.test.tsx",
+    "src/app/App.tsx",
+    "src/main.tsx"
   ],
   "tests": [
     "npm run test:unit -- --run src/components/__tests__/uiFoundation.test.tsx",
