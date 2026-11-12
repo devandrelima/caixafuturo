@@ -22,7 +22,10 @@
     "src/domain/finance/types.ts",
     "src/domain/finance/money.ts",
     "src/domain/finance/dates.ts",
-    "src/domain/finance/__tests__/primitives.test.ts"
+    "src/domain/finance/__tests__/primitives.test.ts",
+    ".gitignore",
+    "src/vite-env.d.ts",
+    "src/test/setup.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/finance/__tests__/primitives.test.ts",
