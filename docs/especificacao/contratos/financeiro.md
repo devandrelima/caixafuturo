@@ -21,3 +21,11 @@ Resolve a PEND-S02-001. Resumo normativo:
 - O resultado independe da ordem de importação (vínculo recalculado do estado). Editar/liquidar mantém o vínculo; excluir a conta devolve o derivado ao saldo.
 - **Limitações:** parcelas e lotes não suportados (sinalizados); prazo em dias corridos; sem estorno/pagamento parcial.
 - Regressão obrigatória do `project()` da S01 (demo 12/11 R$ 500 · 13/11 R$ 1.300 · 14/11 −R$ 700 · 15/11 R$ 3.300) inalterada: derivados chegam ao motor como `CashEntry` comuns (`origin: 'sale'`, `sourceKey: sale-settlement:<id>`).
+
+
+## Recorrências e 13 semanas (S04) — decididas em [ADR-0008](../../decisoes/0008-recorrencias-13-semanas-exportacao.md)
+- `RecurrenceRule = {id, direction, amountCents, description, category, frequency:'weekly'|'biweekly'|'monthly'|'yearly', startDate, endDate?, skippedDates?[]}`. Regra persistida; **ocorrências são calculadas** (função pura), não gravadas. Periodicidades em dias corridos; sem dias úteis/feriados (limitação).
+- Mensal/anual preservam a âncora do dia: 31/jan → último dia de fev → 31/mar; 29/fev → 28/fev em ano não bissexto. `startDate` e `endDate` inclusivas.
+- Ocorrência = `CashEntry` com `origin:'recurring'`, `state:'scheduled'`, `sourceKey = rec:<ruleId>:<data>`. Só datas **depois da data-base** (como o motor). Lançamento real com a mesma `sourceKey` (qualquer estado) suprime a ocorrência; lançamento equivalente (direção, vencimento, valor e descrição normalizada) também, **informando** a cobertura. Passado liquidado/conciliado/editado é imutável; excluir regra não apaga lançamentos.
+- **13 semanas:** semana de segunda a domingo; até 91 dias a partir de `baseDate+1`, última semana pode ser parcial. Saldo de fechamento da semana = fechamento diário do último dia da semana no horizonte, do mesmo `project()`. Premissas: lançamentos + repasses derivados; nunca previsão de faturamento nem hipótese manual. A incerteza cresce com o horizonte.
+- **Filtros:** só visualização; nunca alteram saldo nem escondem alertas globais; o somatório mostrado corresponde exatamente aos IDs listados.

@@ -19,3 +19,6 @@ Colunas: identificador_venda, data_venda, valor_bruto, meio_pagamento, categoria
 ## Exportação (S04)
 Cabeçalho, filtros, datas ISO, centavos/BRL desambiguados e UTF-8; escapar aspas, quebras e delimitadores. Neutralizar fórmula-injection para texto iniciado por =, +, - ou @. Não transmitir arquivo para servidor.
 
+Formato decidido em [ADR-0008](../../decisoes/0008-recorrencias-13-semanas-exportacao.md) (D10–D12): UTF-8 **com BOM**, separador `;`, decimal com vírgula, CRLF, datas `AAAA-MM-DD`, cabeçalhos fixos; dinheiro em `valor` (reais, vírgula) e `valor_centavos` (inteiro). Texto iniciado por `=`, `+`, `-`, `@`, TAB ou CR (após espaços à esquerda) recebe prefixo `'`. A exportação de lançamentos usa as colunas do CSV de contas; reimportação idempotente garantida só para origem `csv` (limites em D12). O arquivo é gerado no navegador e não é transmitido.
+
+
