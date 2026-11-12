@@ -1,8 +1,8 @@
 {
   "id": "S01-P02-T02",
   "kind": "interface",
-  "instruction": "Integrar UI financeira real sobre AppShell, Onboarding e tokens da task S01-P02-T04: configuração de saldos, cadastro/edição/exclusão, importação CSV com preview e erros, dashboard de 30 dias, gráfico+tabela e calendário. Navegação limitada às três vistas funcionais, sem números fixos, links falsos ou cálculo independente nos componentes. Respeitar wireframes S01 e não mudar tema sem justificativa/atualização do contrato.",
-  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "instruction": "Implementar e integrar a UI financeira REAL com dados persistidos: cadastro, edição/exclusão, importação CSV, configuração de saldos, dashboard 30 dias, gráfico/tabela e calendário no AppShell. **Na própria T02** criar dataset sintético determinístico em src/demo/restaurant.ts conforme contratos/demo-s01.md, testes unitários em src/demo/__tests__/restaurant.test.ts e conectar na src/app/App.tsx o callback 'Explorar demonstração' do Onboarding (persistir via repository, recalcular pelo motor, exibir selo 'Dados fictícios', confirmar antes de substituir dados existentes e permitir reset mediante confirmação). Documentar no README somente comportamento implementado. Não delegar a montagem/ligação do dataset à T03. Nunca calcular saldo no componente, usar valores fixos como KPI ou tocar arquivos fora de writes.",
+  "result": "Três vistas do CaixaFuturo e fluxo de demonstração sintética já funcionais e verificáveis localmente, incluindo fixture, testes unitários e onboarding conectado; T03 fará apenas QA/E2E/evidências.",
   "depends_on": [
     "S01-P01-T02",
     "S01-P01-T03",
@@ -17,7 +17,8 @@
     "docs/especificacao/design/componentes.md",
     "docs/especificacao/design/qualidade.md",
     "docs/especificacao/contratos/financeiro.md",
-    "docs/especificacao/design/telas/S01.md"
+    "docs/especificacao/design/telas/S01.md",
+    "docs/especificacao/contratos/demo-s01.md"
   ],
   "reads": [
     "src/storage/repository.ts",
@@ -34,9 +35,13 @@
     "src/components/ImportPreview.tsx",
     "src/components/CashDashboard.tsx",
     "src/components/RiskCalendar.tsx",
-    "src/components/__tests__/dashboard.test.tsx"
+    "src/components/__tests__/dashboard.test.tsx",
+    "src/demo/restaurant.ts",
+    "src/demo/__tests__/restaurant.test.ts",
+    "README.md"
   ],
   "tests": [
+    "npm run test:unit -- --run src/demo/__tests__/restaurant.test.ts",
     "npm run test:unit -- --run src/components/__tests__/dashboard.test.tsx",
     "npm run build"
   ],
@@ -45,9 +50,13 @@
     "Labels R$, datas, origem e saldo inicial/projetado não se confundem",
     "Teclado, foco, estados vazio/erro e visual móvel funcionam",
     "Gráfico, tabela e calendário recebem dados do mesmo motor, sem saldo recalculado na apresentação",
-    "Visual segue tokens; riscos são identificáveis por texto e data; não há scroll horizontal da página em mobile"
+    "Visual segue tokens; riscos são identificáveis por texto e data; não há scroll horizontal da página em mobile",
+    "Dataset sintético determinístico e testes pertencem à T02; App.tsx importa a fixture e conecta 'Explorar demonstração' sem depender de alterações da T03",
+    "Carregar demonstração solicita confirmação antes de substituir dados existentes, persiste via repositório e recalcula dashboard/calendário com selo visível 'Dados fictícios'; reset exige confirmação",
+    "Resultados esperados do contrato demo-s01.md conferem com as funções de projeção (12/11 R$ 500; 14/11 -R$ 700), não com constantes do frontend",
+    "README descreve como abrir a demo já funcional após T02; falhas de armazenamento não são mostradas como sucesso"
   ],
-  "context_budget_tokens": 12000,
+  "context_budget_tokens": 15000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

@@ -15,12 +15,15 @@
     "docs/especificacao/design/componentes.md",
     "docs/especificacao/design/qualidade.md",
     "docs/especificacao/contratos/financeiro.md",
-    "docs/especificacao/design/evolucao.md"
+    "docs/especificacao/design/evolucao.md",
+    "docs/especificacao/pendencias/S02-conciliacao-recebiveis.md"
   ],
   "reads": [
     "src/app/styles.css",
     "src/components/AppShell.tsx",
-    "src/components/ui/UiPrimitives.tsx"
+    "src/components/ui/UiPrimitives.tsx",
+    "src/domain/sales/settlement.ts",
+    "src/storage/salesRepository.ts"
   ],
   "writes": [
     "src/components/SalesPanel.tsx",
@@ -38,9 +41,10 @@
     "Cada risco revela lançamentos e hipóteses considerados",
     "E2E confirma ausência de dupla contagem com fluxo S01 preservado",
     "Faturamento, recebíveis e saldo separados em layout consistente com tema da S01.",
-    "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado."
+    "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado.",
+    "E2E com CSV de contas e CSV de vendas verifica que mesma disponibilidade não é projetada em duplicidade, inclusive importando em ordem inversa; UI sinaliza vinculação ambígua"
   ],
-  "context_budget_tokens": 10000,
+  "context_budget_tokens": 12000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

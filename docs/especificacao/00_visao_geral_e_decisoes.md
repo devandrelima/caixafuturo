@@ -26,6 +26,7 @@ Task: teste local reproduzível, antes de implementar quando possível. Sprint: 
 - Janela 11–15/11 muito curta: confiabilidade da S01 prevalece sobre S02.
 - CSV sem identificador externo pode confundir lançamentos idênticos: exigir chave externa para duplicatas legítimas.
 - Float, fuso e duplicação de recebíveis: testes invariantes e contratos estritos.
+- **PEND-S02-001 (aberta):** conciliar recebíveis importados por CSV de contas versus recebíveis gerados de vendas, inclusive vínculos ambíguos, parcelas e lotes; responsabilidade S02-P01-T02, validação S02-P02-T02; [registro](pendencias/S02-conciliacao-recebiveis.md).
 - IndexedDB não é backup: documentar limitação, exportação na S04.
 - Histórico insuficiente: avisos e projeção manual identificada, sem inventar acurácia.
 - Navegador/Playwright e ambiente de CI podem demandar instalação: registrar resultado concreto.

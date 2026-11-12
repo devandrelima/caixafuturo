@@ -19,3 +19,8 @@ Resultados **esperados de especificação**, ainda não executados no app:
 - Dias 16/11 até 11/12 (completa janela de 30 dias contada do dia seguinte à data-base) sem novas entradas seguem com R$ 3.300, salvo lançamento manual/importado.
 
 Casos de teste: importação repetida não duplica; editar valor muda alerta; excluir conta elimina seu efeito; gráfico/tabela/calendário reproduzem os mesmos saldos; origem de cada dia é rastreável; todos os valores são reais calculados a partir de dados **fictícios**, não KPIs estáticos. Preferir manter datas fixas para repetibilidade em auditorias.
+
+## Posse do dataset e integração (decisão da auditoria)
+- **S01-P02-T02** cria `src/demo/restaurant.ts` com função exportada de geração determinística (nomes concretos definidos pela implementação), utilizando as configurações e lançamentos exatos deste contrato, e cria seus testes unitários em `src/demo/__tests__/restaurant.test.ts`. **Na mesma task**, `src/app/App.tsx` liga `Onboarding.onExploreDemo` ao carregamento intencional de fixture no repositório IndexedDB e à projeção real. A interface mostra dados fictícios e dá opção de confirmação antes de qualquer sobrescrita.
+- **S01-P02-T03** não cria/edita fixture nem integração; lê `src/demo/restaurant.ts` e `src/app/App.tsx` e apenas valida por E2E, review visual e logs. Problemas levam a ajustes formalizados na T02; não ultrapassar `writes`.
+- Teste de contrato obrigatório na T02: 4 eventos sintéticos, IDs estáveis, base em 11/11/2026, data mínima e saldos esperados; o retorno da fixture não deve possuir referência compartilhada mutável entre cargas. Teste E2E da T03 observa a UI depois de carregar e de recarregar a página.

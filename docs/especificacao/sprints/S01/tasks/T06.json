@@ -1,8 +1,8 @@
 {
   "id": "S01-P02-T03",
   "kind": "integration",
-  "instruction": "Criar demo explícita com dados totalmente sintéticos de restaurante e fluxo completo de importação, edição e risco; Playwright E2E; atualizar README com passos realmente executados, medir cobertura alterada e global por risco alto, sem aprovar sprint. Revisar front-end real em 3 viewports e documentar QA visual/acessibilidade com capturas se ambiente permitir. Não declarar revisão realizada sem evidência.",
-  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "instruction": "Realizar exclusivamente testes E2E, revisão visual/acessibilidade e coleta de evidências da Sprint 1. Consumir, sem recriar nem alterar, o dataset src/demo/restaurant.ts e a integração de onboarding App.tsx já entregues pela T02. Criar cenários Playwright de primeiro acesso, carga de demo, saldo/risco, persistência, importação CSV idempotente, edição e reset; inspecionar viewports 390×844, 768×1024 e 1440×900; executar regressão completa, build e medição real de cobertura alterada/global. Registrar logs e achados nos arquivos de evidências. Se a UI ou a fixture falhar, devolver o problema à T02/replanejamento antes de editar código fora de writes, jamais corrigir silenciosamente arquivos de produção.",
+  "result": "Testes E2E, revisão visual e documentos de evidência reproduzíveis sobre a interface e fixture já integradas na T02; sem alterações de aplicação, fixture ou README.",
   "depends_on": [
     "S01-P02-T02"
   ],
@@ -18,13 +18,16 @@
   ],
   "reads": [
     "src/components/CashDashboard.tsx",
-    "src/domain/finance/projection.ts"
-  ],
-  "writes": [
+    "src/domain/finance/projection.ts",
     "src/demo/restaurant.ts",
     "src/demo/__tests__/restaurant.test.ts",
+    "src/app/App.tsx",
+    "src/components/Onboarding.tsx",
+    "src/storage/repository.ts",
+    "README.md"
+  ],
+  "writes": [
     "tests/e2e/cash-flow.spec.ts",
-    "README.md",
     "docs/evidencias/s01.md",
     "docs/evidencias/s01-visual.md"
   ],
@@ -34,11 +37,11 @@
     "npm run build"
   ],
   "acceptance": [
-    "Com baseDate 2026-11-11, saldo R$ 3.000 e mínimo R$ 1.000: 12/11 fecha R$ 500 (déficit R$ 500), 13/11 fecha R$ 1.300, 14/11 fecha -R$ 700 (déficit R$ 1.700), 15/11 fecha R$ 3.300.",
-    "Reimportação dupla não altera saldo e reset demo é explícito",
-    "Logs de unit/E2E/build e cobertura >=80% medida são registrados, sem inventar resultados",
-    "Checklist de visual, mobile, teclado, contraste e estados é preenchido com evidências concretas ou não verificado, em 390x844, 768x1024, 1440x900",
-    "O layout possui identidade original, cartões e formulários conforme especificação, sem números estáticos enganadores"
+    "Playwright exercita 'Explorar demonstração' já conectado pela T02, verifica as datas/saldos do contrato demo-s01.md e lê o mesmo cálculo exibido no dashboard, gráfico, tabela e calendário",
+    "Importar a mesma origem duas vezes não altera saldo; editar lançamento recalcula projeção; recarga do browser preserva estado; reset/confirmar/cancelar não apagam dados sem confirmação",
+    "Logs reais de unit/e2e/build, cobertura alterada >=80% e global >=80% (checkpoint alto risco) são registrados com comando, ambiente e resultado; se não houver medição, marcar pendente",
+    "Checklist de visual, mobile, teclado, contraste e estados com evidências concretas ou 'não verificado' para 390×844, 768×1024, 1440×900",
+    "T03 modifica somente testes/e2e/cash-flow.spec.ts e documentos docs/evidencias/s01*.md; defeitos de T02 não autorizam edição de src/demo, App.tsx, CSS, README ou componentes sem replanejamento"
   ],
-  "context_budget_tokens": 12000
+  "context_budget_tokens": 14000
 }

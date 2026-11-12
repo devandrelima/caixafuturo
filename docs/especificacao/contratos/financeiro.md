@@ -12,3 +12,6 @@ DailyPoint = {date, openingCents, incomingCents, outgoingCents, closingCents, en
 ## Rastreio e conciliação
 Vendas não são dinheiro disponível. Vendas geram expectativa de recebível líquido por regra de repasse, ligada à origem. Realizado/confirmado substitui ou concilia previsto, nunca soma ambos. Preservar IDs causais em saldo/alerta. Reimportar por chave estável não duplica eventos. Saldo real da data-base não é sobrescrito por hipótese, previsão ou cenário. Testar zero, negativo, reimportação, fim de mês e diferença entre datas.
 
+
+## Ponto ainda não resolvido da Sprint 2
+A prioridade "confirmado > previsto" não define **como** reconhecer que um recebível CSV e um gerado a partir de venda representam o mesmo repasse. A definição é pendente [PEND-S02-001](../pendencias/S02-conciliacao-recebiveis.md). Não presumir equivalência apenas por valor/data nem agregar os dois automaticamente. O contrato de vínculo deve ser consolidado antes de `S02-P01-T02` implementar liquidação, com regressão obrigatória do motor de projeção.
