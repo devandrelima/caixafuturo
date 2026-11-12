@@ -17,9 +17,11 @@
 
 ## Fonte de verdade e leitura seletiva
 - [tokens.json](tokens.json): **única fonte de cores, tipografia, dimensões e raios**. Na implementação usar CSS custom properties extraídas desses tokens, não inventar novas cores por componente.
+- [componentes.md](componentes.md): componentes, props e estados mínimos.
 - [telas/S01.md](telas/S01.md): organização, comportamento e wireframes da Sprint 1.
 - [evolucao.md](evolucao.md): como expandir a interface nas Sprints 2–6 sem redesenhá-la.
 - [qualidade.md](qualidade.md): revisão e evidências de layout, acessibilidade, estados e interação.
+- [REVISAO_VISUAL_MODELO.md](REVISAO_VISUAL_MODELO.md): formato de evidência a preencher após executar.
 - [Contrato UI](../contratos/interface.md): fontes e semântica dos dados, rotas e comportamento.
 - [ADR-0004](../../../decisoes/0004-identidade-visual.md): decisão e limites da inspiração.
 
