@@ -86,7 +86,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S04-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "2b7eed9",
+      "evidence": "Testes escritos antes e vistos falhar (módulo inexistente). recurrence.test.ts 48/48 (valores calculados à mão: 31/jan→28/fev→31/mar, bissexto 29/fev, 2000 bissexto e 2100 não, virada de ano, semanal/quinzenal/anual, inclusivos, série antiga; 3 propriedades com PRNG determinístico; integração com project(): 11/30 R$ 2.900,00 e 12/07 R$ 2.700,00; liquidado soma uma vez só). Mutação: 13 mutantes (sem supressão por sourceKey, âncora com drift, fim exclusivo, início exclusivo, equivalência sem normalizar/sem valor/desligada, skippedDates ignorado, avanço rápido weekly/biweekly, bissexto ÷100/÷400, anual sem clamp) todos derrubados; 2 sobreviveram na 1ª rodada (avanço rápido e ÷400) e geraram testes novos. Um erro foi do TESTE (2026-11-02 não é ocorrência quinzenal de série iniciada em 2024-03-04), não do app. Cobertura v8 recurrence.ts 100% stmts/95,95% branches/100% funções. tsc --noEmit e build OK; validar e validar_fronteiras_tasks OK. Sem UI nem persistência (T03; migração v3 do IndexedDB lá), sem deploy. ADR-0008 + contratos atualizados antes do código.",
+      "verification": "declarada; confira logs e Git"
     },
     "S04-P01-T02": {
       "status": "pendente"
