@@ -14,7 +14,8 @@
   "reads": [],
   "writes": [
     "src/domain/forecast/seasonality.ts",
-    "src/domain/forecast/__tests__/seasonality.test.ts"
+    "src/domain/forecast/__tests__/seasonality.test.ts",
+    "src/domain/forecast/baseline.ts"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/forecast/__tests__/seasonality.test.ts"
