@@ -74,7 +74,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S03-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "6d22144",
+      "evidence": "backtest.test.ts 25/25 + intervals.test.ts 14/14 + baseline.test.ts (2 novos): MAE/WAPE conferidos à mão (ingênuo 420000/42 = R$ 100,00 e 100%; média móvel 240000/42 = 5714; sazonal e HW erro 0), percentis 10/90 à mão (resíduos -5000/+10000), denominador zero => WAPE null com MAE 5000/2500; treino termina na origem em toda dobra; alterar vendas depois da data-base ou depois da origem não muda o previsto; 11 mutações detectadas (vazamento de cutoff e dobras comuns por crash do relatório; as demais por asserção: WAPE zero, mínimo de dobras, percentil piso, mínimo de resíduos, empate, erro zerado, passo, piso zero). Obs.: para backtest/intervals o teste e o código foram escritos juntos, sem rodar a etapa vermelha isolada. Cobertura v8 domain/forecast 99.37% stmts/97.08% branches; global 95.26%/89.91%; suíte 459/459 em 3 execuções seguidas; tsc e build OK. Falha intermitente encontrada em salesFlow.test.tsx (S02, findByText 1s) sob CPU disputada da VPS (carga 11-15 em 4 núcleos, por outros serviços): causa do ambiente/teste, não do app; asyncUtilTimeout 15s em setup.ts. Sem UI nem deploy.",
+      "verification": "declarada; confira logs e Git"
     },
     "S03-P02-T02": {
       "status": "pendente"
