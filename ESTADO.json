@@ -8,7 +8,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S01-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "ded5487",
+      "evidence": "repository.test.ts 32/32 passam (fake-indexeddb): persistência após reabrir, centavos string no registro bruto, CRUD, import idempotente/atômico, replaceAll atômico, clearAll com confirmação, quota/indisponível; cobertura v8 storage 90.9% stmts/81.5% branches; suíte total 131 passam; build OK. Não testado em IndexedDB real de navegador (será exercitado no E2E)",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P01-T03": {
       "status": "pendente"
