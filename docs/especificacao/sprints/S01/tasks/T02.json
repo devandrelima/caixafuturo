@@ -1,0 +1,31 @@
+{
+  "id": "S01-P01-T02",
+  "kind": "backend",
+  "instruction": "Criar IndexedDB nativo versionado e camada transacional de CashSettings e contas manuais editar/criar/excluir; tratamento de falha e limpar dados mediante confirmação; sem lógica de cálculo no storage.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S01-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [
+    "src/domain/finance/types.ts"
+  ],
+  "writes": [
+    "src/storage/db.ts",
+    "src/storage/repository.ts",
+    "src/storage/__tests__/repository.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/storage/__tests__/repository.test.ts"
+  ],
+  "acceptance": [
+    "Persistência permanece após recarregar e usa centavos como string",
+    "Erros de storage não destroem dados silenciosamente",
+    "Operações de criação/edição/exclusão têm testes"
+  ],
+  "context_budget_tokens": 8000,
+  "parallel_group": "s01-dominios-isolados"
+}

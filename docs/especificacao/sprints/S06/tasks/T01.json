@@ -1,0 +1,28 @@
+{
+  "id": "S06-P01-T01",
+  "kind": "backend",
+  "instruction": "Simular compra de equipamento à vista, adiada e parcelada com juros explicitados, datas e conciliação de principal/encargos.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S05-P02-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/simulacao.md",
+    "docs/especificacao/contratos/simulacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/scenarios/equipment.ts",
+    "src/domain/scenarios/__tests__/equipment.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/scenarios/__tests__/equipment.test.ts"
+  ],
+  "acceptance": [
+    "Parcelas e custos totalizam a quantia informada",
+    "Nenhum pagamento real é realizado",
+    "Base continua imutável"
+  ],
+  "context_budget_tokens": 8000
+}

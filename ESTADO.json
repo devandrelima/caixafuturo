@@ -1,0 +1,109 @@
+{
+  "schema_version": "2.0",
+  "tasks": {
+    "S01-P01-T01": {
+      "status": "pendente"
+    },
+    "S01-P01-T02": {
+      "status": "pendente"
+    },
+    "S01-P01-T03": {
+      "status": "pendente"
+    },
+    "S01-P02-T01": {
+      "status": "pendente"
+    },
+    "S01-P02-T02": {
+      "status": "pendente"
+    },
+    "S01-P02-T03": {
+      "status": "pendente"
+    },
+    "S02-P01-T01": {
+      "status": "pendente"
+    },
+    "S02-P01-T02": {
+      "status": "pendente"
+    },
+    "S02-P02-T01": {
+      "status": "pendente"
+    },
+    "S02-P02-T02": {
+      "status": "pendente"
+    },
+    "S03-P01-T01": {
+      "status": "pendente"
+    },
+    "S03-P01-T02": {
+      "status": "pendente"
+    },
+    "S03-P02-T01": {
+      "status": "pendente"
+    },
+    "S03-P02-T02": {
+      "status": "pendente"
+    },
+    "S04-P01-T01": {
+      "status": "pendente"
+    },
+    "S04-P01-T02": {
+      "status": "pendente"
+    },
+    "S04-P02-T01": {
+      "status": "pendente"
+    },
+    "S04-P02-T02": {
+      "status": "pendente"
+    },
+    "S05-P01-T01": {
+      "status": "pendente"
+    },
+    "S05-P01-T02": {
+      "status": "pendente"
+    },
+    "S05-P02-T01": {
+      "status": "pendente"
+    },
+    "S05-P02-T02": {
+      "status": "pendente"
+    },
+    "S06-P01-T01": {
+      "status": "pendente"
+    },
+    "S06-P01-T02": {
+      "status": "pendente"
+    },
+    "S06-P02-T01": {
+      "status": "pendente"
+    },
+    "S06-P02-T02": {
+      "status": "pendente"
+    }
+  },
+  "sprints": {
+    "S01": {
+      "status": "pendente",
+      "human_approved": false
+    },
+    "S02": {
+      "status": "pendente",
+      "human_approved": false
+    },
+    "S03": {
+      "status": "pendente",
+      "human_approved": false
+    },
+    "S04": {
+      "status": "pendente",
+      "human_approved": false
+    },
+    "S05": {
+      "status": "pendente",
+      "human_approved": false
+    },
+    "S06": {
+      "status": "pendente",
+      "human_approved": false
+    }
+  }
+}

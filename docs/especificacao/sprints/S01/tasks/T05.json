@@ -1,0 +1,44 @@
+{
+  "id": "S01-P02-T02",
+  "kind": "interface",
+  "instruction": "Integrar UI real de cadastro e importação com preview, configuração de saldos e dashboard de 30 dias, gráfico/tabela e calendário de alertas. Não usar números estáticos. Revisar estados vazio e falhas.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S01-P01-T02",
+    "S01-P01-T03",
+    "S01-P02-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [
+    "src/storage/repository.ts",
+    "src/domain/finance/projection.ts",
+    "src/domain/import/csv.ts"
+  ],
+  "writes": [
+    "src/app/App.tsx",
+    "src/app/styles.css",
+    "src/components/FinanceForm.tsx",
+    "src/components/ImportPreview.tsx",
+    "src/components/CashDashboard.tsx",
+    "src/components/RiskCalendar.tsx",
+    "src/components/__tests__/dashboard.test.tsx"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/components/__tests__/dashboard.test.tsx",
+    "npm run build"
+  ],
+  "acceptance": [
+    "Editar uma conta ou saldo atualiza data e valor do risco imediatamente",
+    "Labels R$, datas, origem e saldo inicial/projetado não se confundem",
+    "Teclado, foco, estados vazio/erro e visual móvel funcionam"
+  ],
+  "context_budget_tokens": 8000,
+  "design": {
+    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
+    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+  }
+}

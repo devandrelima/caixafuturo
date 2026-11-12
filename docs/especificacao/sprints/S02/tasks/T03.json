@@ -1,0 +1,28 @@
+{
+  "id": "S02-P02-T01",
+  "kind": "backend",
+  "instruction": "Criar médias/tendências diárias e baseline com aviso de série curta e opção de projeção manual sempre identificada como hipótese.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S02-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/previsoes.md",
+    "docs/especificacao/contratos/previsoes.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/forecast/baseline.ts",
+    "src/domain/forecast/__tests__/baseline.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/forecast/__tests__/baseline.test.ts"
+  ],
+  "acceptance": [
+    "Médias são auditáveis em amostra sintética",
+    "Sem histórico suficiente há aviso em vez de precisão inventada",
+    "Projeção manual não é confundida com modelo validado"
+  ],
+  "context_budget_tokens": 8000
+}

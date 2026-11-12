@@ -1,0 +1,28 @@
+{
+  "id": "S03-P01-T01",
+  "kind": "backend",
+  "instruction": "Identificar sazonalidade por dia da semana e por período somente quando amostra adequada; tratar lacunas, outliers e insuficiência de dados.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S02-P02-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/previsoes.md",
+    "docs/especificacao/contratos/previsoes.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/forecast/seasonality.ts",
+    "src/domain/forecast/__tests__/seasonality.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/forecast/__tests__/seasonality.test.ts"
+  ],
+  "acceptance": [
+    "Sazonalidade testada em séries irregulares",
+    "Nenhuma hipótese é extraída de amostra sem suporte",
+    "A avaliação respeita data de corte"
+  ],
+  "context_budget_tokens": 8000
+}

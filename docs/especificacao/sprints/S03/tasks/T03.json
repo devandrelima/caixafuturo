@@ -1,0 +1,29 @@
+{
+  "id": "S03-P02-T01",
+  "kind": "backend",
+  "instruction": "Backtesting rolling-origin sem vazamento, MAE/WAPE e erros de denominador zero; intervalos conservador/central/otimista apenas com resíduos suficientes; comparar valores realmente realizados.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S03-P01-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/previsoes.md",
+    "docs/especificacao/contratos/previsoes.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/forecast/backtest.ts",
+    "src/domain/forecast/intervals.ts",
+    "src/domain/forecast/__tests__/backtest.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/forecast/__tests__/backtest.test.ts"
+  ],
+  "acceptance": [
+    "Treino sempre termina antes da avaliação em cada dobra",
+    "Métricas possuem tamanho da amostra, janela e valor auditável",
+    "Previsões antigas não mudam retroativamente por realizados"
+  ],
+  "context_budget_tokens": 8000
+}

@@ -1,0 +1,29 @@
+{
+  "id": "S02-P01-T01",
+  "kind": "backend",
+  "instruction": "Importar histórico de vendas por CSV com IDs, data de venda, valor bruto e meio; distinguir venda de recebimento e aplicar relatório de duplicações/erros.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S01-P02-T03"
+  ],
+  "context": [
+    "docs/especificacao/memoria/importacao.md",
+    "docs/especificacao/contratos/importacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/sales/importSales.ts",
+    "src/domain/sales/types.ts",
+    "src/domain/sales/__tests__/importSales.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/sales/__tests__/importSales.test.ts"
+  ],
+  "acceptance": [
+    "Importar duas vezes não duplica faturamento",
+    "Data e valor da venda têm identidade rastreável",
+    "CSV inválido mostra erros por linha"
+  ],
+  "context_budget_tokens": 8000
+}

@@ -1,0 +1,27 @@
+{
+  "id": "S04-P01-T02",
+  "kind": "backend",
+  "instruction": "Agregar fluxo diário numa visão semanal por até 13 semanas com reconciliação exata e ressalva de incerteza do horizonte.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S04-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/finance/weekly.ts",
+    "src/domain/finance/__tests__/weekly.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/finance/__tests__/weekly.test.ts"
+  ],
+  "acceptance": [
+    "Saldo semanal concilia com fechamento diário da semana",
+    "Corte de 13 semanas não inclui entradas externas ao horizonte",
+    "Testes cobrem mudança de ano"
+  ],
+  "context_budget_tokens": 8000
+}

@@ -1,0 +1,28 @@
+{
+  "id": "S02-P01-T02",
+  "kind": "backend",
+  "instruction": "Configurar taxas, comissões, Pix/cartão e defasagem; converter vendas em recebíveis líquidos datados com ID por venda e conciliação que impede contar previsto e confirmado juntos.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S02-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/sales/settlement.ts",
+    "src/domain/sales/__tests__/settlement.test.ts",
+    "src/storage/salesRepository.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/sales/__tests__/settlement.test.ts"
+  ],
+  "acceptance": [
+    "Datas de repasse e valores líquidos coincidem com exemplos calculados manualmente",
+    "Repasse já confirmado substitui sua previsão, nunca soma",
+    "Venda bruta não aumenta saldo por si"
+  ],
+  "context_budget_tokens": 8000
+}

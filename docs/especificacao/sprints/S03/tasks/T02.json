@@ -1,0 +1,28 @@
+{
+  "id": "S03-P01-T02",
+  "kind": "backend",
+  "instruction": "Comparar baseline ingênuo, média móvel, sazonal e Holt-Winters quando cabível; parâmetros e critérios de elegibilidade documentados; sem APIs externas.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S03-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/previsoes.md",
+    "docs/especificacao/contratos/previsoes.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/forecast/models.ts",
+    "src/domain/forecast/__tests__/models.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/forecast/__tests__/models.test.ts"
+  ],
+  "acceptance": [
+    "Modelos usam mesma janela válida de entrada",
+    "Holt-Winters não roda em amostra insuficiente",
+    "Baseline simples permanece como comparação"
+  ],
+  "context_budget_tokens": 8000
+}

@@ -1,0 +1,37 @@
+{
+  "id": "S06-P02-T02",
+  "kind": "interface",
+  "instruction": "Simular antecipação de recebíveis e custos/taxas, impedir recebimento futuro duplicado; integrar comparação de todas decisões avançadas e executar checkpoint S06 de regressão total e cobertura global.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S06-P02-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/scenarios/advance.ts",
+    "src/domain/scenarios/__tests__/advance.test.ts",
+    "src/components/AdvancedDecisions.tsx",
+    "src/components/__tests__/advancedDecisions.test.tsx",
+    "tests/e2e/advanced.spec.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run --coverage",
+    "npm run test:e2e",
+    "npm run build"
+  ],
+  "acceptance": [
+    "Antecipação mostra valor líquido e custo, sem duplicação futura",
+    "Quatro tipos de decisão têm hipóteses explícitas na comparação",
+    "Suíte completa e cobertura global >=80% medidas, sem integração bancária"
+  ],
+  "context_budget_tokens": 8000,
+  "design": {
+    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
+    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+  }
+}

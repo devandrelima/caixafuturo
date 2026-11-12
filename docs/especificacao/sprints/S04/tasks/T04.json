@@ -1,0 +1,29 @@
+{
+  "id": "S04-P02-T02",
+  "kind": "backend",
+  "instruction": "Exportar projeções/linhas filtradas em CSV com datas e valores desambiguados, escape de delimitadores e prevenção de injeção de fórmula; ligar botão exportar.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S04-P02-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/importacao.md",
+    "docs/especificacao/contratos/importacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/export/csv.ts",
+    "src/domain/export/__tests__/csv.test.ts",
+    "src/components/ExportMenu.tsx"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/export/__tests__/csv.test.ts"
+  ],
+  "acceptance": [
+    "CSV corresponde ao período filtrado",
+    "Texto iniciando =,+,-,@ não executa como fórmula",
+    "Exportação abre com UTF-8 e cabeçalhos definidos"
+  ],
+  "context_budget_tokens": 8000
+}

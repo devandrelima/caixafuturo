@@ -1,0 +1,28 @@
+{
+  "id": "S05-P02-T01",
+  "kind": "backend",
+  "instruction": "Simular variação de vendas ou despesas por fator/valor explícito e período definido, com taxas em basis points e arredondamento exato.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S05-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/simulacao.md",
+    "docs/especificacao/contratos/simulacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/scenarios/shocks.ts",
+    "src/domain/scenarios/__tests__/shocks.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/scenarios/__tests__/shocks.test.ts"
+  ],
+  "acceptance": [
+    "Mudança não é aplicada duas vezes à origem",
+    "Resultados hipotéticos são rotulados",
+    "Arredondamento de centavos é determinístico"
+  ],
+  "context_budget_tokens": 8000
+}

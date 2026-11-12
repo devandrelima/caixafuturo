@@ -1,0 +1,34 @@
+{
+  "id": "S04-P02-T01",
+  "kind": "interface",
+  "instruction": "Integrar recorrências, visão de 13 semanas, filtros por data/categoria/origem e detalhamento rastreável sem esconder alertas globais.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S04-P01-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/components/RecurringPanel.tsx",
+    "src/components/WeeklyView.tsx",
+    "src/components/DetailFilters.tsx",
+    "src/components/__tests__/filters.test.tsx"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/components/__tests__/filters.test.tsx"
+  ],
+  "acceptance": [
+    "Filtro não altera saldos subjacentes",
+    "Somatório exibido corresponde aos IDs de origem",
+    "UI permite limpar filtros e usar teclado"
+  ],
+  "context_budget_tokens": 8000,
+  "design": {
+    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
+    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+  }
+}

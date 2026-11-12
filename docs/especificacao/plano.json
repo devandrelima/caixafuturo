@@ -1,0 +1,200 @@
+{
+  "schema_version": "2.0",
+  "product": "CaixaFuturo",
+  "human_gate": true,
+  "coverage_min": 80,
+  "full_suite_every": 3,
+  "global_context": [
+    "docs/especificacao/memoria/global.md"
+  ],
+  "sprints": [
+    {
+      "id": "S01",
+      "title": "Primeiro fluxo de caixa funcional",
+      "delivery": "Usuário carrega contas sintéticas, ajusta saldo, consulta 30 dias e identifica data e valor de falta de caixa.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "high",
+      "requires_full_suite": true,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S01/P01.md",
+          "tasks": [
+            "sprints/S01/tasks/T01.json",
+            "sprints/S01/tasks/T02.json",
+            "sprints/S01/tasks/T03.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S01/P02.md",
+          "tasks": [
+            "sprints/S01/tasks/T04.json",
+            "sprints/S01/tasks/T05.json",
+            "sprints/S01/tasks/T06.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "Vendas e recebimentos futuros",
+      "delivery": "Usuário importa vendas, configura repasses e distingue faturamento, recebimento e dinheiro disponível sem dupla contagem.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "high",
+      "requires_full_suite": false,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S02/P01.md",
+          "tasks": [
+            "sprints/S02/tasks/T01.json",
+            "sprints/S02/tasks/T02.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S02/P02.md",
+          "tasks": [
+            "sprints/S02/tasks/T03.json",
+            "sprints/S02/tasks/T04.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "Inteligência estatística",
+      "delivery": "Usuário compara baselines/modelos e erros históricos e vê estimativas justificadas versus realizado.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "moderate",
+      "requires_full_suite": true,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S03/P01.md",
+          "tasks": [
+            "sprints/S03/tasks/T01.json",
+            "sprints/S03/tasks/T02.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S03/P02.md",
+          "tasks": [
+            "sprints/S03/tasks/T03.json",
+            "sprints/S03/tasks/T04.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "Planejamento ampliado",
+      "delivery": "Usuário acompanha recorrências e 13 semanas, filtra lançamentos e exporta CSV consistente.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "moderate",
+      "requires_full_suite": false,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S04/P01.md",
+          "tasks": [
+            "sprints/S04/tasks/T01.json",
+            "sprints/S04/tasks/T02.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S04/P02.md",
+          "tasks": [
+            "sprints/S04/tasks/T03.json",
+            "sprints/S04/tasks/T04.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "Simulador de cenários",
+      "delivery": "Usuário simula atrasos e choques, compara alternativas sem modificar o cenário original.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "moderate",
+      "requires_full_suite": false,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S05/P01.md",
+          "tasks": [
+            "sprints/S05/tasks/T01.json",
+            "sprints/S05/tasks/T02.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S05/P02.md",
+          "tasks": [
+            "sprints/S05/tasks/T03.json",
+            "sprints/S05/tasks/T04.json"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "Simulações financeiras avançadas",
+      "delivery": "Usuário avalia compras, contratações, mudanças com fornecedores e antecipação com custos explícitos.",
+      "demo_command": "npm ci && npm run dev",
+      "regression_tests": [
+        "npm run test:unit -- --run --coverage",
+        "npm run test:e2e",
+        "npm run build"
+      ],
+      "risk": "high",
+      "requires_full_suite": true,
+      "prompts": [
+        {
+          "id": "P01",
+          "map": "sprints/S06/P01.md",
+          "tasks": [
+            "sprints/S06/tasks/T01.json",
+            "sprints/S06/tasks/T02.json"
+          ]
+        },
+        {
+          "id": "P02",
+          "map": "sprints/S06/P02.md",
+          "tasks": [
+            "sprints/S06/tasks/T03.json",
+            "sprints/S06/tasks/T04.json"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "S01-P01-T01",
+  "kind": "backend",
+  "instruction": "Inicializar Vite/React/TypeScript strict, scripts npm para Vitest coverage-v8, Testing Library, fake-indexeddb e Playwright. Implementar money/dates/types com BigInt e ISO civil, primeiro teste falhando e depois passando. Sem backend, login ou IA no runtime.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "package.json",
+    "package-lock.json",
+    "index.html",
+    "tsconfig.json",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "src/main.tsx",
+    "src/app/App.tsx",
+    "src/domain/finance/types.ts",
+    "src/domain/finance/money.ts",
+    "src/domain/finance/dates.ts",
+    "src/domain/finance/__tests__/primitives.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/finance/__tests__/primitives.test.ts",
+    "npm run build"
+  ],
+  "acceptance": [
+    "R$ 1.234,56 converte em 123456 centavos exatos; valores inválidos rejeitados",
+    "Data de vencimento não muda por timezone; campo de data civil validado",
+    "npm run build e teste primitivo executam; nenhuma feature de caixa é alegada pronta"
+  ],
+  "context_budget_tokens": 8000
+}

@@ -1,0 +1,35 @@
+{
+  "id": "S03-P02-T02",
+  "kind": "interface",
+  "instruction": "Mostrar modelos, métricas, faixas e previsto versus realizado com avisos; revisar acessibilidade e executar suíte completa/cobertura global checkpoint S03.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S03-P02-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/components/ForecastPanel.tsx",
+    "src/components/__tests__/forecastPanel.test.tsx",
+    "tests/e2e/forecast.spec.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run --coverage",
+    "npm run test:e2e",
+    "npm run build"
+  ],
+  "acceptance": [
+    "Método e erro são exibidos com limites claros",
+    "Dados insuficientes não geram estimativa falsa",
+    "Suíte completa e cobertura global >=80% efetivamente medidas"
+  ],
+  "context_budget_tokens": 8000,
+  "design": {
+    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
+    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+  }
+}

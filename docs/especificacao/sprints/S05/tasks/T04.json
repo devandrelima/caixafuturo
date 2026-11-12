@@ -1,0 +1,36 @@
+{
+  "id": "S05-P02-T02",
+  "kind": "interface",
+  "instruction": "Oferecer controles de atraso/choque e comparação lado a lado entre cenário original/alternativos, sem persistir alterações reais.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S05-P01-T02",
+    "S05-P02-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/components/ScenarioPanel.tsx",
+    "src/components/ScenarioCompare.tsx",
+    "src/components/__tests__/scenarioCompare.test.tsx",
+    "tests/e2e/scenarios.spec.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/components/__tests__/scenarioCompare.test.tsx",
+    "npm run test:e2e"
+  ],
+  "acceptance": [
+    "Trocar hipóteses altera alternativa, não original",
+    "Diferenças em cada dia conciliam com dois saldos",
+    "E2E confirma retorno ao original sem perda"
+  ],
+  "context_budget_tokens": 8000,
+  "design": {
+    "review": "Inspecionar responsividade mobile/desktop, foco visível, teclado, contraste, rótulos, estados vazio/erro/carregando, gráficos e alternativa tabular; registrar captura e achados se ferramenta disponível.",
+    "skills_selection": "Inventariar skills de design realmente instaladas no executor, selecionar menor conjunto compatível com React/acessibilidade e justificar; se nenhuma, seguir contrato visual com revisão manual documentada."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "S01-P02-T01",
+  "kind": "backend",
+  "instruction": "Implementar projeção determinística de 30 dias e riscos por data, com identidade/entryIds, saldo de abertura, saldo mínimo e negativo, contas pré-data-base sinalizadas e sem dupla contagem. Escrever testes de invariantes antes da implementação.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S01-P01-T01"
+  ],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [
+    "src/domain/finance/types.ts"
+  ],
+  "writes": [
+    "src/domain/finance/projection.ts",
+    "src/domain/finance/risk.ts",
+    "src/domain/finance/__tests__/projection.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/finance/__tests__/projection.test.ts"
+  ],
+  "acceptance": [
+    "Saldo de cada dia = anterior + entradas - saídas, sem float",
+    "Risco sinaliza dia exato e valor que falta para mínimo",
+    "Contas já no saldo inicial não são somadas novamente"
+  ],
+  "context_budget_tokens": 8000,
+  "parallel_group": "s01-dominios-isolados"
+}

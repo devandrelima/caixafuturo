@@ -1,0 +1,29 @@
+{
+  "id": "S05-P01-T01",
+  "kind": "backend",
+  "instruction": "Criar cenário imutável tipado e motor puro de delta sem gravar em lançamentos de produção; base reproduzível.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S04-P02-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/simulacao.md",
+    "docs/especificacao/contratos/simulacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/scenarios/types.ts",
+    "src/domain/scenarios/engine.ts",
+    "src/domain/scenarios/__tests__/engine.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/scenarios/__tests__/engine.test.ts"
+  ],
+  "acceptance": [
+    "Base antes e após simulação é idêntica",
+    "Mesmo input retorna mesmo resultado",
+    "Diferença diária é aritmética exata"
+  ],
+  "context_budget_tokens": 8000
+}

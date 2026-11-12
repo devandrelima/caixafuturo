@@ -1,0 +1,28 @@
+{
+  "id": "S06-P02-T01",
+  "kind": "backend",
+  "instruction": "Simular alteração de vencimento com fornecedor mantendo valor da obrigação e trilha da data original.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S06-P01-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/simulacao.md",
+    "docs/especificacao/contratos/simulacao.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/scenarios/vendorTerms.ts",
+    "src/domain/scenarios/__tests__/vendorTerms.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/scenarios/__tests__/vendorTerms.test.ts"
+  ],
+  "acceptance": [
+    "Apenas a data muda sem alterar valor",
+    "Data original permanece rastreável",
+    "Não renegocia pagamentos externos"
+  ],
+  "context_budget_tokens": 8000
+}

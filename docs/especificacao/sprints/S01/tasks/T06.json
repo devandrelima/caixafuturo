@@ -1,0 +1,36 @@
+{
+  "id": "S01-P02-T03",
+  "kind": "integration",
+  "instruction": "Criar demo explícita com dados totalmente sintéticos de restaurante e fluxo completo de importação, edição e risco; Playwright E2E; atualizar README com passos realmente executados, medir cobertura alterada e global por risco alto, sem aprovar sprint.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S01-P02-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/ui.md",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [
+    "src/components/CashDashboard.tsx",
+    "src/domain/finance/projection.ts"
+  ],
+  "writes": [
+    "src/demo/restaurant.ts",
+    "src/demo/__tests__/restaurant.test.ts",
+    "tests/e2e/cash-flow.spec.ts",
+    "README.md",
+    "docs/evidencias/s01.md"
+  ],
+  "tests": [
+    "npm run test:unit -- --run --coverage",
+    "npm run test:e2e",
+    "npm run build"
+  ],
+  "acceptance": [
+    "Demo reproduz falta de caixa em data verificável pela soma dos lançamentos",
+    "Reimportação dupla não altera saldo e reset demo é explícito",
+    "Logs de unit/E2E/build e cobertura >=80% medida são registrados, sem inventar resultados"
+  ],
+  "context_budget_tokens": 8000
+}

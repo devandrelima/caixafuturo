@@ -1,0 +1,27 @@
+{
+  "id": "S04-P01-T01",
+  "kind": "backend",
+  "instruction": "Implementar receita/despesa recorrente com periodicidade, data inicial/final, 31 de mês, exclusão e idempotência sem alterar eventos já conciliados.",
+  "result": "Código integrado ou módulo verificável, com testes locais e evidências reais de execução.",
+  "depends_on": [
+    "S03-P02-T02"
+  ],
+  "context": [
+    "docs/especificacao/memoria/financeiro.md",
+    "docs/especificacao/contratos/financeiro.md"
+  ],
+  "reads": [],
+  "writes": [
+    "src/domain/finance/recurrence.ts",
+    "src/domain/finance/__tests__/recurrence.test.ts"
+  ],
+  "tests": [
+    "npm run test:unit -- --run src/domain/finance/__tests__/recurrence.test.ts"
+  ],
+  "acceptance": [
+    "Recorrência mensal nos meses curtos segue regra testada",
+    "Ocorrência não duplica lançamento equivalente",
+    "Alteração não muda passado liquidado"
+  ],
+  "context_budget_tokens": 8000
+}
