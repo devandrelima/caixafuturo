@@ -140,7 +140,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S06-P01-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "596732a",
+      "evidence": "hiring.test 23/23 escrito antes (módulo inexistente → falhou). Cálculos à mão: R$2.000+70% (R$1.400)+R$300 = R$3.700/mês; saldo 3.300−3.700 = −400 em 05/12 e −4.100 em 05/01; nenhum custo antes da data inicial; âncora dia 31 (28/fev, 29/fev bissexto); data final inclusiva; hipótese incompleta (encargos/fixos) sinalizada e premissa trabalhista sempre presente. Mutação: 21 mutantes, 3 sobreviveram (início depois da data-base com dia de pagamento antes do início; pagamento exatamente na data-base; data inicial = data-base) → testes adicionados, todos morreram. Um erro foi do TESTE (horizonte padrão de 120 dias gerava 4 pagamentos, esperava 2); um incidente do meu script de mutação (timeout SIGTERM deixou 1 mutante aplicado; detectado e restaurado). Suíte total 917/917; tsc e build OK.",
+      "verification": "declarada; confira logs e Git"
     },
     "S06-P02-T01": {
       "status": "pendente"
