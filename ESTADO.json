@@ -152,7 +152,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S06-P02-T02": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "d350469",
+      "evidence": "advance.test 20/20 + advancedDecisions.test 21 + inputs 14 + advancedDemo 5 escritos antes/junto; suíte completa 985/985 com cobertura global 96,20% stmts/92,02% branches/94,90% funções/97,36% linhas e código alterado 97,36%/94,55%/96,47%/98,87%; E2E local 72/72 (62+10 de advanced.spec.ts) e contra o container (commit d350469, healthy, HTTP 200, /simulador 200) 72/72; tsc, build, validar_design, validar e fronteiras OK. À mão: antecipar R$4.000 de 15/11 para 13/11 a 1% a.m. = custo R$2,67, líquido R$3.997,33, delta final −R$2,67 (nunca os dois); fixture advancedDemo conferida por modelo Python independente (15 datas). Mutação: antecipação 23 + UI 21 mutantes, sobreviventes viraram teste e morreram (1 equivalente removido). Revisão visual 390/768/1440 olhada nas imagens, sem estouro, alvos >=44px, teclado Enter/Tab no Chromium. Nada aprovado; contraste medido, leitor de tela, zoom 200% e outros navegadores NÃO verificados.",
+      "verification": "declarada; confira logs e Git"
     },
     "S01-P02-T04": {
       "status": "concluida",
