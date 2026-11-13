@@ -7,6 +7,7 @@ import { sha256Hex } from '../import/sha256';
 import { applyDelay } from './delay';
 import { applyEquipmentPurchase } from './equipment';
 import { applyHiring } from './hiring';
+import { applyShiftVendorDue } from './vendorTerms';
 import { applyScaleExpense, applyScaleSales } from './shocks';
 import { HYPOTHETICAL_ID_PREFIX, HYPOTHETICAL_LABEL, ScenarioError } from './types';
 import type {
@@ -33,8 +34,8 @@ import type {
  */
 
 /** Aplicadores reais por tipo de ajuste . */
-const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense, equipment_purchase: applyEquipmentPurchase, hiring: applyHiring };
-// shift_vendor_due e advance_receivable são registrados nas demais tasks da S06 (ADR-0010).
+const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense, equipment_purchase: applyEquipmentPurchase, hiring: applyHiring, shift_vendor_due: applyShiftVendorDue };
+// advance_receivable é registrado na última task da S06 (ADR-0010).
 
 // ───────────────────────────── utilitários ─────────────────────────────
 
