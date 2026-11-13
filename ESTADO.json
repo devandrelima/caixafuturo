@@ -134,7 +134,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S06-P01-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "9e5836c",
+      "evidence": "Testes escritos antes e vistos falhar (16 falhas no motor; módulo equipment inexistente). equipment.test 21/21 (casos à mão: R$10.000 em 3x a 2% = 3.467,55+3.467,55+3.467,54, encargos R$402,64, conferidos com frações exatas em Python; R$1,00 em 3x; propriedade de 500 casos determinísticos Σparcelas=principal+encargos); calendar 6/6; engine +13 (adições scn:<id>:<n>, retirada, conflitos, trilha). Mutação: 28 mutantes, 4 sobreviveram (limite data-base, limite do horizonte, mês de 30 dias, checagem pmt<1 redundante removida) → testes adicionados e todos morreram. Suíte total 894/894; tsc e build OK; validar e fronteiras OK. Manifestos ampliados antes (ADR-0010). Erro de conta foi do TESTE (esqueci o atraso de 13→14/11 na composição), não do motor.",
+      "verification": "declarada; confira logs e Git"
     },
     "S06-P01-T02": {
       "status": "pendente"
