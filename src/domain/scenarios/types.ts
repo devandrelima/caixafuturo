@@ -8,13 +8,13 @@ import type { CashEntry, CashSettings, CentString, DailyPoint, ISODate, RiskLeve
 
 export const HYPOTHETICAL_LABEL = 'Hipótese — não é saldo real';
 
-/** Tipos implementados na S05. */
-export const SUPPORTED_KINDS = ['delay_receipt', 'scale_sales', 'scale_expense'] as const;
+/** Tipos de ajuste (S05: atraso e choques; S06: equipamento, contratação, vencimento de fornecedor e antecipação). */
+export const SUPPORTED_KINDS = ['delay_receipt', 'scale_sales', 'scale_expense', 'equipment_purchase', 'hiring', 'shift_vendor_due', 'advance_receivable'] as const;
 export type SupportedKind = (typeof SUPPORTED_KINDS)[number];
 
-/** Tipos previstos no contrato para a S06: aceitos pelo tipo (extensível), porém ignorados com aviso. */
-export const RESERVED_KINDS = ['equipment_purchase', 'hiring', 'shift_vendor_due', 'advance_receivable'] as const;
-export type ReservedKind = (typeof RESERVED_KINDS)[number];
+/** Prefixo do id/sourceKey de lançamentos CRIADOS por hipótese (ADR-0010 D5/D6): nunca gravados nem exportados. */
+export const HYPOTHETICAL_ID_PREFIX = 'scn:';
+export const isHypotheticalEntryId = (id: string): boolean => id.startsWith(HYPOTHETICAL_ID_PREFIX);
 
 interface AdjustmentBase {
   /** Identificador único dentro do cenário; id repetido é ignorado (idempotência). */
@@ -49,13 +49,62 @@ export interface ScaleExpenseAdjustment extends AdjustmentBase {
   change: ShockChange;
 }
 
-/** Ajuste reservado à S06: o motor o ignora e avisa. */
-export interface ReservedAdjustment extends AdjustmentBase {
-  kind: ReservedKind;
+/** Forma de pagamento de uma compra de equipamento (ADR-0010 D1). */
+export type EquipmentPayment =
+  | { mode: 'cash'; date: ISODate }
+  /** Adiada: uma saída em data posterior, com encargo único informado (bps sobre o principal, pode ser 0). */
+  | { mode: 'deferred'; date: ISODate; chargeBps: number }
+  /** Parcelada: `count` parcelas mensais a partir de `firstDate`, juros compostos mensais em bps (tabela Price). */
+  | { mode: 'installments'; firstDate: ISODate; count: number; monthlyRateBps: number };
+
+/** Compra hipotética de equipamento: cria saídas (nenhum pagamento real). */
+export interface EquipmentPurchaseAdjustment extends AdjustmentBase {
+  kind: 'equipment_purchase';
+  description: string;
+  principalCents: CentString;
+  payment: EquipmentPayment;
 }
 
-export type SupportedAdjustment = DelayReceiptAdjustment | ScaleSalesAdjustment | ScaleExpenseAdjustment;
-export type Adjustment = SupportedAdjustment | ReservedAdjustment;
+/** Contratação hipotética: custos mensais INFORMADOS a partir de uma data (sem cálculo trabalhista, ADR-0010 D3). */
+export interface HiringAdjustment extends AdjustmentBase {
+  kind: 'hiring';
+  role: string;
+  monthlyCostCents: CentString;
+  /** Encargos informados (bps sobre o custo mensal). Ausente = não informado (hipótese incompleta). */
+  chargesBps?: number;
+  /** Outros custos mensais fixos informados. Ausente = não informado (hipótese incompleta). */
+  fixedMonthlyCents?: CentString;
+  /** Dia do pagamento (1–31; mês curto usa o último dia). */
+  payDay: number;
+  startDate: ISODate;
+  endDate?: ISODate;
+}
+
+/** Muda só a DATA de uma saída agendada (valor intacto). */
+export interface ShiftVendorDueAdjustment extends AdjustmentBase {
+  kind: 'shift_vendor_due';
+  entryId: string;
+  newDate: ISODate;
+}
+
+/** Antecipa UM recebível inteiro: sai da data original e o líquido (bruto − custo) entra na data antecipada. */
+export interface AdvanceReceivableAdjustment extends AdjustmentBase {
+  kind: 'advance_receivable';
+  entryId: string;
+  advanceDate: ISODate;
+  /** Taxa informada ao mês, em bps; custo proporcional a dias/30 (ADR-0010 D2). */
+  rateBps: number;
+}
+
+export type SupportedAdjustment =
+  | DelayReceiptAdjustment
+  | ScaleSalesAdjustment
+  | ScaleExpenseAdjustment
+  | EquipmentPurchaseAdjustment
+  | HiringAdjustment
+  | ShiftVendorDueAdjustment
+  | AdvanceReceivableAdjustment;
+export type Adjustment = SupportedAdjustment;
 
 /** Bruto e custo (taxa+comissão, bps) de um repasse derivado de venda: permite recalcular o líquido (ADR-0006). */
 export interface SaleBasis {
@@ -86,10 +135,25 @@ export interface EntryChange {
   entryId: string;
   dueDate?: ISODate;
   amountCents?: CentString;
+  /** Retira o lançamento da alternativa (antecipação). Ocupa data, valor e presença: qualquer outro ajuste conflita. */
+  remove?: true;
+}
+
+/** Lançamento HIPOTÉTICO novo. O motor atribui id e sourceKey `scn:<idDoAjuste>:<posição>` (determinísticos). */
+export interface EntryAddition {
+  direction: 'in' | 'out';
+  amountCents: CentString;
+  dueDate: ISODate;
+  description: string;
+  category: string;
+  linkedSaleId?: string;
+  /** Só vale se este ajuste retirou (com sucesso) o lançamento indicado: evita o líquido sem a retirada. */
+  dependsOn?: string;
 }
 
 export interface ApplierOutcome {
   changes: EntryChange[];
+  additions?: EntryAddition[];
   assumptions: string[];
   warnings: string[];
 }
@@ -121,13 +185,24 @@ export interface DeltaPoint {
   alternativeRisk: RiskLevel;
 }
 
+/** Trilha do que o ajuste mudou, sempre a partir do valor ORIGINAL da base (`to: null` = retirado). */
+export interface EffectChange {
+  entryId: string;
+  field: 'dueDate' | 'amountCents' | 'removed';
+  from: string;
+  to: string | null;
+}
+
 export interface AdjustmentEffect {
   adjustmentId: string;
   kind: string;
   label: string;
   status: 'applied' | 'ignored';
-  /** Lançamentos efetivamente alterados por este ajuste. */
+  /** Lançamentos efetivamente alterados ou retirados por este ajuste. */
   changedEntryIds: string[];
+  /** Lançamentos hipotéticos criados por este ajuste. */
+  createdEntryIds: string[];
+  changes: EffectChange[];
 }
 
 export interface RiskDiff {
@@ -146,6 +221,10 @@ export interface SimulationResult {
   deltaByDate: DeltaPoint[];
   riskDiff: RiskDiff;
   effects: AdjustmentEffect[];
+  /** Lançamentos hipotéticos criados (só existem na alternativa; nunca gravados nem exportados). */
+  createdEntries: CashEntry[];
+  /** Lançamentos da base retirados da alternativa. */
+  removedEntryIds: string[];
   assumptions: string[];
   warnings: string[];
 }

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createScenarioDemoBase } from '../../demo/scenarioDemo';
-import { simulate } from '../../domain/scenarios/engine';
+import { simulate, simulateWith } from '../../domain/scenarios/engine';
 import type { Adjustment, SimulationResult } from '../../domain/scenarios/types';
 import { ScenarioCompare, signedBRL } from '../ScenarioCompare';
 import { ScenarioPanel } from '../ScenarioPanel';
@@ -334,7 +334,7 @@ describe('ScenarioCompare (apresentação)', () => {
   });
 
   it('avisos do motor aparecem em um alerta de atenção', () => {
-    render(<ScenarioCompare result={run([{ id: 'h', kind: 'hiring' }])} hasAdjustments />);
+    render(<ScenarioCompare result={simulateWith({}, base, [{ id: 'h', kind: 'delay_receipt', entryId: 'cen-conta-01', days: 3 }])} hasAdjustments />);
     expect(screen.getByText('Atenção nesta hipótese')).toBeInTheDocument();
     expect(screen.getByText(/tipo ainda não suportado/)).toBeInTheDocument();
   });

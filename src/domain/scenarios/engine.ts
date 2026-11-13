@@ -1,19 +1,23 @@
 import { DEFAULT_HORIZON_DAYS, project } from '../finance/projection';
 import type { ProjectionResult } from '../finance/projection';
-import { formatBR, isValidISODate } from '../finance/dates';
+import { addDays, formatBR, isValidISODate } from '../finance/dates';
 import { centsFromString } from '../finance/money';
 import type { CashEntry, CashSettings, ISODate } from '../finance/types';
 import { sha256Hex } from '../import/sha256';
 import { applyDelay } from './delay';
+import { applyEquipmentPurchase } from './equipment';
 import { applyScaleExpense, applyScaleSales } from './shocks';
-import { HYPOTHETICAL_LABEL, ScenarioError } from './types';
+import { HYPOTHETICAL_ID_PREFIX, HYPOTHETICAL_LABEL, ScenarioError } from './types';
 import type {
   Adjustment,
   AdjustmentEffect,
   ApplierContext,
+  ApplierOutcome,
   ApplierRegistry,
   BaseSnapshot,
   DeltaPoint,
+  EffectChange,
+  EntryAddition,
   EntryChange,
   RiskDiff,
   SaleBasis,
@@ -28,7 +32,8 @@ import type {
  */
 
 /** Aplicadores reais por tipo de ajuste . */
-const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense };
+const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense, equipment_purchase: applyEquipmentPurchase };
+// hiring, shift_vendor_due e advance_receivable são registrados nas demais tasks da S06 (ADR-0010).
 
 // ───────────────────────────── utilitários ─────────────────────────────
 
@@ -134,13 +139,14 @@ export function createScenario(snapshot: BaseSnapshot, label: string, adjustment
 
 // ───────────────────────────── simulação ─────────────────────────────
 
-const FIELD_LABEL = { dueDate: 'data', amountCents: 'valor' } as const;
+const FIELD_LABEL = { dueDate: 'data', amountCents: 'valor', removed: 'presença' } as const;
 type Field = keyof typeof FIELD_LABEL;
 
 const labelOf = (adjustment: Adjustment): string => adjustment.label ?? `Ajuste ${adjustment.id}`;
 
 function validateChange(change: EntryChange): void {
   if (typeof change.entryId !== 'string' || change.entryId === '') throw new ScenarioError('Mudança sem id de lançamento.');
+  if (change.remove === true && (change.dueDate !== undefined || change.amountCents !== undefined)) throw new ScenarioError(`Mudança em ${change.entryId}: retirar não combina com mudar data ou valor.`);
   if (change.dueDate !== undefined && !isValidISODate(change.dueDate)) throw new ScenarioError(`Mudança em ${change.entryId}: data inválida (${change.dueDate}).`);
   if (change.amountCents !== undefined) {
     try {
@@ -149,6 +155,20 @@ function validateChange(change: EntryChange): void {
       throw new ScenarioError(`Mudança em ${change.entryId}: valor em centavos inválido.`);
     }
   }
+}
+
+function validateAddition(addition: EntryAddition, adjustmentId: string): bigint {
+  const where = `Ajuste ${adjustmentId}: lançamento hipotético "${addition.description}"`;
+  if (addition.direction !== 'in' && addition.direction !== 'out') throw new ScenarioError(`${where}: direção inválida.`);
+  if (!isValidISODate(addition.dueDate)) throw new ScenarioError(`${where}: data inválida (${addition.dueDate}).`);
+  let cents: bigint;
+  try {
+    cents = centsFromString(addition.amountCents);
+  } catch {
+    throw new ScenarioError(`${where}: valor em centavos inválido.`);
+  }
+  if (cents <= 0n) throw new ScenarioError(`${where}: o valor deve ser maior que zero.`);
+  return cents;
 }
 
 function buildDelta(base: ProjectionResult, alternative: ProjectionResult): { deltaByDate: DeltaPoint[]; riskDiff: RiskDiff } {
@@ -173,9 +193,12 @@ function buildDelta(base: ProjectionResult, alternative: ProjectionResult): { de
   return { deltaByDate, riskDiff: { newRiskDates, resolvedRiskDates } };
 }
 
-function generalWarnings(base: ProjectionResult, alternative: ProjectionResult, riskDiff: RiskDiff, horizonDays: number): string[] {
+function generalWarnings(base: ProjectionResult, alternative: ProjectionResult, riskDiff: RiskDiff, horizonDays: number, createdBeyond: number): string[] {
   const out: string[] = [];
-  const extraBeyond = alternative.summary.beyondHorizon - base.summary.beyondHorizon;
+  if (createdBeyond > 0) {
+    out.push(`${createdBeyond} lançamento(s) da hipótese vence(m) depois do horizonte de ${horizonDays} dias e não entra(m) no saldo projetado (o valor existe na hipótese; só cai fora da janela).`);
+  }
+  const extraBeyond = alternative.summary.beyondHorizon - base.summary.beyondHorizon - createdBeyond;
   if (extraBeyond > 0) {
     out.push(`${extraBeyond} lançamento(s) passam a vencer depois do horizonte de ${horizonDays} dias e deixam de contar nele (o valor não some: só cai fora da janela).`);
   }
@@ -219,7 +242,10 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
 
   const seenIds = new Set<string>();
   const touched = new Map<string, Map<Field, string>>(); // lançamento → campo → rótulo do ajuste que o alterou
-  const overrides = new Map<string, { dueDate?: ISODate; amountCents?: string }>();
+  const overrides = new Map<string, { dueDate?: ISODate; amountCents?: string; removed?: true }>();
+  const created: CashEntry[] = [];
+  const removedIds: string[] = [];
+  const lastDate = addDays(settings.baseDate, horizonDays);
 
   for (const adjustment of adjustments) {
     if (seenIds.has(adjustment.id)) {
@@ -228,10 +254,10 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
     }
     seenIds.add(adjustment.id);
     const label = labelOf(adjustment);
-    const effect: AdjustmentEffect = { adjustmentId: adjustment.id, kind: adjustment.kind, label, status: 'ignored', changedEntryIds: [] };
+    const effect: AdjustmentEffect = { adjustmentId: adjustment.id, kind: adjustment.kind, label, status: 'ignored', changedEntryIds: [], createdEntryIds: [], changes: [] };
     effects.push(effect);
 
-    const applier = appliers[adjustment.kind as keyof ApplierRegistry] as ((a: SupportedAdjustment, c: ApplierContext) => { changes: EntryChange[]; assumptions: string[]; warnings: string[] }) | undefined;
+    const applier = appliers[adjustment.kind as keyof ApplierRegistry] as ((a: SupportedAdjustment, c: ApplierContext) => ApplierOutcome) | undefined;
     if (!applier) {
       warnings.push(`${label} (${adjustment.kind}): tipo ainda não suportado; ignorado.`);
       continue;
@@ -240,34 +266,84 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
     assumptions.push(...outcome.assumptions);
     warnings.push(...outcome.warnings);
 
+    const removedHere = new Set<string>();
     for (const change of outcome.changes) {
       validateChange(change);
       if (!live.has(change.entryId)) {
         warnings.push(`${label}: o lançamento ${change.entryId} não conta no saldo; mudança ignorada.`);
         continue;
       }
+      const original = live.get(change.entryId) as CashEntry;
       const marks = touched.get(change.entryId) ?? new Map<Field, string>();
       touched.set(change.entryId, marks);
       const draft = overrides.get(change.entryId) ?? {};
+      const trail: EffectChange[] = [];
       let applied = false;
-      for (const field of ['dueDate', 'amountCents'] as const) {
-        const value = change[field];
-        if (value === undefined) continue;
-        const owner = marks.get(field);
+
+      if (change.remove === true) {
+        const owner = [...marks.values()][0];
         if (owner !== undefined) {
-          warnings.push(`${label} ignorado em ${change.entryId} (${FIELD_LABEL[field]}): já alterado por "${owner}". Cada lançamento muda uma vez por campo.`);
-          continue;
+          warnings.push(`${label} ignorado em ${change.entryId} (retirada): já alterado por "${owner}". Um lançamento alterado ou retirado não pode ser retirado de novo.`);
+        } else {
+          for (const field of Object.keys(FIELD_LABEL) as Field[]) marks.set(field, label);
+          draft.removed = true;
+          trail.push({ entryId: change.entryId, field: 'removed', from: original.dueDate, to: null });
+          removedHere.add(change.entryId);
+          applied = true;
         }
-        marks.set(field, label);
-        draft[field] = value;
-        applied = true;
+      } else {
+        for (const field of ['dueDate', 'amountCents'] as const) {
+          const value = change[field];
+          if (value === undefined) continue;
+          const owner = marks.get(field);
+          if (owner !== undefined) {
+            warnings.push(`${label} ignorado em ${change.entryId} (${FIELD_LABEL[field]}): já alterado por "${owner}". Cada lançamento muda uma vez por campo.`);
+            continue;
+          }
+          marks.set(field, label);
+          draft[field] = value;
+          trail.push({ entryId: change.entryId, field, from: original[field], to: value });
+          applied = true;
+        }
       }
       if (applied) {
         overrides.set(change.entryId, draft);
         if (!effect.changedEntryIds.includes(change.entryId)) effect.changedEntryIds.push(change.entryId);
+        effect.changes.push(...trail);
+        if (draft.removed === true && !removedIds.includes(change.entryId)) removedIds.push(change.entryId);
       }
     }
-    if (effect.changedEntryIds.length > 0) effect.status = 'applied';
+
+    (outcome.additions ?? []).forEach((addition, index) => {
+      validateAddition(addition, adjustment.id);
+      const id = `${HYPOTHETICAL_ID_PREFIX}${adjustment.id}:${index + 1}`;
+      if (addition.dependsOn !== undefined && !removedHere.has(addition.dependsOn)) {
+        warnings.push(`${label}: o lançamento hipotético "${addition.description}" não foi criado, porque a retirada de ${addition.dependsOn} não valeu (conflito com outro ajuste ou lançamento fora do saldo).`);
+        return;
+      }
+      if (addition.dueDate <= settings.baseDate) {
+        warnings.push(`${label}: o lançamento hipotético "${addition.description}" vence em ${formatBR(addition.dueDate)}, até a data-base (${formatBR(settings.baseDate)}): já estaria no saldo informado e não foi criado.`);
+        return;
+      }
+      if (all.has(id)) {
+        warnings.push(`${label}: o id ${id} já existe na base e o lançamento hipotético "${addition.description}" não foi criado (a base nunca é sobrescrita).`);
+        return;
+      }
+      created.push({
+        id,
+        direction: addition.direction,
+        amountCents: addition.amountCents,
+        dueDate: addition.dueDate,
+        description: addition.description,
+        category: addition.category,
+        origin: 'manual',
+        sourceKey: id,
+        state: 'scheduled',
+        ...(addition.linkedSaleId !== undefined ? { linkedSaleId: addition.linkedSaleId } : {}),
+      });
+      effect.createdEntryIds.push(id);
+    });
+    if (effect.changedEntryIds.length > 0 || effect.createdEntryIds.length > 0) effect.status = 'applied';
   }
 
   const alternativeEntries: CashEntry[] = [];
@@ -277,6 +353,7 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
       alternativeEntries.push(entry);
       continue;
     }
+    if (override.removed === true) continue;
     const next: CashEntry = { ...entry, ...(override.dueDate !== undefined ? { dueDate: override.dueDate } : {}), ...(override.amountCents !== undefined ? { amountCents: override.amountCents } : {}) };
     if (override.amountCents !== undefined && centsFromString(override.amountCents) <= 0n) {
       warnings.push(`O lançamento ${entry.id} ficou com valor zero na hipótese e foi retirado da alternativa.`);
@@ -284,12 +361,13 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
     }
     alternativeEntries.push(next);
   }
+  alternativeEntries.push(...created);
 
   const alternativeProjection = project(settings, alternativeEntries, { horizonDays });
   const { deltaByDate, riskDiff } = buildDelta(baseProjection, alternativeProjection);
-  warnings.push(...generalWarnings(baseProjection, alternativeProjection, riskDiff, horizonDays));
+  warnings.push(...generalWarnings(baseProjection, alternativeProjection, riskDiff, horizonDays, created.filter((e) => e.dueDate > lastDate).length));
 
-  return { hypothetical: true, label: HYPOTHETICAL_LABEL, baseSnapshotId: snapshot.id, baseProjection, alternativeProjection, deltaByDate, riskDiff, effects, assumptions, warnings };
+  return { hypothetical: true, label: HYPOTHETICAL_LABEL, baseSnapshotId: snapshot.id, baseProjection, alternativeProjection, deltaByDate, riskDiff, effects, createdEntries: created, removedEntryIds: removedIds, assumptions, warnings };
 }
 
 /** `simulate(baseSnapshot, adjustments)` do contrato: pura, determinística e sem efeitos colaterais. */

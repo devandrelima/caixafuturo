@@ -20,7 +20,9 @@
     "src/domain/scenarios/engine.ts",
     "src/domain/scenarios/__tests__/engine.test.ts",
     "src/domain/scenarios/calendar.ts",
-    "src/domain/scenarios/__tests__/calendar.test.ts"
+    "src/domain/scenarios/__tests__/calendar.test.ts",
+    "src/domain/scenarios/__tests__/base.test.ts",
+    "src/components/__tests__/scenarioCompare.test.tsx"
   ],
   "tests": [
     "npm run test:unit -- --run src/domain/scenarios/__tests__/equipment.test.ts"

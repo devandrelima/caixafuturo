@@ -4,7 +4,7 @@ import { project, ProjectionError } from '../../finance/projection';
 import type { CashEntry, CashSettings } from '../../finance/types';
 import { createBaseSnapshot, createScenario, deepFreeze, simulate, simulateScenario, simulateWith } from '../engine';
 import { HYPOTHETICAL_LABEL, ScenarioError } from '../types';
-import type { Adjustment, ApplierRegistry, BaseSnapshot, DelayReceiptAdjustment, ScaleExpenseAdjustment } from '../types';
+import type { Adjustment, ApplierRegistry, BaseSnapshot, AdvanceReceivableAdjustment, DelayReceiptAdjustment, EntryAddition, EquipmentPurchaseAdjustment, ScaleExpenseAdjustment } from '../types';
 
 const settings = (o: Partial<CashSettings> = {}): CashSettings => ({ baseDate: '2026-11-11', openingBalanceCents: '300000', minimumBalanceCents: '100000', ...o });
 
@@ -268,11 +268,14 @@ describe('simulate — composição sem soma dupla', () => {
     expect(json(r.alternativeProjection)).toBe(json(r.baseProjection));
   });
 
-  it('tipos reservados à S06 e sem aplicador são ignorados com aviso, sem alterar nada', () => {
-    const r = simulate(snap(), [{ id: 'h', kind: 'hiring' }, { id: 'e', kind: 'equipment_purchase' }]);
+  it('qualquer tipo sem aplicador registrado é ignorado com aviso, sem alterar nada', () => {
+    const hiring: Adjustment = { id: 'h', kind: 'hiring', role: 'Auxiliar', monthlyCostCents: '100000', payDay: 5, startDate: '2026-11-20' };
+    const equipment: Adjustment = { id: 'e', kind: 'equipment_purchase', description: 'Forno', principalCents: '100000', payment: { mode: 'cash', date: '2026-11-20' } };
+    const r = simulateWith({}, snap(), [hiring, equipment]);
     expect(r.effects.map((e) => e.status)).toEqual(['ignored', 'ignored']);
     expect(r.warnings.join(' ')).toContain('ainda não suportado');
     expect(json(r.alternativeProjection)).toBe(json(r.baseProjection));
+    expect(r.createdEntries).toEqual([]);
   });
 
   it('tipo sem aplicador registrado é ignorado com aviso', () => {
@@ -354,3 +357,168 @@ describe('cenário replayável', () => {
 function createBaseScenario(s: BaseSnapshot) {
   return createScenario(s, 'Atraso de R$ 4.000', [delay('a1', 'demo-receita-02', 1)], 'cen-1');
 }
+
+
+// ───────────── S06 (ADR-0010): lançamentos hipotéticos criados, retirada e trilha ─────────────
+
+const addition = (o: Partial<EntryAddition> = {}): EntryAddition => ({ direction: 'out', amountCents: '100000', dueDate: '2026-11-20', description: 'Hipótese', category: 'Equipamento', ...o });
+const buy = (id: string): EquipmentPurchaseAdjustment => ({ id, kind: 'equipment_purchase', description: 'Forno', principalCents: '100000', payment: { mode: 'cash', date: '2026-11-20' } });
+const advance = (id: string, entryId: string): AdvanceReceivableAdjustment => ({ id, kind: 'advance_receivable', entryId, advanceDate: '2026-11-13', rateBps: 100 });
+
+/** Compra falsa: cria os lançamentos informados. */
+const fakeBuy = (additions: EntryAddition[]): ApplierRegistry => ({ equipment_purchase: () => ({ changes: [], additions, assumptions: ['fake compra'], warnings: [] }) });
+/** Antecipação falsa: retira o recebível e cria o líquido na data antecipada (dependente da retirada). */
+const fakeAdvance: ApplierRegistry = {
+  advance_receivable: (adj, ctx) => {
+    const e = ctx.live.get(adj.entryId) as CashEntry;
+    return {
+      changes: [{ entryId: e.id, remove: true }],
+      additions: [{ direction: 'in', amountCents: '396000', dueDate: adj.advanceDate, description: 'Antecipação', category: '', dependsOn: e.id }],
+      assumptions: [],
+      warnings: [],
+    };
+  },
+};
+const both: ApplierRegistry = { ...fakes, ...fakeAdvance };
+
+describe('simulate — lançamentos hipotéticos criados (id determinístico, só na alternativa)', () => {
+  it('cria o lançamento com id e sourceKey scn:<ajuste>:<n>, só na alternativa, e a base não muda', () => {
+    const s = snap();
+    const before = json(s);
+    const r = simulateWith(fakeBuy([addition(), addition({ dueDate: '2026-11-21', amountCents: '50000' })]), s, [buy('c1')]);
+    expect(r.createdEntries.map((e) => [e.id, e.sourceKey, e.origin, e.state])).toEqual([
+      ['scn:c1:1', 'scn:c1:1', 'manual', 'scheduled'],
+      ['scn:c1:2', 'scn:c1:2', 'manual', 'scheduled'],
+    ]);
+    expect(r.effects[0]).toMatchObject({ status: 'applied', createdEntryIds: ['scn:c1:1', 'scn:c1:2'], changedEntryIds: [] });
+    // calculado à mão: a base fecha 15/11 em R$ 3.300,00; 20/11 sai R$ 1.000,00 (→ 2.300,00); 21/11 sai R$ 500,00 (→ 1.800,00)
+    expect(closing(r.baseProjection, '2026-11-20')).toBe(330000n);
+    expect(closing(r.alternativeProjection, '2026-11-20')).toBe(230000n);
+    expect(closing(r.alternativeProjection, '2026-11-21')).toBe(180000n);
+    expect(json(s)).toBe(before);
+    expect(r.alternativeProjection.duplicates).toEqual([]);
+  });
+
+  it('é determinístico: o mesmo cenário duas vezes dá o mesmo resultado, com os mesmos ids', () => {
+    const s = snap();
+    expect(json(simulateWith(fakeBuy([addition()]), s, [buy('c1')]))).toBe(json(simulateWith(fakeBuy([addition()]), s, [buy('c1')])));
+  });
+
+  it('id de ajuste repetido não cria o lançamento duas vezes', () => {
+    const r = simulateWith(fakeBuy([addition()]), snap(), [buy('c1'), buy('c1')]);
+    expect(r.createdEntries).toHaveLength(1);
+    expect(r.warnings.join(' ')).toContain('Ajuste repetido ignorado');
+  });
+
+  it('adição inválida (data, valor zero, valor não inteiro, direção) é erro de entrada', () => {
+    const run = (a: EntryAddition) => () => simulateWith(fakeBuy([a]), snap(), [buy('c1')]);
+    expect(run(addition({ dueDate: '2026-02-30' }))).toThrow(ScenarioError);
+    expect(run(addition({ amountCents: '0' }))).toThrow(ScenarioError);
+    expect(run(addition({ amountCents: '-5' }))).toThrow(ScenarioError);
+    expect(run(addition({ amountCents: '12,5' }))).toThrow(ScenarioError);
+    expect(run(addition({ direction: 'x' as never }))).toThrow(ScenarioError);
+  });
+
+  it('adição com vencimento até a data-base é ignorada com aviso (já estaria no saldo informado)', () => {
+    const r = simulateWith(fakeBuy([addition({ dueDate: '2026-11-11' }), addition({ dueDate: '2026-11-12' })]), snap(), [buy('c1')]);
+    expect(r.createdEntries.map((e) => e.id)).toEqual(['scn:c1:2']);
+    expect(r.warnings.join(' ')).toContain('11/11/2026');
+  });
+
+  it('id hipotético que já existe na base é recusado com aviso (a base nunca é sobrescrita)', () => {
+    const clash = [...demo(), entry('scn:c1:1', 'out', '777', '2026-11-18', { sourceKey: 'manual:x' })];
+    const r = simulateWith(fakeBuy([addition()]), snap(clash), [buy('c1')]);
+    expect(r.createdEntries).toEqual([]);
+    expect(r.effects[0]?.status).toBe('ignored');
+    expect(r.warnings.join(' ')).toContain('scn:c1:1');
+  });
+
+  it('o que cai depois do horizonte é dito e não conta no saldo, sem fingir que "passou" para depois', () => {
+    const r = simulateWith(fakeBuy([addition({ dueDate: '2026-12-30' })]), snap(), [buy('c1')]);
+    expect(r.createdEntries).toHaveLength(1);
+    expect(r.alternativeProjection.summary.beyondHorizon).toBe(1);
+    expect(r.warnings.join(' ')).toMatch(/1 lançamento\(s\) da hipótese vence\(m\) depois do horizonte/);
+    expect(r.warnings.join(' ')).not.toContain('passam a vencer');
+    expect(json(r.alternativeProjection.points)).toBe(json(r.baseProjection.points));
+  });
+});
+
+describe('simulate — retirada de lançamento (antecipação) e composição sem soma dupla', () => {
+  it('retira o recebível da data futura e cria o líquido na data antecipada: nunca os dois', () => {
+    const r = simulateWith(both, snap(), [advance('a1', 'demo-receita-02')]);
+    // base: 12/11 500 · 13/11 1.300 · 14/11 −700 · 15/11 3.300. Antecipa R$ 4.000 de 15/11 por R$ 3.960 em 13/11:
+    // alternativa: 13/11 500+800+3.960 = 5.260 · 14/11 3.260 · 15/11 3.260 (o original SUMIU de 15/11)
+    expect(r.alternativeProjection.points.slice(0, 4).map((p) => p.closingCents)).toEqual([50000n, 526000n, 326000n, 326000n]);
+    expect(r.deltaByDate.slice(0, 4).map((d) => d.deltaCents)).toEqual([0n, 396000n, 396000n, -4000n]);
+    expect(r.removedEntryIds).toEqual(['demo-receita-02']);
+    expect(r.createdEntries.map((e) => e.id)).toEqual(['scn:a1:1']);
+    expect(r.alternativeProjection.points.flatMap((p) => p.entryIds)).not.toContain('demo-receita-02');
+    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', field: 'removed', from: '2026-11-15', to: null }]);
+    // soma explicada: delta final = líquido − bruto = −custo
+    expect((r.deltaByDate.at(-1) as { deltaCents: bigint }).deltaCents).toBe(-4000n);
+  });
+
+  it('retirar um lançamento já alterado por outro ajuste é conflito: o primeiro vence e a adição dependente NÃO entra', () => {
+    const r = simulateWith(both, snap(), [delay('d1', 'demo-receita-02', 2), advance('a1', 'demo-receita-02')]);
+    expect(r.effects.map((e) => e.status)).toEqual(['applied', 'ignored']);
+    expect(r.createdEntries).toEqual([]);
+    expect(r.removedEntryIds).toEqual([]);
+    expect(r.warnings.join(' ')).toMatch(/Ajuste a1 ignorado em demo-receita-02.*já alterado por/);
+    expect(r.warnings.join(' ')).toMatch(/lançamento hipotético.*não foi criado/);
+    // só o atraso valeu: 15/11 → 17/11 (soma única)
+    expect(closing(r.alternativeProjection, '2026-11-15')).toBe(-70000n);
+    expect(closing(r.alternativeProjection, '2026-11-17')).toBe(330000n);
+  });
+
+  it('alterar um lançamento já retirado é conflito: o atraso seguinte é ignorado e o valor não volta', () => {
+    const r = simulateWith(both, snap(), [advance('a1', 'demo-receita-02'), delay('d1', 'demo-receita-02', 2)]);
+    expect(r.effects.map((e) => e.status)).toEqual(['applied', 'ignored']);
+    expect(r.warnings.join(' ')).toMatch(/ignorado em demo-receita-02 \(data\): já alterado por/);
+    expect(r.alternativeProjection.points.flatMap((p) => p.entryIds).filter((id) => id === 'demo-receita-02')).toEqual([]);
+    expect(closing(r.alternativeProjection, '2026-11-17')).toBe(326000n);
+  });
+
+  it('retirar o mesmo recebível por dois ajustes vale uma vez só (segundo ignorado e sem criar o líquido de novo)', () => {
+    const r = simulateWith(both, snap(), [advance('a1', 'demo-receita-02'), advance('a2', 'demo-receita-02')]);
+    expect(r.createdEntries.map((e) => e.id)).toEqual(['scn:a1:1']);
+    expect(r.effects.map((e) => e.status)).toEqual(['applied', 'ignored']);
+    expect(closing(r.alternativeProjection, '2026-11-15')).toBe(326000n);
+  });
+
+  it('retirada de lançamento que não conta no saldo é ignorada com aviso e não cria a adição dependente', () => {
+    const ghost: ApplierRegistry = { advance_receivable: () => ({ changes: [{ entryId: 'fantasma', remove: true }], additions: [addition({ dependsOn: 'fantasma' })], assumptions: [], warnings: [] }) };
+    const g = simulateWith(ghost, snap(), [advance('g', 'x')]);
+    expect(g.removedEntryIds).toEqual([]);
+    expect(g.createdEntries).toEqual([]);
+    expect(g.effects[0]?.status).toBe('ignored');
+    expect(g.warnings.join(' ')).toContain('fantasma');
+  });
+
+  it('adição que depende de uma retirada que este ajuste não fez não é criada (avisado)', () => {
+    const broken: ApplierRegistry = { advance_receivable: () => ({ changes: [], additions: [addition({ dependsOn: 'demo-receita-02' })], assumptions: [], warnings: [] }) };
+    const r = simulateWith(broken, snap(), [advance('b', 'demo-receita-02')]);
+    expect(r.createdEntries).toEqual([]);
+    expect(r.warnings.join(' ')).toContain('não foi criado');
+  });
+
+  it('as hipóteses da S05 e as criadas coexistem na mesma alternativa, cada lançamento uma vez por campo', () => {
+    const r = simulateWith({ ...both, ...fakeBuy([addition({ dueDate: '2026-11-16' })]) }, snap(), [delay('d1', 'demo-receita-01', 1), buy('c1'), advance('a1', 'demo-receita-02')]);
+    expect(r.effects.map((e) => e.status)).toEqual(['applied', 'applied', 'applied']);
+    // à mão: 12/11 R$ 500 · 13/11 +3.960 (líquido antecipado) = 4.460 · 14/11 +800 (atraso de 13→14) −2.000 = 3.260 ·
+    // 15/11 3.260 (o R$ 4.000 original saiu) · 16/11 −1.000 (compra) = 2.260
+    expect(r.alternativeProjection.points.slice(0, 5).map((p) => p.closingCents)).toEqual([50000n, 446000n, 326000n, 326000n, 226000n]);
+  });
+});
+
+describe('simulate — trilha de mudanças (de → para) calculada a partir do valor ORIGINAL', () => {
+  it('registra data e valor originais e novos de cada lançamento alterado', () => {
+    const r = simulateWith(fakes, snap(), [delay('d1', 'demo-receita-02', 2), { id: 'x', kind: 'scale_expense', from: '2026-11-14', to: '2026-11-14', change: { mode: 'factor', factorBps: 5000 } }]);
+    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', field: 'dueDate', from: '2026-11-15', to: '2026-11-17' }]);
+    expect(r.effects[1]?.changes).toEqual([{ entryId: 'demo-despesa-02', field: 'amountCents', from: '200000', to: '100000' }]);
+  });
+
+  it('um ajuste ignorado por conflito não registra mudança', () => {
+    const r = simulateWith(fakes, snap(), [delay('d1', 'demo-receita-02', 2), delay('d2', 'demo-receita-02', 5)]);
+    expect(r.effects[1]?.changes).toEqual([]);
+  });
+});

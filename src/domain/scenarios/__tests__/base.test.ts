@@ -92,7 +92,7 @@ describe('describeAdjustment', () => {
       { id: '4', kind: 'scale_expense', from: '2026-11-12', to: '2026-11-20', category: 'Aluguel', change: { mode: 'factor', factorBps: 11000 } },
       { id: '5', kind: 'scale_expense', from: '2026-11-12', to: '2026-11-20', category: '', change: { mode: 'factor', factorBps: 5000 } },
       { id: '6', kind: 'scale_expense', from: '2026-11-12', to: '2026-11-20', change: { mode: 'amount', deltaCents: '500' } },
-      { id: '7', kind: 'hiring' },
+      { id: '7', kind: 'delay_receipt', entryId: 'inexistente', days: 1 },
     ];
     expect(a.map((x) => describeAdjustment(x, entries))).toEqual([
       'Atrasar "Recebimento agendado fictício" (R$ 4.000,00, 15/11/2026) em 2 dias',
@@ -101,7 +101,7 @@ describe('describeAdjustment', () => {
       'Despesas de "Aluguel" de 12/11/2026 a 20/11/2026 ficam em 110%',
       'Despesas de "Sem categoria" de 12/11/2026 a 20/11/2026 ficam em 50%',
       'Despesas de 12/11/2026 a 20/11/2026 variam R$ 5,00 por lançamento',
-      'Ajuste 7',
+      'Atrasar inexistente em 1 dia',
     ]);
   });
 });
