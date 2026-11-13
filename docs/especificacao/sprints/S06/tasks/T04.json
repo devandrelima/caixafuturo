@@ -14,19 +14,44 @@
     "docs/especificacao/design/componentes.md",
     "docs/especificacao/design/qualidade.md",
     "docs/especificacao/contratos/financeiro.md",
-    "docs/especificacao/design/evolucao.md"
+    "docs/especificacao/design/evolucao.md",
+    "docs/decisoes/0010-simulacoes-avancadas.md"
   ],
   "reads": [
     "src/app/styles.css",
     "src/components/AppShell.tsx",
-    "src/components/ui/UiPrimitives.tsx"
+    "src/components/ui/UiPrimitives.tsx",
+    "src/domain/scenarios/types.ts",
+    "src/domain/scenarios/engine.ts"
   ],
   "writes": [
     "src/domain/scenarios/advance.ts",
     "src/domain/scenarios/__tests__/advance.test.ts",
     "src/components/AdvancedDecisions.tsx",
     "src/components/__tests__/advancedDecisions.test.tsx",
-    "tests/e2e/advanced.spec.ts"
+    "tests/e2e/advanced.spec.ts",
+    "src/domain/scenarios/types.ts",
+    "src/domain/scenarios/engine.ts",
+    "src/domain/scenarios/__tests__/engine.test.ts",
+    "src/components/ScenarioPanel.tsx",
+    "src/components/ScenarioCompare.tsx",
+    "src/components/__tests__/scenarioCompare.test.tsx",
+    "src/components/__tests__/scenarioPanel.test.tsx",
+    "src/components/__tests__/uiFoundation.test.tsx",
+    "src/components/__tests__/app.test.tsx",
+    "tests/e2e/scenarios.spec.ts",
+    "src/app/App.tsx",
+    "src/app/styles.css",
+    "src/demo/advancedDemo.ts",
+    "src/demo/__tests__/advancedDemo.test.ts",
+    "src/domain/scenarios/inputs.ts",
+    "src/domain/scenarios/__tests__/inputs.test.ts",
+    "README.md",
+    "docs/evidencias/s06.md",
+    "docs/evidencias/s06-visual.md",
+    "docs/evidencias/capturas",
+    "docs/especificacao/contratos/interface.md",
+    "docs/especificacao/contratos/simulacao.md"
   ],
   "tests": [
     "npm run test:unit -- --run --coverage",
@@ -40,7 +65,7 @@
     "Simulações avançadas exibem premissas/custos no mesmo tema, sem CTA de pagamento.",
     "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado."
   ],
-  "context_budget_tokens": 10000,
+  "context_budget_tokens": 16000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."
