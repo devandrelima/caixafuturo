@@ -20,9 +20,7 @@
   "reads": [
     "src/app/styles.css",
     "src/components/AppShell.tsx",
-    "src/components/ui/UiPrimitives.tsx",
-    "src/domain/scenarios/types.ts",
-    "src/domain/scenarios/engine.ts"
+    "src/components/ui/UiPrimitives.tsx"
   ],
   "writes": [
     "src/domain/scenarios/advance.ts",
@@ -65,7 +63,7 @@
     "Simulações avançadas exibem premissas/custos no mesmo tema, sem CTA de pagamento.",
     "Revisão visual nos três viewports e estados funcionais registrada com evidência real ou não verificado."
   ],
-  "context_budget_tokens": 16000,
+  "context_budget_tokens": 20000,
   "design": {
     "review": "Após a implementação, inspecionar aparência e comportamento em 390×844, 768×1024 e 1440×900 conforme design/qualidade.md, incluindo foco, teclado, contraste, estados vazio/erro/risco e tabela do gráfico. Registrar evidências reais e limitações; se não houver captura/navegador, marcar 'não verificado'.",
     "skills_selection": "Inventariar skills de frontend/design realmente disponíveis no executor; escolher só as compatíveis com React e acessibilidade, registrar motivos e fallback manual caso nenhuma; não presumir ferramentas instaladas."

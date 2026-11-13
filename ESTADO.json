@@ -146,7 +146,10 @@
       "verification": "declarada; confira logs e Git"
     },
     "S06-P02-T01": {
-      "status": "pendente"
+      "status": "concluida",
+      "commit": "da751dd",
+      "evidence": "vendorTerms.test 12/12 escrito antes (10 falhas: tipo ainda não suportado). À mão: Aluguel R$2.000 de 14/11 para 21/11 → 14/11 de −R$700 para R$1.300, risco resolvido, 21/11 volta a igualar a base; antecipar para 12/11 → −R$1.500; propriedade (300 casos determinísticos): adiar saída nunca piora nenhum dia, antecipar nunca melhora, só campo dueDate muda; trilha de→para em effects[].changes; conflito de datas (primeiro vence) e coexistência com choque de despesas. Mutação: 13 mutantes, todos mortos. Erros do TESTE: regex 'liquidado' x texto 'liquidada'. Suíte total 929/929; tsc e build OK.",
+      "verification": "declarada; confira logs e Git"
     },
     "S06-P02-T02": {
       "status": "pendente"
