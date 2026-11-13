@@ -3,7 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { formatBR } from '../domain/finance/dates';
 import { formatBRL } from '../domain/finance/money';
 import type { ProjectionResult } from '../domain/finance/projection';
-import type { SimulationResult } from '../domain/scenarios/types';
+import type { EffectChange, SimulationResult } from '../domain/scenarios/types';
 import { riskLabel, riskSentence, riskTone, shortDate } from './riskText';
 import { CfAlert, CfBadge, CfButton, CfCard } from './ui/UiPrimitives';
 
@@ -59,6 +59,88 @@ function Summary({ projection }: { projection: ProjectionResult }) {
         <dd>{summary.riskDays}</dd>
       </div>
     </dl>
+  );
+}
+
+/** "Aluguel: data de 14/11/2026 para 21/11/2026" · "valor de R$ 2.000,00 para R$ 2.200,00" · "retirado da data original (15/11/2026)". */
+export function changeText(change: EffectChange): string {
+  if (change.field === 'dueDate') return `${change.description}: data de ${formatBR(change.from)} para ${formatBR(change.to as string)}`;
+  if (change.field === 'amountCents') return `${change.description}: valor de ${formatBRL(BigInt(change.from))} para ${formatBRL(BigInt(change.to as string))}`;
+  return `${change.description}: retirado da data original (${formatBR(change.from)}) na Alternativa; não existe mais nessa data`;
+}
+
+/**
+ * Custos, datas e mudanças da hipótese em TEXTO, antes do resumo e da tabela: o que cada hipótese assume, os
+ * lançamentos hipotéticos que ela cria (com valor e data) e o que muda nos lançamentos existentes (de → para).
+ */
+function HypothesisText({ result }: { result: SimulationResult }) {
+  const horizonEnd = result.baseProjection.points[result.baseProjection.points.length - 1]?.date ?? '';
+  const changes = result.effects.flatMap((e) => e.changes);
+  return (
+    <section className="cf-hypo cf-advanced__text" aria-label="Custos, datas e mudanças desta hipótese" data-hypothetical="true">
+      <h3 className="cf-compare__head">
+        Custos, datas e mudanças <CfBadge tone="demo">Hipótese</CfBadge>
+      </h3>
+      <details className="cf-details" open>
+        <summary>{`Premissas desta hipótese (${result.assumptions.length})`}</summary>
+        <div className="cf-details__body">
+          <ul>
+            {result.assumptions.map((a, i) => (
+              <li key={`${i}-${a}`}>{a}</li>
+            ))}
+          </ul>
+        </div>
+      </details>
+      {changes.length > 0 && (
+        <div>
+          <h4 className="cf-advanced__subhead">Mudanças em lançamentos existentes</h4>
+          <ul aria-label="Mudanças em lançamentos existentes">
+            {changes.map((c, i) => (
+              <li key={`${i}-${c.entryId}-${c.field}`}>{changeText(c)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {result.createdEntries.length > 0 && (
+        <div>
+          <h4 className="cf-advanced__subhead">Lançamentos hipotéticos criados (existem só nesta tela)</h4>
+          <div className="cf-table-wrap">
+            <table className="cf-table cf-table--compact cf-table--stack" role="table" aria-label="Lançamentos hipotéticos criados">
+              <thead>
+                <tr>
+                  <th scope="col">Data</th>
+                  <th scope="col">Descrição</th>
+                  <th scope="col" className="cf-num">Valor</th>
+                  <th scope="col">Situação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.createdEntries.map((e) => (
+                  <tr key={e.id} role="row" data-hypothetical="true">
+                    <th scope="row" role="rowheader">
+                      {formatBR(e.dueDate)}
+                    </th>
+                    <td role="cell" data-label="Descrição">
+                      {e.description}
+                    </td>
+                    <td className="cf-num" role="cell" data-label="Valor">
+                      {e.direction === 'in' ? '+' : '-'}
+                      {formatBRL(BigInt(e.amountCents))}
+                    </td>
+                    <td role="cell" data-label="Situação">
+                      <span className="cf-compare__cell cf-compare__cell--start">
+                        <CfBadge tone="demo">Hipótese</CfBadge>
+                        {e.dueDate > horizonEnd && <CfBadge tone="neutral">Fora do horizonte</CfBadge>}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -129,6 +211,21 @@ export function ScenarioCompare({ result, hasAdjustments }: ScenarioCompareProps
               ))}
             </ul>
           </CfAlert>
+        )}
+
+        {hasAdjustments ? (
+          <HypothesisText result={result} />
+        ) : (
+          <details className="cf-details">
+            <summary>{`Premissas desta hipótese (${result.assumptions.length})`}</summary>
+            <div className="cf-details__body">
+              <ul>
+                {result.assumptions.map((a, i) => (
+                  <li key={`${i}-${a}`}>{a}</li>
+                ))}
+              </ul>
+            </div>
+          </details>
         )}
 
         {narrow && (
@@ -228,16 +325,6 @@ export function ScenarioCompare({ result, hasAdjustments }: ScenarioCompareProps
           </table>
         </div>
 
-        <details className="cf-details">
-          <summary>{`Premissas desta hipótese (${result.assumptions.length})`}</summary>
-          <div className="cf-details__body">
-            <ul>
-              {result.assumptions.map((a, i) => (
-                <li key={`${i}-${a}`}>{a}</li>
-              ))}
-            </ul>
-          </div>
-        </details>
       </div>
     </CfCard>
   );

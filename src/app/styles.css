@@ -395,3 +395,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .cf-compare__cell { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 100%; }
 .cf-compare__cell .cf-badge { white-space: normal; text-align: right; }
+
+/* ---- S06: decisões avançadas (accordions dentro do Simulador; hipótese = texto + borda tracejada, sem cor nova) ---- */
+.cf-advanced { min-width: 0; }
+.cf-advanced__panel > summary { flex-wrap: wrap; gap: 2px 12px; }
+.cf-advanced__sub { font-weight: 400; font-size: var(--cf-fs-small); color: var(--cf-text-muted); overflow-wrap: anywhere; }
+.cf-advanced__preview, .cf-advanced__premise {
+  margin: 0; padding: 8px 12px; border-radius: var(--cf-radius-field); font-size: var(--cf-fs-small); overflow-wrap: anywhere;
+  background: var(--cf-surface-secondary);
+}
+.cf-advanced__preview { border: 1.5px dashed var(--cf-border-strong); }
+.cf-advanced__text { padding: 12px 16px; min-width: 0; display: grid; gap: 12px; }
+.cf-advanced__text ul { margin: 8px 0 0; padding-left: 20px; overflow-wrap: anywhere; }
+.cf-advanced__subhead { font-size: var(--cf-fs-small); font-weight: 600; margin: 0 0 6px; }
+@media (max-width: 639px) { .cf-advanced__text { padding: 12px 8px; } }
+
+.cf-compare__cell--start { align-items: flex-start; }
+@media (max-width: 639px) { .cf-compare__cell--start { align-items: flex-end; } }

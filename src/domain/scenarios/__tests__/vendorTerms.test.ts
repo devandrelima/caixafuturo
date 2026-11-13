@@ -33,7 +33,7 @@ describe('shift_vendor_due — adiar o vencimento de uma saída (só a data muda
   it('só a DATA muda: valor igual, mesmo lançamento (id), nenhuma criação nem retirada; a trilha guarda a data original', () => {
     const r = simulate(snap(), [shift('demo-despesa-02', '2026-11-21')]);
     expect(r.effects[0]?.status).toBe('applied');
-    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-despesa-02', field: 'dueDate', from: '2026-11-14', to: '2026-11-21' }]);
+    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-despesa-02', description: 'L demo-despesa-02', field: 'dueDate', from: '2026-11-14', to: '2026-11-21' }]);
     expect(r.effects[0]?.changedEntryIds).toEqual(['demo-despesa-02']);
     expect(r.createdEntries).toEqual([]);
     expect(r.removedEntryIds).toEqual([]);

@@ -453,7 +453,7 @@ describe('simulate — retirada de lançamento (antecipação) e composição se
     expect(r.removedEntryIds).toEqual(['demo-receita-02']);
     expect(r.createdEntries.map((e) => e.id)).toEqual(['scn:a1:1']);
     expect(r.alternativeProjection.points.flatMap((p) => p.entryIds)).not.toContain('demo-receita-02');
-    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', field: 'removed', from: '2026-11-15', to: null }]);
+    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', description: 'L demo-receita-02', field: 'removed', from: '2026-11-15', to: null }]);
     // soma explicada: delta final = líquido − bruto = −custo
     expect((r.deltaByDate.at(-1) as { deltaCents: bigint }).deltaCents).toBe(-4000n);
   });
@@ -513,8 +513,8 @@ describe('simulate — retirada de lançamento (antecipação) e composição se
 describe('simulate — trilha de mudanças (de → para) calculada a partir do valor ORIGINAL', () => {
   it('registra data e valor originais e novos de cada lançamento alterado', () => {
     const r = simulateWith(fakes, snap(), [delay('d1', 'demo-receita-02', 2), { id: 'x', kind: 'scale_expense', from: '2026-11-14', to: '2026-11-14', change: { mode: 'factor', factorBps: 5000 } }]);
-    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', field: 'dueDate', from: '2026-11-15', to: '2026-11-17' }]);
-    expect(r.effects[1]?.changes).toEqual([{ entryId: 'demo-despesa-02', field: 'amountCents', from: '200000', to: '100000' }]);
+    expect(r.effects[0]?.changes).toEqual([{ entryId: 'demo-receita-02', description: 'L demo-receita-02', field: 'dueDate', from: '2026-11-15', to: '2026-11-17' }]);
+    expect(r.effects[1]?.changes).toEqual([{ entryId: 'demo-despesa-02', description: 'L demo-despesa-02', field: 'amountCents', from: '200000', to: '100000' }]);
   });
 
   it('um ajuste ignorado por conflito não registra mudança', () => {

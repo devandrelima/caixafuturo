@@ -9,6 +9,7 @@ import { describeAdjustment, parsePercentBps } from '../domain/scenarios/inputs'
 import { MAX_DELAY_DAYS } from '../domain/scenarios/delay';
 import { ScenarioError } from '../domain/scenarios/types';
 import type { Adjustment, BaseSnapshot } from '../domain/scenarios/types';
+import { AdvancedDecisions } from './AdvancedDecisions';
 import { ScenarioCompare } from './ScenarioCompare';
 import { CfAlert, CfBadge, CfButton, CfCard, CfField, CfSelect } from './ui/UiPrimitives';
 
@@ -32,6 +33,10 @@ export function ScenarioPanel({ snapshot, adjustments, onChange }: ScenarioPanel
   const entriesById = useMemo(() => new Map(snapshot.entries.map((e) => [e.id, e] as const)), [snapshot]);
   const receivables = useMemo(
     () => snapshot.entries.filter((e) => e.direction === 'in' && e.state === 'scheduled' && e.dueDate >= firstDay && e.dueDate <= horizonEnd),
+    [snapshot, firstDay, horizonEnd],
+  );
+  const payables = useMemo(
+    () => snapshot.entries.filter((e) => e.direction === 'out' && e.state === 'scheduled' && e.dueDate >= firstDay && e.dueDate <= horizonEnd),
     [snapshot, firstDay, horizonEnd],
   );
   const categories = useMemo(() => [...new Set(snapshot.entries.filter((e) => e.direction === 'out' && e.state === 'scheduled').map((e) => e.category))].sort((a, b) => a.localeCompare(b)), [snapshot]);
@@ -116,6 +121,7 @@ export function ScenarioPanel({ snapshot, adjustments, onChange }: ScenarioPanel
   };
 
   const optionText = (e: CashEntry) => `${formatBR(e.dueDate).slice(0, 5)} · ${e.description} · ${formatBRL(BigInt(e.amountCents))} (${ORIGIN_LABELS[e.origin]})`;
+  const addAdvanced = (adjustment: Adjustment) => add({ ...adjustment, label: describeAdjustment(adjustment, entriesById) });
 
   return (
     <div className="cf-stack">
@@ -188,6 +194,8 @@ export function ScenarioPanel({ snapshot, adjustments, onChange }: ScenarioPanel
               </div>
             </form>
           </div>
+
+          <AdvancedDecisions snapshot={snapshot} receivables={receivables} payables={payables} optionText={optionText} nextId={nextId} onAdd={addAdvanced} />
 
           {notice && (
             <p className="cf-muted" role="status">

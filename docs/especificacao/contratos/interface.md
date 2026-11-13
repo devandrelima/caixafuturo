@@ -21,3 +21,7 @@ S02 separa **faturamento bruto**, **recebimento líquido previsto** e **saldo pr
 
 ## Simulador (S05)
 Vista `simulador` (menu "Simulador"): painel de hipóteses (atraso, variação de vendas, variação de despesas) + comparação Original × Alternativa (hipótese) × Diferença. Tudo da Alternativa é rotulado como hipótese em **texto e forma** (selo "Hipótese", borda tracejada), sem token de cor novo; o Original fica sempre visível (colunas lado a lado ≥ 768 px; abas Original | Alternativa + Diferença abaixo disso); CTA "Voltar ao original"; hipóteses só em memória; nenhum botão sugere execução real. Ver ADR-0009.
+
+
+## Decisões avançadas (S06)
+Dentro do Simulador (sem item novo de menu): quatro painéis recolhíveis (`<details>`) — Compra de equipamento, Contratação, Vencimento de fornecedor, Antecipação de recebimento —, cada um com formulário rotulado, validação em texto e **prévia em texto de custos e datas** antes de adicionar. Na comparação, a seção "Custos, datas e mudanças" (premissas, mudanças de → para e tabela de lançamentos hipotéticos criados, com selo "Hipótese" e "Fora do horizonte") vem **antes** do resumo e da tabela de saldos. Rótulos neutros ("Adicionar hipótese de compra", "Simular antecipação"); nenhum CTA de pagamento, contratação, antecipação ou compra; hipótese = texto + selo + borda tracejada, sem token novo. Ver ADR-0010.

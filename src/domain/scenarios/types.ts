@@ -188,6 +188,8 @@ export interface DeltaPoint {
 /** Trilha do que o ajuste mudou, sempre a partir do valor ORIGINAL da base (`to: null` = retirado). */
 export interface EffectChange {
   entryId: string;
+  /** Descrição do lançamento da base, para a trilha ser legível ("Aluguel: de 14/11 para 21/11"). */
+  description: string;
   field: 'dueDate' | 'amountCents' | 'removed';
   from: string;
   to: string | null;

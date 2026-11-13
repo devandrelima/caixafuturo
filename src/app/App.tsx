@@ -51,7 +51,7 @@ const TITLES: Record<View, { title: string; subtitle: string }> = {
   vendas: { title: 'Vendas e recebimentos', subtitle: 'Importe vendas, configure repasses e separe faturamento, recebimentos e saldo.' },
   previsoes: { title: 'Previsões', subtitle: 'Compare modelos de faturamento, veja o erro medido e o previsto versus realizado.' },
   calendario: { title: 'Calendário', subtitle: 'Veja o saldo de cada data, as próximas 13 semanas e as recorrências.' },
-  simulador: { title: 'Simulador', subtitle: 'Teste hipóteses (atrasos e variações) e compare com o original, sem alterar seus dados.' },
+  simulador: { title: 'Simulador', subtitle: 'Teste hipóteses (atrasos, variações, compras, contratação, vencimentos e antecipação) e compare com o original, sem alterar seus dados.' },
 };
 
 interface Data {

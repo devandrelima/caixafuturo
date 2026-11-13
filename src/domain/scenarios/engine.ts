@@ -4,6 +4,7 @@ import { addDays, formatBR, isValidISODate } from '../finance/dates';
 import { centsFromString } from '../finance/money';
 import type { CashEntry, CashSettings, ISODate } from '../finance/types';
 import { sha256Hex } from '../import/sha256';
+import { applyAdvanceReceivable } from './advance';
 import { applyDelay } from './delay';
 import { applyEquipmentPurchase } from './equipment';
 import { applyHiring } from './hiring';
@@ -34,8 +35,7 @@ import type {
  */
 
 /** Aplicadores reais por tipo de ajuste . */
-const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense, equipment_purchase: applyEquipmentPurchase, hiring: applyHiring, shift_vendor_due: applyShiftVendorDue };
-// advance_receivable é registrado na última task da S06 (ADR-0010).
+const APPLIERS: ApplierRegistry = { delay_receipt: applyDelay, scale_sales: applyScaleSales, scale_expense: applyScaleExpense, equipment_purchase: applyEquipmentPurchase, hiring: applyHiring, shift_vendor_due: applyShiftVendorDue, advance_receivable: applyAdvanceReceivable };
 
 // ───────────────────────────── utilitários ─────────────────────────────
 
@@ -289,7 +289,7 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
         } else {
           for (const field of Object.keys(FIELD_LABEL) as Field[]) marks.set(field, label);
           draft.removed = true;
-          trail.push({ entryId: change.entryId, field: 'removed', from: original.dueDate, to: null });
+          trail.push({ entryId: change.entryId, description: original.description, field: 'removed', from: original.dueDate, to: null });
           removedHere.add(change.entryId);
           applied = true;
         }
@@ -304,7 +304,7 @@ export function simulateWith(appliers: ApplierRegistry, snapshot: BaseSnapshot, 
           }
           marks.set(field, label);
           draft[field] = value;
-          trail.push({ entryId: change.entryId, field, from: original[field], to: value });
+          trail.push({ entryId: change.entryId, description: original.description, field, from: original[field], to: value });
           applied = true;
         }
       }
