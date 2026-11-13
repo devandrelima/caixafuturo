@@ -227,8 +227,15 @@
       "verification": "evidências declaradas; não executadas pela CLI"
     },
     "S06": {
-      "status": "pendente",
-      "human_approved": false
+      "status": "aprovada",
+      "human_approved": true,
+      "human_feedback": "aprovo (usuário, 13/11/2026, após o relatório de execução da Sprint 6 e o roteiro de avaliação)",
+      "regression_evidence": "npm run test:unit -- --run --coverage: 46 arquivos, 985 testes passam; npx playwright test (build local): 72/72; E2E_BASE_URL=http://84.247.135.249:8084 E2E_EXPECT_INSECURE=1 npx playwright test (container, commit d350469): 72/72; npx tsc --noEmit, npm run build, tools/validar_design.py, fluxo.py validar e tools/validar_fronteiras_tasks.py OK; GitHub Actions app-ci e validar-planejamento-v2 verdes em cc26cf9; S01-S05 sem regressão (suítes anteriores dentro dos 985 unit e 72 E2E)",
+      "demo_evidence": "http://84.247.135.249:8084 → Explorar demonstração → Simulador: antecipar o recebimento de 15/11 (R$ 4.000,00) para 13/11 a 1% ao mês = custo R$ 2,67, líquido R$ 3.997,33, diferença final −R$ 2,67; mover o Aluguel de 14/11 para 21/11 (−R$ 700,00 → R$ 1.300,00 em 14/11); compra de R$ 10.000,00 em 3x a 2% = R$ 10.402,64 (encargos R$ 402,64); contratação R$ 2.000 + 70% + R$ 300 a partir de 20/11 (1º custo em 05/12); Voltar ao original",
+      "changed_coverage": 97.36,
+      "full_suite_evidence": "unit 985/985 com cobertura; E2E 72/72 local e 72/72 no container; build e tsc OK",
+      "global_coverage": 96.2,
+      "verification": "evidências declaradas; não executadas pela CLI"
     }
   }
 }

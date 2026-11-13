@@ -5,7 +5,7 @@ Usuário avalia compras, contratações, mudanças com fornecedores e antecipaç
 
 Funcionalidades aprovadas preservadas: **F23** Equipamento e parcelamento; **F24** Contratação; **F25** Vencimento fornecedores; **F26** Antecipação recebíveis.
 
-Situação: **implementada em 13/11/2026 e aguardando avaliação humana** (nenhuma aprovação registrada). Evidências em `docs/evidencias/s06.md` e `s06-visual.md`; decisões na [ADR-0010](../../../decisoes/0010-simulacoes-avancadas.md). Evolução posterior à candidatura (15/11/2026).
+Situação: **implementada e aprovada pelo usuário em 13/11/2026** (última sprint do plano). Evidências em `docs/evidencias/s06.md` e `s06-visual.md`; decisões na [ADR-0010](../../../decisoes/0010-simulacoes-avancadas.md). Evolução posterior à candidatura (15/11/2026).
 
 ## Demonstração quando implementada
 `npm ci && npm run dev` → abrir URL local apresentada pelo Vite. Usar **dados fictícios** e verificar o incremento: Usuário avalia compras, contratações, mudanças com fornecedores e antecipação com custos explícitos. Executar roteiro de aceite manual: identificar entradas, mudar um dado, conferir saldos/resultado por cálculo independente, verificar erro e voltar ao estado anterior.
